@@ -5,6 +5,8 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { usePartyGame } from '../../context/PartyGameContext';
 import { FIXED_PARTY_PLAYERS } from '../../services/party/gameRegistry';
+import { DumbCharadesSetup } from './views/DumbCharadesSetup';
+import { createDumbCharadesTournament } from '../../services/party/dumbCharadesEngine';
 
 export const PartyGameLobby = () => {
   const {
@@ -22,7 +24,23 @@ export const PartyGameLobby = () => {
     launchGameSession,
     isLoadingContent,
     returnToArenaHome,
+    setPartyView,
   } = usePartyGame();
+
+  if (selectedGame?.id === 'party_dumb_charades') {
+    return (
+      <DumbCharadesSetup
+        onLaunchTournament={(config) => {
+          if (!config?.isResume) {
+            createDumbCharadesTournament(config);
+            setActivePlayers(config.selectedTeams);
+          }
+          setPartyView('playing');
+        }}
+        onBack={returnToArenaHome}
+      />
+    );
+  }
 
   const [playerCount, setPlayerCount] = useState(activePlayers.length || 4);
   const [activeCategory, setActiveCategory] = useState(selectedCategory || 'mixed');

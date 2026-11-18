@@ -27,7 +27,13 @@ export const PartyGameRunner = () => {
     recordTurnResult,
     advanceTurn,
     returnToArenaHome,
+    setPartyView,
   } = usePartyGame();
+
+  // Dumb Charades 2.0 Dedicated Tournament Arena View
+  if (selectedGame?.mechanic === 'dumb_charades') {
+    return <DumbCharadesView onExitToSetup={() => setPartyView('lobby')} />;
+  }
 
   const [hasAnsweredThisTurn, setHasAnsweredThisTurn] = useState(false);
 
