@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: #080A12;
+    --color-surface: #101321;
+    --color-card: #151A2B;
+    --color-purple: #9147FF;
+    --color-cyan: #00D9FF;
+    --color-orange: #FF8A35;
+    --color-neon: #B7F34A;
+    --color-pink: #FF4FA3;
+  }
+
+  body {
+    background-color: #080A12;
+    color: #F5F6FF;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Custom esports scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #080A12;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #232A44;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9147FF;
+  }
+}
+
+@layer components {
+  /* Esports atmospheric background grid */
+  .bg-grid-pattern {
+    background-size: 36px 36px;
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  }
+
+  /* High-end glassmorphism panel */
+  .battle-panel {
+    background: rgba(21, 26, 43, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  .battle-panel-interactive {
+    background: rgba(21, 26, 43, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .battle-panel-interactive:hover {
+    background: rgba(27, 33, 55, 0.95);
+    border-color: rgba(145, 71, 255, 0.4);
+    box-shadow: 0 14px 40px -12px rgba(145, 71, 255, 0.25);
+    transform: translateY(-2px);
+  }
+
+  /* Radiant glow borders */
+  .glow-border-purple {
+    border: 1px solid rgba(145, 71, 255, 0.4);
+    box-shadow: 0 0 20px -3px rgba(145, 71, 255, 0.3);
+  }
+
+  .glow-border-cyan {
+    border: 1px solid rgba(0, 217, 255, 0.5);
+    box-shadow: 0 0 20px -3px rgba(0, 217, 255, 0.35);
+  }
+
+  .glow-border-orange {
+    border: 1px solid rgba(255, 138, 53, 0.5);
+    box-shadow: 0 0 20px -3px rgba(255, 138, 53, 0.35);
+  }
+
+  /* Broadcast typography & neon texts */
+  .font-broadcast {
+    font-family: 'Rajdhani', Impact, -apple-system, sans-serif;
+    letter-spacing: 0.06em;
+  }
+
+  .neon-text-gold {
+    text-shadow: 0 0 15px rgba(255, 208, 39, 0.6), 0 0 30px rgba(255, 208, 39, 0.3);
+  }
+
+  .neon-text-cyan {
+    text-shadow: 0 0 15px rgba(0, 217, 255, 0.7), 0 0 30px rgba(0, 217, 255, 0.35);
+  }
+
+  .neon-text-purple {
+    text-shadow: 0 0 15px rgba(145, 71, 255, 0.7), 0 0 30px rgba(145, 71, 255, 0.35);
+  }
+
+  .neon-text-neon {
+    text-shadow: 0 0 15px rgba(183, 243, 74, 0.7), 0 0 30px rgba(183, 243, 74, 0.35);
+  }
+}

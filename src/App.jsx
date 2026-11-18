@@ -1,0 +1,92 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AuctionProvider, useAuction } from './context/AuctionContext';
+import { PartyGameProvider, usePartyGame } from './context/PartyGameContext';
+import { Navbar } from './components/common/Navbar';
+import { Home } from './components/landing/Home';
+import { SetupWizard } from './components/setup/SetupWizard';
+import { LiveAuction } from './components/auction/LiveAuction';
+import { TeamDashboard } from './components/teams/TeamDashboard';
+import { UnsoldManager } from './components/unsold/UnsoldManager';
+import { ResultsScreen } from './components/results/ResultsScreen';
+import { PartyArenaHome } from './components/party/PartyArenaHome';
+import { PartyGameLobby } from './components/party/PartyGameLobby';
+import { PartyGameRunner } from './components/party/PartyGameRunner';
+import { PartyResultsScreen } from './components/party/PartyResultsScreen';
+import { Toaster } from './components/ui/Toaster';
+import { WifiOff, Heart } from 'lucide-react';
+
+const MainContent = ({ platformMode, setPlatformMode }) => {
+  const { activePage } = useAuction();
+  const { partyView } = usePartyGame();
+
+  return (
+    <main className="flex-1 pb-12">
+      {platformMode === 'party' ? (
+        <div key={`party_${partyView}`} className="transition-opacity duration-300">
+          {partyView === 'arena' && (
+            <PartyArenaHome onSwitchToAuction={() => setPlatformMode('auction')} />
+          )}
+          {partyView === 'lobby' && <PartyGameLobby />}
+          {partyView === 'playing' && <PartyGameRunner />}
+          {partyView === 'results' && <PartyResultsScreen />}
+        </div>
+      ) : (
+        <div key={`auction_${activePage}`} className="transition-opacity duration-300">
+          {activePage === 'home' && (
+            <Home onSwitchToParty={() => setPlatformMode('party')} />
+          )}
+          {activePage === 'setup' && <SetupWizard />}
+          {activePage === 'live' && <LiveAuction />}
+          {activePage === 'teams' && <TeamDashboard />}
+          {activePage === 'unsold' && <UnsoldManager />}
+          {activePage === 'results' && <ResultsScreen />}
+        </div>
+      )}
+    </main>
+  );
+};
+
+export function AppContent() {
+  const [platformMode, setPlatformMode] = useState('party'); // 'party' | 'auction'
+
+  return (
+    <div className="min-h-screen bg-battle-bg text-battle-text flex flex-col font-sans selection:bg-brand-purple selection:text-white relative">
+      <Navbar platformMode={platformMode} setPlatformMode={setPlatformMode} />
+      <MainContent platformMode={platformMode} setPlatformMode={setPlatformMode} />
+      <Toaster />
+
+      {/* Global Footer */}
+      <footer className="border-t border-battle-border bg-battle-bg/90 py-5 px-6 text-center text-xs text-battle-muted print:hidden">
+        <div className="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2 font-broadcast tracking-wide">
+            <span className="font-bold text-white">BIDBATTLE 7.1</span>
+            <span>•</span>
+            <span className="text-brand-cyan">AI-Powered Party Arena & Auction Showdown</span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5 text-[11px] text-brand-neon font-bold font-broadcast tracking-wider">
+              <WifiOff className="w-3.5 h-3.5 text-brand-neon" />
+              100% PASS-AND-PLAY OFFLINE
+            </span>
+            <span>•</span>
+            <span className="text-battle-muted">1 Laptop • 2–4 Friends • Zero Login</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+export function App() {
+  return (
+    <AuctionProvider>
+      <PartyGameProvider>
+        <AppContent />
+      </PartyGameProvider>
+    </AuctionProvider>
+  );
+}
+
+export default App;
