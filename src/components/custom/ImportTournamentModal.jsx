@@ -412,8 +412,8 @@ export const ImportTournamentModal = ({ isOpen, onClose, onImportSuccess }) => {
                       <div>
                         <div className="flex items-center justify-between gap-1 mb-1">
                           <span className="text-[10px] font-mono text-battle-muted">#{idx + 1}</span>
-                          <span className="text-[10px] font-mono font-bold text-brand-neon bg-brand-neon/10 px-1.5 py-0.2 rounded">
-                            ★ {entry.rating}
+                          <span className="text-[10px] font-mono font-bold text-brand-purple bg-brand-purple/10 px-1.5 py-0.5 rounded">
+                            {entry.category || 'Entry'}
                           </span>
                         </div>
                         <h5 className="text-xs font-bold text-white truncate" title={entry.name}>

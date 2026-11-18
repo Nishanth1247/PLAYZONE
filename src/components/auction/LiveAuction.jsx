@@ -431,19 +431,11 @@ export const LiveAuction = () => {
               <Badge variant="purple">
                 {currentItem.role || 'Superstar'}
               </Badge>
-              {isRatingHidden ? (
-                <Badge variant="cyan" title="Surprise-Reveal Mode active">
-                  🔒 Hidden Rating
+              {currentItem.category && (
+                <Badge variant="cyan">
+                  {currentItem.category}
                 </Badge>
-              ) : currentItem.imdbRating ? (
-                <Badge variant="gold" className="font-mono">
-                  ★ IMDb RATING: {currentItem.imdbRating} / 10
-                </Badge>
-              ) : currentItem.rating ? (
-                <Badge variant="gold" className="font-mono">
-                  ★ {scoreMetricLabel}: {currentItem.rating}/100
-                </Badge>
-              ) : null}
+              )}
             </div>
 
             {/* Glowing Countdown Clock with Urgency Pulse */}
@@ -521,7 +513,7 @@ export const LiveAuction = () => {
               {currentItem.desc || `Championship lot ready to make an immediate impact.`}
             </p>
 
-            {/* Base price & score strip */}
+            {/* Base price & info strip (Ratings strictly hidden during active auction) */}
             <div className="inline-flex items-center gap-3 mt-1.5 px-4 py-1 rounded-full bg-battle-surface border border-battle-border text-xs text-battle-muted font-broadcast">
               <div>
                 <span className="mr-1.5 text-battle-muted">BASE PRICE:</span>
@@ -531,28 +523,10 @@ export const LiveAuction = () => {
               </div>
               <span className="text-battle-border">|</span>
               <div>
-                {currentItem.imdbRating ? (
-                  <span>
-                    <span className="mr-1.5 text-amber-400 font-bold">★ IMDb RATING:</span>
-                    <span className="font-mono font-bold text-white">
-                      {currentItem.imdbRating} / 10
-                    </span>
-                    <span className="text-[10px] text-brand-neon ml-1 font-mono">
-                      ({currentItem.rating} pts)
-                    </span>
-                  </span>
-                ) : (
-                  <span>
-                    <span className="mr-1.5">{scoreMetricLabel.toUpperCase()}:</span>
-                    {isRatingHidden ? (
-                      <span className="font-mono font-bold text-brand-cyan">🔒 Hidden</span>
-                    ) : (
-                      <span className="font-mono font-bold text-brand-neon">
-                        ★ {currentItem.rating} / 100
-                      </span>
-                    )}
-                  </span>
-                )}
+                <span className="mr-1.5 text-battle-muted">ROLE:</span>
+                <span className="font-mono font-bold text-brand-cyan">
+                  {currentItem.role || currentItem.category || 'Championship Lot'}
+                </span>
               </div>
             </div>
           </div>

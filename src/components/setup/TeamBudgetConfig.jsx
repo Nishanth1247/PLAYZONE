@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FIXED_TEAMS } from '../../services/presets';
 import { RotateCcw, AlertCircle, Coins, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -15,10 +15,14 @@ export const TeamBudgetConfig = ({
   const [mode, setMode] = useState('common');
   const [commonPurseInput, setCommonPurseInput] = useState('100');
 
+  // Stable base teams definition
+  const baseTeams = useMemo(() => {
+    return initialTeams && initialTeams.length === 4 ? initialTeams : FIXED_TEAMS;
+  }, [initialTeams ? initialTeams.map(t => `${t.id}:${t.name}`).join(',') : '']);
+
   // Individual budgets state keyed by team id
   const [teamBudgets, setTeamBudgets] = useState(() => {
     const defaultObj = {};
-    const baseTeams = initialTeams && initialTeams.length === 4 ? initialTeams : FIXED_TEAMS;
     baseTeams.forEach((t) => {
       defaultObj[t.id] = String(t.initialPurse || t.purse || 100);
     });
@@ -32,8 +36,6 @@ export const TeamBudgetConfig = ({
     const errors = {};
     let hasError = false;
     let totalPurse = 0;
-
-    const baseTeams = initialTeams && initialTeams.length === 4 ? initialTeams : FIXED_TEAMS;
 
     const configuredTeams = baseTeams.map((t) => {
       const rawVal = teamBudgets[t.id];
@@ -74,13 +76,12 @@ export const TeamBudgetConfig = ({
         budgetMap: teamBudgets,
       });
     }
-  }, [teamBudgets, initialTeams]);
+  }, [teamBudgets, baseTeams]);
 
   // Handle common purse change
   const handleCommonPurseChange = (valStr) => {
     setCommonPurseInput(valStr);
     const updated = {};
-    const baseTeams = initialTeams && initialTeams.length === 4 ? initialTeams : FIXED_TEAMS;
     baseTeams.forEach((t) => {
       updated[t.id] = valStr;
     });
@@ -106,7 +107,6 @@ export const TeamBudgetConfig = ({
     handleCommonPurseChange('100');
   };
 
-  const baseTeams = initialTeams && initialTeams.length === 4 ? initialTeams : FIXED_TEAMS;
   const currentTotal = Object.values(teamBudgets).reduce((sum, v) => {
     const num = Number(v);
     return !isNaN(num) && num > 0 ? sum + num : sum;

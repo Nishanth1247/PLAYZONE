@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { 
   Gavel, 
   Gamepad2,
+  Swords,
   Volume2, 
   VolumeX, 
   Maximize, 
@@ -102,6 +103,8 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
           onClick={() => {
             if (platformMode === 'party') {
               returnToArenaHome();
+            } else if (platformMode === 'battle') {
+              // Stay on battle
             } else {
               setActivePage('home');
             }
@@ -112,6 +115,8 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
             <div className="w-full h-full bg-battle-bg rounded-[10px] flex items-center justify-center">
               {platformMode === 'party' ? (
                 <Gamepad2 className="w-5 h-5 text-brand-cyan group-hover:scale-110 transition-transform duration-300" />
+              ) : platformMode === 'battle' ? (
+                <Swords className="w-5 h-5 text-brand-orange group-hover:scale-110 transition-transform duration-300" />
               ) : (
                 <Gavel className="w-5 h-5 text-brand-cyan group-hover:rotate-12 transition-transform duration-300" />
               )}
@@ -122,18 +127,39 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
               <span className="font-broadcast text-xl sm:text-2xl font-black tracking-wider bg-gradient-to-r from-white via-cyan-200 to-brand-cyan bg-clip-text text-transparent">
                 BIDBATTLE
               </span>
-              <span className="text-[10px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-brand-purple/20 text-brand-purple border border-brand-purple/40">
-                7.1
+              <span className="text-[10px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-brand-orange/20 text-brand-orange border border-brand-orange/40 font-mono">
+                7.3
               </span>
             </div>
             <p className="text-[11px] text-battle-muted font-medium tracking-tight -mt-1 hidden sm:block">
-              {platformMode === 'party' ? 'AI-Powered Party Arena' : 'IPL-Style Auction Arena'}
+              {platformMode === 'party'
+                ? 'AI-Powered Party Arena'
+                : platformMode === 'battle'
+                ? 'Battle Arena • Auction & Clash'
+                : 'IPL-Style Auction Arena'}
             </p>
           </div>
         </div>
 
-        {/* Global Platform Mode Switcher: Party Arena vs Auction Showdown */}
+        {/* Global Platform Mode Switcher: Auction vs Party vs Battle Arena */}
         <div className="flex items-center p-1 rounded-2xl bg-battle-surface border border-battle-border font-broadcast text-xs font-bold shadow-inner">
+          <button
+            type="button"
+            onClick={() => setPlatformMode('auction')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+              platformMode === 'auction'
+                ? 'bg-gradient-to-r from-brand-purple to-brand-cyan text-white shadow-glow-purple font-black'
+                : 'text-battle-muted hover:text-white'
+            }`}
+          >
+            <Gavel className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">AUCTION</span>
+            <span className="sm:hidden">AUCT</span>
+            {hasLiveAuction && (
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+            )}
+          </button>
+
           <button
             type="button"
             onClick={() => setPlatformMode('party')}
@@ -144,25 +170,22 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
             }`}
           >
             <Gamepad2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">PARTY ARENA</span>
+            <span className="hidden sm:inline">PARTY</span>
             <span className="sm:hidden">PARTY</span>
           </button>
 
           <button
             type="button"
-            onClick={() => setPlatformMode('auction')}
+            onClick={() => setPlatformMode('battle')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
-              platformMode === 'auction'
-                ? 'bg-gradient-to-r from-brand-purple to-brand-orange text-white shadow-glow-orange font-black'
+              platformMode === 'battle'
+                ? 'bg-gradient-to-r from-brand-orange to-red-600 text-white shadow-glow-orange font-black'
                 : 'text-battle-muted hover:text-white'
             }`}
           >
-            <Gavel className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">AUCTION ARENA</span>
-            <span className="sm:hidden">AUCTION</span>
-            {hasLiveAuction && (
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-            )}
+            <Swords className="w-3.5 h-3.5 text-amber-300" />
+            <span className="hidden sm:inline">BATTLE ARENA</span>
+            <span className="sm:hidden">BATTLE</span>
           </button>
         </div>
 

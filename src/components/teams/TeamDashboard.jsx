@@ -326,13 +326,19 @@ export const TeamDashboard = () => {
                           <Badge variant="purple" className="text-[9px] py-0">
                             {item.role || 'Hero'}
                           </Badge>
-                          {item.imdbRating ? (
-                            <span className="text-[10px] text-amber-300 font-mono font-bold">
-                              ★ IMDb {item.imdbRating} ({item.rating} pts)
-                            </span>
+                          {auction?.status === 'completed' ? (
+                            item.imdbRating ? (
+                              <span className="text-[10px] text-amber-300 font-mono font-bold">
+                                ★ IMDb {item.imdbRating} ({item.rating} pts)
+                              </span>
+                            ) : (
+                              <span className="text-[10px] text-amber-300 font-mono font-bold">
+                                ★ {item.rating} pts
+                              </span>
+                            )
                           ) : (
-                            <span className="text-[10px] text-amber-300 font-mono font-bold">
-                              ★ {item.rating} pts
+                            <span className="text-[10px] text-brand-cyan font-mono font-bold">
+                              Acquired
                             </span>
                           )}
                         </div>

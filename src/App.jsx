@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuctionProvider, useAuction } from './context/AuctionContext';
 import { PartyGameProvider, usePartyGame } from './context/PartyGameContext';
+import { BattleArenaProvider } from './context/BattleArenaContext';
 import { Navbar } from './components/common/Navbar';
 import { Home } from './components/landing/Home';
 import { SetupWizard } from './components/setup/SetupWizard';
@@ -13,6 +14,7 @@ import { PartyArenaHome } from './components/party/PartyArenaHome';
 import { PartyGameLobby } from './components/party/PartyGameLobby';
 import { PartyGameRunner } from './components/party/PartyGameRunner';
 import { PartyResultsScreen } from './components/party/PartyResultsScreen';
+import { BattleArenaManager } from './components/battle/BattleArenaManager';
 import { Toaster } from './components/ui/Toaster';
 import { WifiOff, Heart } from 'lucide-react';
 
@@ -31,6 +33,13 @@ const MainContent = ({ platformMode, setPlatformMode }) => {
           {partyView === 'playing' && <PartyGameRunner />}
           {partyView === 'results' && <PartyResultsScreen />}
         </div>
+      ) : platformMode === 'battle' ? (
+        <div key="battle_arena" className="transition-opacity duration-300">
+          <BattleArenaManager
+            onSwitchToAuction={() => setPlatformMode('auction')}
+            onSwitchToParty={() => setPlatformMode('party')}
+          />
+        </div>
       ) : (
         <div key={`auction_${activePage}`} className="transition-opacity duration-300">
           {activePage === 'home' && (
@@ -48,7 +57,7 @@ const MainContent = ({ platformMode, setPlatformMode }) => {
 };
 
 export function AppContent() {
-  const [platformMode, setPlatformMode] = useState('party'); // 'party' | 'auction'
+  const [platformMode, setPlatformMode] = useState('party'); // 'party' | 'auction' | 'battle'
 
   return (
     <div className="min-h-screen bg-battle-bg text-battle-text flex flex-col font-sans selection:bg-brand-purple selection:text-white relative">
@@ -60,9 +69,11 @@ export function AppContent() {
       <footer className="border-t border-battle-border bg-battle-bg/90 py-5 px-6 text-center text-xs text-battle-muted print:hidden">
         <div className="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2 font-broadcast tracking-wide">
-            <span className="font-bold text-white">BIDBATTLE 7.1</span>
+            <span className="font-bold text-white">BIDBATTLE 7.3</span>
             <span>•</span>
-            <span className="text-brand-cyan">AI-Powered Party Arena & Auction Showdown</span>
+            <span className="text-brand-orange">Battle Arena</span>
+            <span>•</span>
+            <span className="text-brand-cyan">Party & Auction Showdown</span>
           </div>
 
           <div className="flex items-center gap-4">
@@ -83,7 +94,9 @@ export function App() {
   return (
     <AuctionProvider>
       <PartyGameProvider>
-        <AppContent />
+        <BattleArenaProvider>
+          <AppContent />
+        </BattleArenaProvider>
       </PartyGameProvider>
     </AuctionProvider>
   );

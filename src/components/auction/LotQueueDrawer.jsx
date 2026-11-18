@@ -151,25 +151,14 @@ export const LotQueueDrawer = ({
                   </div>
                 </div>
 
-                {/* Score badge / Hidden rating */}
+                {/* Lot info footer with rating strictly hidden during auction */}
                 <div className="mt-2 pt-1.5 border-t border-battle-border/40 flex items-center justify-between text-[10px] pl-1 font-mono">
-                  <span className="text-battle-muted">
-                    {item.movie ? item.movie : item.director ? `Dir: ${item.director}` : ''}
+                  <span className="text-battle-muted truncate max-w-[140px]">
+                    {item.movie ? item.movie : item.director ? `Dir: ${item.director}` : item.role || ''}
                   </span>
-                  {isRatingHidden && isPending ? (
-                    <span className="text-brand-cyan font-bold flex items-center gap-1">
-                      <EyeOff className="w-3 h-3" />
-                      Hidden
-                    </span>
-                  ) : item.imdbRating ? (
-                    <span className="text-amber-400 font-bold">
-                      ★ IMDb {item.imdbRating}
-                    </span>
-                  ) : (
-                    <span className="text-brand-neon font-bold">
-                      ★ {item.rating} pts
-                    </span>
-                  )}
+                  <span className="text-brand-purple font-bold">
+                    {item.status === 'sold' ? 'Sold' : item.status === 'unsold' ? 'Unsold' : 'On Block'}
+                  </span>
                 </div>
               </div>
             );

@@ -131,7 +131,7 @@ export const TournamentLaunchModal = ({
         {/* Dedicated Team Budget Configuration Section */}
         <div className="mb-6 relative z-10">
           <TeamBudgetConfig
-            initialTeams={budgetConfigState.teams}
+            initialTeams={preset.teams}
             currency={preset.currency}
             onChange={(cfg) => setBudgetConfigState(cfg)}
           />
