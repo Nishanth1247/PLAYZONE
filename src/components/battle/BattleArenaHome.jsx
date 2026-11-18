@@ -19,6 +19,7 @@ import { Badge } from '../ui/Badge';
 import { FIXED_TEAMS, AUCTION_PRESETS } from '../../services/presets';
 import { useBattleArena } from '../../context/BattleArenaContext';
 import { storageService } from '../../services/storageService';
+import { BattleImportModal } from './BattleImportModal';
 import { toast } from 'sonner';
 
 export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
@@ -28,42 +29,20 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   const [squadSize, setSquadSize] = useState(3);
   const [startingPurse, setStartingPurse] = useState(100);
   const [selectedPresetId, setSelectedPresetId] = useState(AUCTION_PRESETS[0].id);
+  const [importedTournament, setImportedTournament] = useState(null);
   const [customFileItems, setCustomFileItems] = useState(null);
   const [customTournamentName, setCustomTournamentName] = useState('');
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Selected teams based on team count
   const activeTeams = FIXED_TEAMS.slice(0, teamCount);
 
   // Selected preset
   const selectedPreset = AUCTION_PRESETS.find((p) => p.id === selectedPresetId) || AUCTION_PRESETS[0];
-  const activePool = customFileItems || selectedPreset.items;
+  const activePool = importedTournament?.items || customFileItems || selectedPreset.items;
 
   const requiredPoolLots = teamCount * squadSize;
   const isPoolSufficient = activePool.length >= requiredPoolLots;
-
-  // Handle Custom Tournament JSON file upload
-  const handleFileUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const json = JSON.parse(event.target.result);
-        if (!json.items || !Array.isArray(json.items) || json.items.length === 0) {
-          toast.error('Invalid tournament JSON: missing "items" array.');
-          return;
-        }
-
-        setCustomFileItems(json.items);
-        setCustomTournamentName(json.name || file.name.replace('.json', ''));
-        toast.success(`Loaded custom tournament: ${json.name || file.name} (${json.items.length} lots)`);
-      } catch (err) {
-        toast.error('Failed to parse JSON file.');
-      }
-    };
-    reader.readAsText(file);
-  };
 
   const handleStartTournament = () => {
     if (!isPoolSufficient) {
@@ -76,7 +55,8 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
       teamCount,
       squadSize,
       startingPurse: Number(startingPurse) || 100,
-      customItems: customFileItems,
+      customItems: importedTournament?.items || customFileItems,
+      customTournament: importedTournament,
     });
 
     if (success) {
@@ -248,14 +228,16 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
               {/* Preset Cards Selector */}
               <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                 {AUCTION_PRESETS.map((preset) => {
-                  const isSelected = selectedPresetId === preset.id && !customFileItems;
+                  const isSelected = selectedPresetId === preset.id && !importedTournament && !customFileItems;
                   return (
                     <button
                       key={preset.id}
                       type="button"
                       onClick={() => {
                         setSelectedPresetId(preset.id);
+                        setImportedTournament(null);
                         setCustomFileItems(null);
+                        setCustomTournamentName('');
                       }}
                       className={`w-full p-3 rounded-2xl border text-left transition-all flex items-center justify-between ${
                         isSelected
@@ -279,23 +261,72 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
                 })}
               </div>
 
-              {/* Custom JSON Upload Option */}
-              <div className="pt-2 border-t border-battle-border/60">
-                <label className="flex items-center justify-between p-3 rounded-2xl border border-dashed border-battle-border hover:border-brand-cyan/60 bg-battle-bg cursor-pointer transition-all">
-                  <div className="flex items-center gap-2">
-                    <Upload className="w-4 h-4 text-brand-cyan" />
-                    <span className="text-xs font-mono font-bold text-white truncate max-w-[180px]">
-                      {customTournamentName ? customTournamentName : 'Import Custom Tournament JSON'}
-                    </span>
+              {/* Dedicated Import Tournament Button */}
+              <div className="pt-2 border-t border-battle-border/60 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setIsImportModalOpen(true)}
+                  className="w-full py-3 px-4 rounded-2xl border border-dashed border-brand-orange/60 hover:border-brand-orange bg-battle-bg/80 hover:bg-brand-orange/10 transition-all flex items-center justify-between text-left group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-battle-surface border border-brand-orange/40 flex items-center justify-center text-brand-orange shadow-sm group-hover:scale-105 transition-transform">
+                      <Upload className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-broadcast font-bold text-white block">
+                        Import Tournament JSON
+                      </span>
+                      <span className="text-[10px] text-battle-muted font-mono block">
+                        Upload custom player roster (.json)
+                      </span>
+                    </div>
                   </div>
-                  <input
-                    type="file"
-                    accept=".json"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <span className="text-[10px] font-mono text-brand-cyan font-bold">Browse</span>
-                </label>
+                  <Badge variant="orange" className="text-[10px]">
+                    IMPORT
+                  </Badge>
+                </button>
+
+                {/* Active Imported Tournament Card */}
+                {importedTournament && (
+                  <div className="p-3.5 rounded-2xl border-2 border-brand-orange bg-brand-orange/10 relative shadow-glow-orange space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Badge variant="orange" className="text-[9px]">
+                        ACTIVE IMPORTED TOURNAMENT
+                      </Badge>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImportedTournament(null);
+                          setCustomFileItems(null);
+                          setCustomTournamentName('');
+                        }}
+                        className="text-[10px] text-battle-muted hover:text-rose-400 font-mono transition-colors"
+                      >
+                        Revert to Preset
+                      </button>
+                    </div>
+                    <div>
+                      <h4 className="font-broadcast font-bold text-sm text-white truncate">
+                        {importedTournament.name}
+                      </h4>
+                      <p className="text-[11px] text-battle-muted font-mono truncate">
+                        {importedTournament.category} • {importedTournament.items.length} Entries
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between pt-1 border-t border-brand-orange/20">
+                      <span className="text-[10px] text-brand-orange font-mono font-medium">
+                        ✓ Loaded for Round 1 Auction
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsImportModalOpen(true)}
+                        className="text-[10px] text-brand-cyan hover:underline font-mono font-bold"
+                      >
+                        Re-import / Replace
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Pool Validation Status Card */}
@@ -335,6 +366,19 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
         </div>
 
       </div>
+
+      {/* Battle Tournament Import Modal */}
+      <BattleImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        teamCount={teamCount}
+        squadSize={squadSize}
+        onImportSuccess={({ tournament, items }) => {
+          setImportedTournament(tournament);
+          setCustomFileItems(items);
+          setCustomTournamentName(tournament.name);
+        }}
+      />
     </div>
   );
 };

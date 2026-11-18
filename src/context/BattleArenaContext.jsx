@@ -234,6 +234,7 @@ export const BattleArenaProvider = ({ children }) => {
     squadSize = 3,
     startingPurse = 100,
     customItems = null,
+    customTournament = null,
   }) => {
     const selectedPreset = preset || AUCTION_PRESETS[0];
     const pool = customItems && customItems.length > 0 ? customItems : selectedPreset.items;
@@ -253,11 +254,20 @@ export const BattleArenaProvider = ({ children }) => {
       squad: [],
     }));
 
-    // Randomize pool order
+    // Randomize pool order, preserving all metadata, unique IDs, base prices, and ratings
     const randomizedPool = [...pool].sort(() => Math.random() - 0.5).map((item, idx) => ({
       ...item,
-      id: item.id || `battle_lot_${idx + 1}`,
-      basePrice: Number(item.basePrice) || 1.0,
+      id: item.id ? String(item.id) : `battle_lot_${idx + 1}`,
+      name: item.name,
+      movie: item.movie || item.film || '',
+      actor: item.actor || item.star || '',
+      year: item.year || '',
+      category: item.category || item.role || 'Superstar Fighter',
+      basePrice: Number(item.basePrice) > 0 ? Number(item.basePrice) : 1.0,
+      rating: typeof item.rating === 'number' ? item.rating : (Number(item.rating) || 80),
+      description: item.description || '',
+      imageUrl: item.imageUrl || '',
+      metadata: item.metadata || {},
       status: 'pending',
     }));
 
@@ -277,8 +287,9 @@ export const BattleArenaProvider = ({ children }) => {
       teamCount,
       squadSize,
       startingPurse,
-      tournamentName: selectedPreset.name || 'Battle Arena Clash',
-      themeColor: selectedPreset.theme?.primary || '#9147FF',
+      tournamentName: customTournament?.name || selectedPreset.name || 'Battle Arena Clash',
+      themeColor: customTournament?.theme?.primary || selectedPreset.theme?.primary || '#FF8A35',
+      tournamentMetadata: customTournament || null,
       teams: activeTeams,
       auction: {
         items: randomizedPool,
