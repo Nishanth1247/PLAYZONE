@@ -204,7 +204,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
           </h3>
         </div>
 
-        <div className={`grid grid-cols-1 sm:grid-cols-2 ${teams.length === 3 ? 'lg:grid-cols-3' : teams.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-2 max-w-3xl mx-auto'} gap-4`}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${teams.length === 2 ? 'lg:grid-cols-2 max-w-3xl mx-auto' : teams.length === 3 ? 'lg:grid-cols-3' : 'md:grid-cols-3 lg:grid-cols-4'} gap-4`}>
           {leaderboard.map((entry, idx) => {
             const badgeStyle = rankBadges[idx] || rankBadges[3];
             const isWinner = idx === 0;
@@ -219,9 +219,16 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
 
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-3xl p-2 rounded-2xl bg-battle-bg border border-battle-border">
-                      {entry.team.logo}
-                    </span>
+                    <div
+                      className="w-12 h-12 rounded-2xl bg-battle-bg border border-battle-border flex items-center justify-center overflow-hidden font-broadcast font-black text-xl"
+                      style={{ color: entry.team.color }}
+                    >
+                      {entry.team.logo && (entry.team.logo.startsWith('http') || entry.team.logo.startsWith('data:')) ? (
+                        <img src={entry.team.logo} alt={entry.team.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span>{entry.team.logo || entry.team.shortName || entry.team.name?.slice(0, 2).toUpperCase()}</span>
+                      )}
+                    </div>
                     <span className={`px-2.5 py-1 rounded-xl text-[10px] font-broadcast font-bold uppercase border ${badgeStyle.glow}`}>
                       {badgeStyle.label}
                     </span>

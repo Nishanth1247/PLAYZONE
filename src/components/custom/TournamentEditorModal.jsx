@@ -28,6 +28,7 @@ import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { TeamBudgetConfig } from '../setup/TeamBudgetConfig';
 import { FIXED_TEAMS } from '../../services/presets';
+import { franchiseService } from '../../services/franchiseService';
 import { generateUniqueId } from '../../services/tournamentSchema';
 import { toast } from 'sonner';
 
@@ -97,7 +98,9 @@ export const TournamentEditorModal = ({
   // Team Budgets State
   const [budgetConfigState, setBudgetConfigState] = useState(() => {
     const defaultPurse = tournament?.teamBudgets?.defaultPurse || 100;
-    const baseTeams = FIXED_TEAMS.map((ft) => {
+    const activeFranchises = franchiseService.getActiveFranchises();
+    const sourceFranchises = activeFranchises.length >= 2 ? activeFranchises : FIXED_TEAMS;
+    const baseTeams = sourceFranchises.map((ft) => {
       const existing = tournament?.teamBudgets?.teams?.find(
         (t) => t.id === ft.id || t.name?.toLowerCase() === ft.name.toLowerCase()
       ) || tournament?.teams?.find(
@@ -310,7 +313,7 @@ export const TournamentEditorModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}

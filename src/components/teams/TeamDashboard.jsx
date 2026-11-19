@@ -230,9 +230,16 @@ export const TeamDashboard = () => {
 
                 <div className="flex items-center justify-between pl-2 mb-2">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl p-1.5 rounded-xl bg-battle-bg border border-battle-border">
-                      {t.logo}
-                    </span>
+                    <div
+                      className="w-10 h-10 rounded-xl bg-battle-bg border border-battle-border flex items-center justify-center overflow-hidden font-broadcast font-black text-base"
+                      style={{ color: t.color }}
+                    >
+                      {t.logo && (t.logo.startsWith('http') || t.logo.startsWith('data:')) ? (
+                        <img src={t.logo} alt={t.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span>{t.logo || t.shortName || t.name?.slice(0, 2).toUpperCase()}</span>
+                      )}
+                    </div>
                     <div>
                       <h4 className="font-broadcast font-bold text-sm text-white">{t.name}</h4>
                       <span className="text-xs text-battle-muted">

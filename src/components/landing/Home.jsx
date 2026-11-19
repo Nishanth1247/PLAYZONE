@@ -243,6 +243,18 @@ export const Home = ({ onSwitchToParty }) => {
               <BookOpen className="w-5 h-5" />
               <span>Auction Rulebook</span>
             </Button>
+
+            <Button
+              variant="secondary"
+              size="xl"
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('bidbattle_open_franchises'));
+              }}
+              className="border-[#39465A] text-[#F5F3EE] hover:bg-[#2C394C] font-heading"
+            >
+              <Users className="w-5 h-5 text-[#D4B879]" />
+              <span>Franchises</span>
+            </Button>
           </motion.div>
         </div>
 

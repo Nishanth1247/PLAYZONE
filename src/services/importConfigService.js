@@ -11,6 +11,7 @@
  */
 
 import { FIXED_TEAMS } from './presets.js';
+import { franchiseService } from './franchiseService.js';
 import { generateUniqueId } from './tournamentSchema.js';
 
 /**
@@ -19,7 +20,8 @@ import { generateUniqueId } from './tournamentSchema.js';
 export function matchFixedTeam(rawIdOrName) {
   if (!rawIdOrName) return null;
   const s = String(rawIdOrName).toLowerCase().replace(/^team-/, '').trim();
-  return FIXED_TEAMS.find((ft) => {
+  const allFranchises = franchiseService.getAllFranchises();
+  return allFranchises.find((ft) => {
     const ftClean = ft.id.toLowerCase().replace(/^team-/, '').trim();
     const ftName = ft.name.toLowerCase().trim();
     return ftClean === s || ftName === s || ft.id === rawIdOrName;
@@ -61,7 +63,7 @@ export function extractImportTournamentDefaults(rawParsed, arenaType = 'auction'
     ? rawParsed.teams
     : null;
 
-  if (rawTeamsList && [2, 3, 4].includes(rawTeamsList.length)) {
+  if (rawTeamsList && rawTeamsList.length >= 2) {
     detectedTeamCount = rawTeamsList.length;
     const matched = rawTeamsList
       .map((rt) => matchFixedTeam(rt.id || rt.name))
@@ -70,13 +72,14 @@ export function extractImportTournamentDefaults(rawParsed, arenaType = 'auction'
     if (matched.length === detectedTeamCount) {
       detectedSelectedIds = matched;
     } else {
-      detectedSelectedIds = FIXED_TEAMS.slice(0, detectedTeamCount).map((t) => t.id);
+      const active = franchiseService.getActiveFranchises();
+      detectedSelectedIds = active.slice(0, detectedTeamCount).map((t) => t.id);
     }
   } else if (rawBudgets.individual && typeof rawBudgets.individual === 'object') {
     const keys = Object.keys(rawBudgets.individual);
     const matched = keys.map((k) => matchFixedTeam(k)).filter(Boolean).map((t) => t.id);
     const uniqueMatched = [...new Set(matched)];
-    if ([2, 3, 4].includes(uniqueMatched.length)) {
+    if (uniqueMatched.length >= 2) {
       detectedTeamCount = uniqueMatched.length;
       detectedSelectedIds = uniqueMatched;
     }

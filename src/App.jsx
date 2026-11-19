@@ -16,6 +16,7 @@ import { PartyGameRunner } from './components/party/PartyGameRunner';
 import { PartyResultsScreen } from './components/party/PartyResultsScreen';
 import { BattleArenaManager } from './components/battle/BattleArenaManager';
 import { GameRules } from './components/rules/GameRules';
+import { FranchiseManager } from './components/franchise/FranchiseManager';
 import { GAME_REGISTRY } from './services/party/gameRegistry';
 import { Toaster } from './components/ui/Toaster';
 import { WifiOff, Heart, BookOpen } from 'lucide-react';
@@ -48,6 +49,10 @@ const MainContent = ({ platformMode, setPlatformMode, rulesTab, setRulesTab, pre
               }
             }}
           />
+        </div>
+      ) : platformMode === 'franchises' ? (
+        <div key="franchise_manager" className="transition-opacity duration-300">
+          <FranchiseManager onNavigateToArena={(arena) => setPlatformMode(arena || 'auction')} />
         </div>
       ) : platformMode === 'party' ? (
         <div key={`party_${partyView}`} className="transition-opacity duration-300">
@@ -88,14 +93,26 @@ export function AppContent() {
 
   React.useEffect(() => {
     const handleOpenRules = (e) => {
-      if (platformMode !== 'rules') {
+      if (platformMode !== 'rules' && platformMode !== 'franchises') {
         setPreviousMode(platformMode);
       }
       setRulesTab(e.detail?.tab || 'auction');
       setPlatformMode('rules');
     };
+
+    const handleOpenFranchises = () => {
+      if (platformMode !== 'rules' && platformMode !== 'franchises') {
+        setPreviousMode(platformMode);
+      }
+      setPlatformMode('franchises');
+    };
+
     window.addEventListener('bidbattle_open_rules', handleOpenRules);
-    return () => window.removeEventListener('bidbattle_open_rules', handleOpenRules);
+    window.addEventListener('bidbattle_open_franchises', handleOpenFranchises);
+    return () => {
+      window.removeEventListener('bidbattle_open_rules', handleOpenRules);
+      window.removeEventListener('bidbattle_open_franchises', handleOpenFranchises);
+    };
   }, [platformMode]);
 
   const handleModeChange = (mode) => {

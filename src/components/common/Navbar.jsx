@@ -104,7 +104,7 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
               returnToArenaHome();
             } else if (platformMode === 'battle') {
               // Stay on battle
-            } else if (platformMode === 'rules') {
+            } else if (platformMode === 'rules' || platformMode === 'franchises') {
               setPlatformMode('auction');
             } else {
               setActivePage('home');
@@ -120,6 +120,8 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                 <Swords className="w-4 h-4 text-[#D97858] group-hover:scale-105 transition-transform" />
               ) : platformMode === 'rules' ? (
                 <BookOpen className="w-4 h-4 text-[#D4B879] group-hover:scale-105 transition-transform" />
+              ) : platformMode === 'franchises' ? (
+                <Users className="w-4 h-4 text-[#D97858] group-hover:scale-105 transition-transform" />
               ) : (
                 <Gavel className="w-4 h-4 text-[#D97858] group-hover:rotate-6 transition-transform" />
               )}
@@ -136,6 +138,8 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                 ? 'Battle Arena • Tactical Clash'
                 : platformMode === 'rules'
                 ? 'Official Rulebooks & Guides'
+                : platformMode === 'franchises'
+                ? 'Franchise Manager • Team Branding'
                 : 'Auction Arena • Franchise Bidding'}
             </p>
           </div>
@@ -201,10 +205,24 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
             <span className="hidden sm:inline">RULES</span>
             <span className="sm:hidden">RULES</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setPlatformMode('franchises')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              platformMode === 'franchises'
+                ? 'bg-[#D97858] text-[#F5F3EE] font-bold shadow-sm'
+                : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">FRANCHISES</span>
+            <span className="sm:hidden">TEAMS</span>
+          </button>
         </div>
 
         {/* Navigation Tabs (if inside party or auction mode) */}
-        {platformMode !== 'rules' && (
+        {platformMode !== 'rules' && platformMode !== 'franchises' && (
           <nav className="hidden lg:flex items-center gap-1 p-1 rounded-xl bg-[#222F43] border border-[#39465A] text-xs font-medium relative font-heading">
             {platformMode === 'party' ? (
               partyNavItems.map((item) => {

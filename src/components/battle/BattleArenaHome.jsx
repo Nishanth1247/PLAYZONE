@@ -17,56 +17,37 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { FIXED_TEAMS, AUCTION_PRESETS } from '../../services/presets';
+import { AUCTION_PRESETS } from '../../services/presets';
 import { FranchiseSelector } from '../common/FranchiseSelector';
+import { franchiseService } from '../../services/franchiseService';
 import { useBattleArena } from '../../context/BattleArenaContext';
 import { storageService } from '../../services/storageService';
 import { BattleImportModal } from './BattleImportModal';
 import { openGameRules } from '../rules/GameRules';
 import { toast } from 'sonner';
 
-const BATTLE_TEAMS_STORAGE_KEY = 'bidbattle_battle_teams_selection';
-
 export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   const { initializeBattleTournament } = useBattleArena();
 
-  // Restore team count & selected team IDs independently from Battle LocalStorage
-  const [teamCount, setTeamCount] = useState(() => {
-    try {
-      const saved = localStorage.getItem(BATTLE_TEAMS_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if ([2, 3, 4].includes(parsed.teamCount)) return parsed.teamCount;
-      }
-    } catch (e) {}
-    return 4;
-  });
-
+  // Restore team count & selected team IDs independently using franchiseService
   const [selectedTeamIds, setSelectedTeamIds] = useState(() => {
-    try {
-      const saved = localStorage.getItem(BATTLE_TEAMS_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed.selectedTeamIds) && parsed.selectedTeamIds.length > 0) {
-          const valid = parsed.selectedTeamIds.filter((id) =>
-            FIXED_TEAMS.some((ft) => ft.id === id)
-          );
-          if (valid.length > 0) return valid;
-        }
-      }
-    } catch (e) {}
-    return FIXED_TEAMS.map((t) => t.id);
+    const saved = franchiseService.getSelectedFranchiseIds('battle');
+    if (saved && saved.length >= 2) return saved;
+    const active = franchiseService.getActiveFranchises();
+    return active.slice(0, Math.min(4, active.length)).map((f) => f.id);
   });
 
-  // Save battle selection to independent LocalStorage key
+  const [teamCount, setTeamCount] = useState(() => {
+    const saved = franchiseService.getSelectedFranchiseIds('battle');
+    return saved && saved.length >= 2 ? saved.length : 4;
+  });
+
+  // Save battle selection to independent franchiseService storage
   React.useEffect(() => {
-    try {
-      localStorage.setItem(
-        BATTLE_TEAMS_STORAGE_KEY,
-        JSON.stringify({ teamCount, selectedTeamIds })
-      );
-    } catch (e) {}
-  }, [teamCount, selectedTeamIds]);
+    if (selectedTeamIds && selectedTeamIds.length > 0) {
+      franchiseService.saveSelectedFranchiseIds('battle', selectedTeamIds);
+    }
+  }, [selectedTeamIds]);
 
   const [squadSize, setSquadSize] = useState(3);
   const [startingPurse, setStartingPurse] = useState(100);
@@ -76,10 +57,10 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   const [customTournamentName, setCustomTournamentName] = useState('');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  // Selected teams based on user choice
+  // Selected teams dynamically resolved from franchiseService
   const activeTeams = React.useMemo(() => {
     return selectedTeamIds
-      .map((id) => FIXED_TEAMS.find((t) => t.id === id))
+      .map((id) => franchiseService.getFranchiseById(id))
       .filter(Boolean);
   }, [selectedTeamIds]);
 

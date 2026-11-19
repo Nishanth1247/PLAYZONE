@@ -444,10 +444,10 @@ export const ResultsScreen = () => {
       <div className="mb-12">
         <h3 className="text-2xl font-black text-white font-broadcast uppercase tracking-wider mb-5 flex items-center gap-2">
           <Trophy className="w-6 h-6 text-brand-cyan" />
-          Official Standings (1st — {rankedTeams.length === 2 ? '2nd' : rankedTeams.length === 3 ? '3rd' : '4th'} Position)
+          Official Standings (1st — {rankedTeams.length === 2 ? '2nd' : rankedTeams.length === 3 ? '3rd' : `${rankedTeams.length}th`} Position)
         </h3>
 
-        <div className={`grid grid-cols-1 sm:grid-cols-2 ${rankedTeams.length === 2 ? 'lg:grid-cols-2 max-w-4xl mx-auto' : rankedTeams.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-5`}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${rankedTeams.length === 2 ? 'lg:grid-cols-2 max-w-4xl mx-auto' : rankedTeams.length === 3 ? 'lg:grid-cols-3' : 'md:grid-cols-3 lg:grid-cols-4'} gap-5`}>
           {rankedTeams.map((team, idx) => {
             const badgeInfo = rankBadges[idx] || rankBadges[3];
             const isChamp = idx === 0;
@@ -468,9 +468,16 @@ export const ResultsScreen = () => {
 
                 <div>
                   <div className="flex items-start justify-between mb-4">
-                    <span className="text-4xl p-2 rounded-2xl bg-battle-bg border border-battle-border shadow-md">
-                      {team.logo}
-                    </span>
+                    <div
+                      className="w-12 h-12 rounded-2xl bg-battle-bg border border-battle-border shadow-md flex items-center justify-center overflow-hidden font-broadcast font-black text-xl"
+                      style={{ color: team.color }}
+                    >
+                      {team.logo && (team.logo.startsWith('http') || team.logo.startsWith('data:')) ? (
+                        <img src={team.logo} alt={team.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span>{team.logo || team.shortName || team.name?.slice(0, 2).toUpperCase()}</span>
+                      )}
+                    </div>
                     <span className={`px-2.5 py-1 rounded-xl text-[10px] font-broadcast font-bold tracking-wider uppercase border ${badgeInfo.glow}`}>
                       {team.rank === 1 ? '🥇 1ST PLACE' : team.rank === 2 ? '🥈 2ND PLACE' : team.rank === 3 ? '🥉 3RD PLACE' : `${team.rank}TH PLACE`}
                     </span>

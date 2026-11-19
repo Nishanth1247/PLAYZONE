@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { FIXED_TEAMS, AUCTION_PRESETS } from '../services/presets';
+import { franchiseService } from '../services/franchiseService';
 import { 
   toPaise, 
   fromPaise, 
@@ -35,7 +36,9 @@ export const BattleArenaProvider = ({ children }) => {
       startingPurse: 100,
       tournamentName: 'Tamil Hero Battle Clash',
       themeColor: '#9147FF',
-      teams: FIXED_TEAMS.map((t) => ({
+      teams: (franchiseService.getActiveFranchises().slice(0, 4).length >= 2 
+        ? franchiseService.getActiveFranchises().slice(0, 4) 
+        : FIXED_TEAMS).map((t) => ({
         ...t,
         initialPurse: 100,
         purse: 100,
@@ -330,10 +333,13 @@ export const BattleArenaProvider = ({ children }) => {
       return false;
     }
 
-    // Configure teams for 2, 3, or 4 teams using selected franchises
+    // Configure teams using selected franchises dynamically
+    const defaultFranchises = franchiseService.getActiveFranchises();
     const teamsToUse = (selectedTeams && Array.isArray(selectedTeams) && selectedTeams.length === teamCount)
       ? selectedTeams
-      : FIXED_TEAMS.slice(0, teamCount);
+      : (defaultFranchises.slice(0, teamCount).length === teamCount
+          ? defaultFranchises.slice(0, teamCount)
+          : FIXED_TEAMS.slice(0, teamCount));
 
     const activeTeams = teamsToUse.map((t) => {
       const p = Number(t.initialPurse != null ? t.initialPurse : (t.purse != null ? t.purse : startingPurse));
@@ -885,7 +891,9 @@ export const BattleArenaProvider = ({ children }) => {
       startingPurse: 100,
       tournamentName: 'Tamil Hero Battle Clash',
       themeColor: '#9147FF',
-      teams: FIXED_TEAMS.map((t) => ({
+      teams: (franchiseService.getActiveFranchises().slice(0, 4).length >= 2 
+        ? franchiseService.getActiveFranchises().slice(0, 4) 
+        : FIXED_TEAMS).map((t) => ({
         ...t,
         initialPurse: 100,
         purse: 100,

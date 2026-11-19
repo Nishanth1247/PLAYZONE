@@ -22,6 +22,7 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { FranchiseSelector } from '../common/FranchiseSelector';
 import { FIXED_TEAMS } from '../../services/presets';
+import { franchiseService } from '../../services/franchiseService';
 import { validateImportTournamentConfig, buildRuntimeTournamentConfig } from '../../services/importConfigService';
 import { AUCTION_MODES } from '../../services/auctionEngine';
 
@@ -75,7 +76,7 @@ export const ImportConfigForm = ({
   // Selected teams metadata
   const selectedTeams = useMemo(() => {
     return selectedTeamIds
-      .map((id) => FIXED_TEAMS.find((t) => t.id === id))
+      .map((id) => franchiseService.getFranchiseById(id) || FIXED_TEAMS.find((t) => t.id === id))
       .filter(Boolean)
       .map((t) => ({
         ...t,

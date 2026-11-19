@@ -122,6 +122,95 @@ export const generateBattleSchedule = (teams, squadSize) => {
         });
       }
     }
+  } else {
+    // Dynamic N-team round-robin schedule for teamCount > 4 (e.g. 5, 6, 8, 10...)
+    const isOdd = teamCount % 2 !== 0;
+    const m = isOdd ? teamCount + 1 : teamCount;
+    // Generate canonical round-robin rounds
+    const baseRounds = [];
+    for (let r = 0; r < m - 1; r++) {
+      const roundPairs = [];
+      for (let k = 0; k < m / 2; k++) {
+        const t1 = (r + k) % (m - 1);
+        let t2 = (m - 1 - k + r) % (m - 1);
+        if (k === 0) t2 = m - 1;
+        if (t1 < teamCount && t2 < teamCount) {
+          roundPairs.push([t1, t2]);
+        }
+      }
+      baseRounds.push(roundPairs);
+    }
+
+    let matchNum = 1;
+    if (isOdd) {
+      // For odd N, every team plays (teamCount - 1) matches in one full cycle
+      const cycles = Math.max(1, Math.floor(squadSize / (teamCount - 1)));
+      for (let c = 0; c < cycles; c++) {
+        for (const round of baseRounds) {
+          for (const [idxA, idxB] of round) {
+            schedule.push({
+              id: `match_${matchId++}`,
+              matchNumber: matchNum++,
+              cycle: c + 1,
+              teamAId: teams[idxA].id,
+              teamBId: teams[idxB].id,
+              teamAName: teams[idxA].name,
+              teamBName: teams[idxB].name,
+              teamAColor: teams[idxA].color,
+              teamBColor: teams[idxB].color,
+              teamALogo: teams[idxA].logo,
+              teamBLogo: teams[idxB].logo,
+              teamAPlayer: null,
+              teamBPlayer: null,
+              winnerId: null,
+              isDraw: false,
+              scoreDiff: 0,
+              teamAScore: 0,
+              teamBScore: 0,
+              status: 'pending',
+            });
+          }
+        }
+      }
+    } else {
+      // For even N, each round gives every team exactly 1 match
+      const fullCycleRounds = m - 1;
+      let totalRoundsToPlay;
+      if (squadSize < fullCycleRounds) {
+        totalRoundsToPlay = squadSize;
+      } else {
+        const cycles = Math.floor(squadSize / fullCycleRounds);
+        totalRoundsToPlay = cycles * fullCycleRounds;
+      }
+
+      for (let r = 0; r < totalRoundsToPlay; r++) {
+        const round = baseRounds[r % fullCycleRounds];
+        const cycleNum = Math.floor(r / fullCycleRounds) + 1;
+        for (const [idxA, idxB] of round) {
+          schedule.push({
+            id: `match_${matchId++}`,
+            matchNumber: matchNum++,
+            cycle: cycleNum,
+            teamAId: teams[idxA].id,
+            teamBId: teams[idxB].id,
+            teamAName: teams[idxA].name,
+            teamBName: teams[idxB].name,
+            teamAColor: teams[idxA].color,
+            teamBColor: teams[idxB].color,
+            teamALogo: teams[idxA].logo,
+            teamBLogo: teams[idxB].logo,
+            teamAPlayer: null,
+            teamBPlayer: null,
+            winnerId: null,
+            isDraw: false,
+            scoreDiff: 0,
+            teamAScore: 0,
+            teamBScore: 0,
+            status: 'pending',
+          });
+        }
+      }
+    }
   }
 
   return schedule;

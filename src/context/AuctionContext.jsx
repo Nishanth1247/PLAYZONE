@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { storageService } from '../services/storageService';
 import { soundService } from '../services/soundService';
 import { AUCTION_PRESETS, FIXED_TEAMS, shuffleArray, getScoreMetricLabel } from '../services/presets';
+import { franchiseService } from '../services/franchiseService';
 import { calculateTeamRankings } from '../services/scoringEngine';
 import { validateBid, toPaise, fromPaise, DEFAULT_INCREMENTS, calculateNextBid, AUCTION_MODES } from '../services/auctionEngine';
 
@@ -161,8 +162,11 @@ export const AuctionProvider = ({ children }) => {
     // Fresh Fisher-Yates shuffle for new tournament
     const randomizedItems = shuffleArray(mappedItems);
 
-    // Fixed teams default fallback
-    const rawTeams = (setupData.teams && setupData.teams.length > 0) ? setupData.teams : FIXED_TEAMS;
+    // Active franchises default fallback
+    const defaultFranchises = franchiseService.getActiveFranchises();
+    const rawTeams = (setupData.teams && setupData.teams.length >= 2) 
+      ? setupData.teams 
+      : (defaultFranchises.length >= 2 ? defaultFranchises : FIXED_TEAMS);
     const initialPurseAmount = Number(rawTeams[0]?.initialPurse || rawTeams[0]?.purse || 100);
 
     const configuredTeams = rawTeams.map((t, idx) => {
@@ -270,7 +274,9 @@ export const AuctionProvider = ({ children }) => {
       });
     } else {
       const presetPurse = modeConfig.defaultPurse || preset.teams?.[0]?.initialPurse || 100;
-      tournamentTeams = FIXED_TEAMS.map((t) => ({
+      const activeFranchises = franchiseService.getActiveFranchises();
+      const sourceTeams = activeFranchises.length >= 2 ? activeFranchises : FIXED_TEAMS;
+      tournamentTeams = sourceTeams.map((t) => ({
         ...t,
         initialPurse: presetPurse,
         purse: presetPurse,
@@ -311,9 +317,10 @@ export const AuctionProvider = ({ children }) => {
     }
 
     const defaultPurse = Number(tournamentPreset.teamBudgets?.defaultPurse || 100);
-    const baseTeamsToUse = (tournamentPreset.teams && Array.isArray(tournamentPreset.teams) && tournamentPreset.teams.length >= 2 && tournamentPreset.teams.length <= 4)
+    const activeFranchises = franchiseService.getActiveFranchises();
+    const baseTeamsToUse = (tournamentPreset.teams && Array.isArray(tournamentPreset.teams) && tournamentPreset.teams.length >= 2)
       ? tournamentPreset.teams
-      : FIXED_TEAMS;
+      : (activeFranchises.length >= 2 ? activeFranchises : FIXED_TEAMS);
 
     const configuredTeams = baseTeamsToUse.map((t, idx) => {
       const customT = tournamentPreset.teamBudgets?.teams?.find(

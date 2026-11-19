@@ -211,7 +211,7 @@ export const TeamBudgetConfig = ({
       </div>
 
       {/* Individual Contender Cards Grid */}
-      <div className={`grid grid-cols-1 sm:grid-cols-2 ${baseTeams.length === 2 ? 'lg:grid-cols-2 max-w-2xl mx-auto' : baseTeams.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-3.5`}>
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${baseTeams.length === 2 ? 'lg:grid-cols-2 max-w-2xl mx-auto' : baseTeams.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4 xl:grid-cols-4'} gap-3.5`}>
         {baseTeams.map((team) => {
           const hasError = Boolean(fieldErrors[team.id]);
           const currentVal = teamBudgets[team.id] ?? '100';
@@ -233,9 +233,13 @@ export const TeamBudgetConfig = ({
 
               <div>
                 <div className="flex items-center gap-2.5 mb-3">
-                  <span className="text-2xl p-1.5 rounded-xl bg-battle-bg border border-battle-border shadow-inner">
-                    {team.logo}
-                  </span>
+                  <div className="w-10 h-10 rounded-xl bg-battle-bg border border-battle-border shadow-inner flex items-center justify-center overflow-hidden font-broadcast font-black text-sm">
+                    {team.logo && (team.logo.startsWith('http') || team.logo.startsWith('data:')) ? (
+                      <img src={team.logo} alt={team.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{team.logo || team.shortName || team.name?.slice(0, 2).toUpperCase()}</span>
+                    )}
+                  </div>
                   <div>
                     <h4
                       className="font-broadcast font-black text-sm tracking-wide"

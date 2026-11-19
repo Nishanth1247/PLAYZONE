@@ -187,9 +187,16 @@ export const BattleAuctionStage = () => {
                   <div className="pl-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-xl p-1 rounded-xl bg-battle-bg border border-battle-border shadow-sm">
-                          {t.logo}
-                        </span>
+                        <div
+                          className="w-8 h-8 rounded-xl bg-battle-bg border border-battle-border shadow-sm flex items-center justify-center overflow-hidden font-broadcast font-black text-sm"
+                          style={{ color: t.color }}
+                        >
+                          {t.logo && (t.logo.startsWith('http') || t.logo.startsWith('data:')) ? (
+                            <img src={t.logo} alt={t.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span>{t.logo || t.shortName || t.name?.slice(0, 2).toUpperCase()}</span>
+                          )}
+                        </div>
                         <div>
                           <div className="flex items-center gap-1.5">
                             <h4 className="font-broadcast font-bold text-sm text-white truncate max-w-[100px]">
@@ -412,7 +419,7 @@ export const BattleAuctionStage = () => {
               </span>
             </div>
 
-            <div className={`grid grid-cols-1 ${teams.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-2`}>
+            <div className={`grid grid-cols-1 ${teams.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-2 ${teams.length > 4 ? 'max-h-[220px] sm:max-h-[260px] overflow-y-auto pr-1' : ''}`}>
               {teams.map((t) => {
                 const isLeading = highestBidder === t.id;
                 const isSquadFull = t.squad.length >= squadSize;
@@ -444,7 +451,7 @@ export const BattleAuctionStage = () => {
                     whileTap={isDisabled ? undefined : { scale: 0.98 }}
                     onClick={() => placeBattleBid(t.id)}
                     title={subReason}
-                    className={`p-3 rounded-2xl border text-left transition-all duration-200 relative overflow-hidden flex flex-col justify-between ${
+                    className={`${teams.length > 4 ? 'p-2 sm:p-2.5' : 'p-3'} rounded-2xl border text-left transition-all duration-200 relative overflow-hidden flex flex-col justify-between ${
                       isDisabled
                         ? 'bg-battle-surface/40 border-battle-border opacity-45 cursor-not-allowed text-battle-muted'
                         : 'bg-battle-surface shadow-md hover:shadow-xl cursor-pointer'
@@ -455,8 +462,17 @@ export const BattleAuctionStage = () => {
                     }}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{t.logo}</span>
+                      <div className="flex items-center gap-1.5">
+                        <div
+                          className="w-5 h-5 rounded-lg bg-battle-bg border border-battle-border shadow-sm flex items-center justify-center overflow-hidden text-[10px] font-broadcast font-black"
+                          style={{ color: t.color }}
+                        >
+                          {t.logo && (t.logo.startsWith('http') || t.logo.startsWith('data:')) ? (
+                            <img src={t.logo} alt={t.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span>{t.logo || t.shortName || t.name?.slice(0, 2).toUpperCase()}</span>
+                          )}
+                        </div>
                         <span className="font-broadcast font-bold text-xs text-white truncate max-w-[90px]">
                           {t.name}
                         </span>

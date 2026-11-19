@@ -26,6 +26,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { AUCTION_PRESETS, FIXED_TEAMS } from '../../services/presets';
+import { franchiseService } from '../../services/franchiseService';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
@@ -88,18 +89,28 @@ export const SetupWizard = () => {
   const [showBulkInput, setShowBulkInput] = useState(false);
 
   // Step 3 State: Dynamic Franchise Selection & Purses
-  const [teamCount, setTeamCount] = useState(4);
-  const [selectedTeamIds, setSelectedTeamIds] = useState(FIXED_TEAMS.map((t) => t.id));
+  const [selectedTeamIds, setSelectedTeamIds] = useState(() => {
+    const saved = franchiseService.getSelectedFranchiseIds('auction');
+    if (saved && saved.length >= 2) return saved;
+    const active = franchiseService.getActiveFranchises();
+    return active.slice(0, Math.min(4, active.length)).map((f) => f.id);
+  });
+  const [teamCount, setTeamCount] = useState(() => {
+    const saved = franchiseService.getSelectedFranchiseIds('auction');
+    return saved && saved.length >= 2 ? saved.length : 4;
+  });
   const selectedTeams = React.useMemo(() => {
     return selectedTeamIds
-      .map((id) => FIXED_TEAMS.find((t) => t.id === id))
+      .map((id) => franchiseService.getFranchiseById(id))
       .filter(Boolean);
   }, [selectedTeamIds]);
 
   const [defaultPurse, setDefaultPurse] = useState(100);
-  const [teams, setTeams] = useState(
-    FIXED_TEAMS.map((t) => ({ ...t, initialPurse: 100, purse: 100 }))
-  );
+  const [teams, setTeams] = useState(() => {
+    const active = franchiseService.getActiveFranchises();
+    const source = active.length >= 2 ? active.slice(0, 4) : FIXED_TEAMS;
+    return source.map((t) => ({ ...t, initialPurse: 100, purse: 100 }));
+  });
   const [newTeamName, setNewTeamName] = useState('');
   const [newTeamColor, setNewTeamColor] = useState('#00D9FF');
   const [newTeamLogo, setNewTeamLogo] = useState('🔥');

@@ -6,10 +6,9 @@ import { Badge } from '../ui/Badge';
 import { TeamBudgetConfig } from '../setup/TeamBudgetConfig';
 import { FranchiseSelector } from '../common/FranchiseSelector';
 import { FIXED_TEAMS } from '../../services/presets';
+import { franchiseService } from '../../services/franchiseService';
 import { AUCTION_MODES } from '../../services/auctionEngine';
 import { toast } from 'sonner';
-
-const AUCTION_TEAMS_STORAGE_KEY = 'bidbattle_auction_teams_selection';
 
 export const TournamentLaunchModal = ({
   preset,
@@ -19,51 +18,32 @@ export const TournamentLaunchModal = ({
 }) => {
   if (!isOpen || !preset) return null;
 
-  // Restore team count & selected team IDs from LocalStorage or default
-  const [teamCount, setTeamCount] = useState(() => {
-    try {
-      const saved = localStorage.getItem(AUCTION_TEAMS_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if ([2, 3, 4].includes(parsed.teamCount)) return parsed.teamCount;
-      }
-    } catch (e) {}
-    return 4;
-  });
-
+  // Restore team count & selected team IDs using franchiseService
   const [selectedTeamIds, setSelectedTeamIds] = useState(() => {
-    try {
-      const saved = localStorage.getItem(AUCTION_TEAMS_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed.selectedTeamIds) && parsed.selectedTeamIds.length > 0) {
-          // Filter to ensure only valid predefined franchise IDs
-          const validIds = parsed.selectedTeamIds.filter((id) =>
-            FIXED_TEAMS.some((ft) => ft.id === id)
-          );
-          if (validIds.length > 0) return validIds;
-        }
-      }
-    } catch (e) {}
-    return FIXED_TEAMS.map((t) => t.id);
+    const saved = franchiseService.getSelectedFranchiseIds('auction');
+    if (saved && saved.length >= 2) return saved;
+    const active = franchiseService.getActiveFranchises();
+    return active.slice(0, Math.min(4, active.length)).map((f) => f.id);
   });
 
-  // Save selection preference to LocalStorage
+  const [teamCount, setTeamCount] = useState(() => {
+    const saved = franchiseService.getSelectedFranchiseIds('auction');
+    return saved && saved.length >= 2 ? saved.length : 4;
+  });
+
+  // Save selection preference to franchiseService
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        AUCTION_TEAMS_STORAGE_KEY,
-        JSON.stringify({ teamCount, selectedTeamIds })
-      );
-    } catch (e) {}
-  }, [teamCount, selectedTeamIds]);
+    if (selectedTeamIds && selectedTeamIds.length > 0) {
+      franchiseService.saveSelectedFranchiseIds('auction', selectedTeamIds);
+    }
+  }, [selectedTeamIds]);
 
   const [selectedMode, setSelectedMode] = useState('standard');
 
-  // Compute selected team objects preserving predefined metadata
+  // Compute selected team objects dynamically via franchiseService
   const selectedTeams = useMemo(() => {
     return selectedTeamIds
-      .map((id) => FIXED_TEAMS.find((t) => t.id === id))
+      .map((id) => franchiseService.getFranchiseById(id))
       .filter(Boolean);
   }, [selectedTeamIds]);
 
@@ -107,7 +87,7 @@ export const TournamentLaunchModal = ({
   const primaryColor = preset.theme?.primary || '#9147FF';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
