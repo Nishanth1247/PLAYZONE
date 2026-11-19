@@ -21,6 +21,8 @@ import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { validateTournamentJSON, normalizeTournamentData, generateUniqueId } from '../../services/tournamentSchema';
 import { storageService } from '../../services/storageService';
+import { CreateWithChatGPTCard } from '../common/CreateWithChatGPTCard';
+import { AUCTION_ARENA_CHATGPT_PROMPT } from '../../services/chatGptPrompts';
 import { toast } from 'sonner';
 
 export const ImportTournamentModal = ({ isOpen, onClose, onImportSuccess }) => {
@@ -211,6 +213,18 @@ export const ImportTournamentModal = ({ isOpen, onClose, onImportSuccess }) => {
               <X className="w-5 h-5" />
             </button>
           </div>
+        </div>
+
+        {/* Section: CREATE YOUR OWN TOURNAMENT — Create with ChatGPT */}
+        <div className="mb-6 relative z-10">
+          <CreateWithChatGPTCard
+            title="CREATE YOUR OWN TOURNAMENT"
+            description="Generate a custom tournament using ChatGPT. Copy our prompt, create your JSON file, and import it here."
+            promptText={AUCTION_ARENA_CHATGPT_PROMPT}
+            targetPlatform="Auction Arena"
+            badgeText="AUCTION ARENA"
+            accentColor="#00D9FF"
+          />
         </div>
 
         {/* Stage 1: Input method tabs */}

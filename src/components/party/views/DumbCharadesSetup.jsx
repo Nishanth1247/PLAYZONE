@@ -22,6 +22,8 @@ import { FIXED_PARTY_PLAYERS } from '../../../services/party/gameRegistry';
 import { parseDumbCharadesInput } from '../../../services/party/dumbCharadesParser';
 import { DUMB_CHARADES_TAMIL } from '../../../services/party/offlineDatabase';
 import { getSavedDumbCharadesState, clearDumbCharadesState, createDumbCharadesTournament } from '../../../services/party/dumbCharadesEngine';
+import { CreateWithChatGPTCard } from '../../common/CreateWithChatGPTCard';
+import { DUMB_CHARADES_CHATGPT_PROMPT } from '../../../services/chatGptPrompts';
 import { toast } from 'sonner';
 
 export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
@@ -440,6 +442,16 @@ export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
                 </Button>
               )}
             </div>
+
+            {/* CREATE YOUR OWN PROMPT COLLECTION — ChatGPT Generator Section */}
+            <CreateWithChatGPTCard
+              title="CREATE YOUR OWN PROMPT COLLECTION"
+              description="Choose any topic and let ChatGPT generate a prompt collection that you can import directly into Dumb Charades."
+              promptText={DUMB_CHARADES_CHATGPT_PROMPT}
+              targetPlatform="Dumb Charades 2.0"
+              badgeText="DUMB CHARADES"
+              accentColor="#9147FF"
+            />
 
             {/* Mode Tabs */}
             <div className="flex gap-2 p-1 rounded-2xl bg-battle-bg border border-battle-border">
