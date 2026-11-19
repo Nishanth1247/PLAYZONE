@@ -154,105 +154,105 @@ export const LiveAuctionCard = ({
         {/* Urgency Countdown Timer */}
         <div className="flex items-center gap-1.5 shrink-0">
           <motion.div
-            animate={timer <= 5 && isTimerRunning ? { scale: [1, 1.08, 1] } : {}}
+            animate={timer <= 5 && isTimerRunning ? { scale: [1, 1.05, 1] } : {}}
             transition={{ repeat: Infinity, duration: 0.6 }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border font-mono font-bold transition-all shadow-md ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border font-mono font-bold transition-all ${
               !isTimerRunning
-                ? 'bg-amber-950/40 border-amber-600 text-amber-300'
+                ? 'bg-[#191919] border-[#444444] text-[#A3A3A3]'
                 : timer <= 5
-                ? 'bg-rose-950/90 border-rose-500 text-rose-300 shadow-lg shadow-rose-600/50 animate-pulse ring-2 ring-rose-500/40'
-                : 'bg-battle-bg border-battle-border text-brand-cyan'
+                ? 'bg-[#191919] border-rose-600 text-rose-400 animate-pulse'
+                : 'bg-[#191919] border-[#303030] text-[#F2F2F0]'
             }`}
           >
-            <Clock className={`w-3.5 h-3.5 ${timer <= 5 && isTimerRunning ? 'text-rose-400 animate-spin' : 'text-brand-cyan'}`} />
-            <span className="text-xl font-black leading-none">{timer}s</span>
+            <Clock className={`w-3.5 h-3.5 ${timer <= 5 && isTimerRunning ? 'text-rose-400 animate-spin' : 'text-[#A3A3A3]'}`} />
+            <span className="text-xl font-bold leading-none">{timer}s</span>
           </motion.div>
 
           {/* Clock Pause/Resume Trigger */}
           <button
             onClick={toggleTimer}
             title={isTimerRunning ? 'Pause Auction Clock' : 'Resume Auction Clock'}
-            className="p-1.5 rounded-xl bg-battle-bg hover:bg-battle-surface border border-battle-border text-battle-muted hover:text-white transition-colors"
+            className="p-1.5 rounded-lg bg-[#191919] hover:bg-[#222222] border border-[#303030] text-[#A3A3A3] hover:text-[#F2F2F0] transition-colors"
           >
             {isTimerRunning ? (
-              <Pause className="w-3.5 h-3.5 text-amber-400" />
+              <Pause className="w-3.5 h-3.5 text-[#F2F2F0]" />
             ) : (
-              <Play className="w-3.5 h-3.5 text-emerald-400 fill-current" />
+              <Play className="w-3.5 h-3.5 text-[#F2F2F0] fill-current" />
             )}
           </button>
         </div>
       </div>
 
       {/* SECTION A: PLAYER SPOTLIGHT (Primary Visual Focus) */}
-      <div className="relative rounded-2xl overflow-hidden bg-battle-bg border border-battle-border/80 shadow-inner my-1.5 z-10 group flex-1 min-h-[180px] max-h-[260px] flex flex-col justify-end">
+      <div className="relative rounded-xl overflow-hidden bg-[#111111] border border-[#303030] shadow-sm my-1.5 z-10 group flex-1 min-h-[180px] max-h-[260px] flex flex-col justify-end">
         {currentItem.imageUrl ? (
           <img
             src={currentItem.imageUrl}
             alt={currentItem.name}
-            className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+            className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-battle-card via-battle-bg to-dark-950">
-            <span className="text-5xl p-4 rounded-3xl bg-battle-surface/40 border border-battle-border/50 shadow-2xl">
+          <div className="absolute inset-0 flex items-center justify-center bg-[#111111]">
+            <span className="text-4xl p-3 rounded-xl bg-[#191919] border border-[#303030]">
               {currentItem.imdbRating ? '🍿' : currentItem.movie ? '🎭' : '⭐'}
             </span>
           </div>
         )}
 
-        {/* Dark Cinematic Gradient Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/70 to-transparent pointer-events-none" />
+        {/* Dark Vignette Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#090909] via-[#090909]/75 to-transparent pointer-events-none" />
 
         {/* Overlay Player Metadata & Economics */}
         <div className="relative p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 z-10">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-1.5 mb-1">
               {currentItem.movie && (
-                <span className="px-2 py-0.5 rounded-lg bg-brand-purple/40 border border-brand-purple/60 text-purple-200 text-[10px] font-broadcast font-bold">
+                <span className="px-2 py-0.5 rounded bg-[#191919] border border-[#303030] text-[#F2F2F0] text-[10px] font-heading font-medium">
                   🎬 {currentItem.movie}
                 </span>
               )}
               {currentItem.actor && (
-                <span className="px-2 py-0.5 rounded-lg bg-brand-cyan/40 border border-brand-cyan/60 text-cyan-200 text-[10px] font-broadcast font-bold">
+                <span className="px-2 py-0.5 rounded bg-[#191919] border border-[#303030] text-[#F2F2F0] text-[10px] font-heading font-medium">
                   🎭 {currentItem.actor}
                 </span>
               )}
               {currentItem.year && (
-                <span className="px-2 py-0.5 rounded-lg bg-battle-surface border border-battle-border text-battle-muted text-[10px] font-mono">
+                <span className="px-2 py-0.5 rounded bg-[#191919] border border-[#303030] text-[#A3A3A3] text-[10px] font-mono">
                   {currentItem.year}
                 </span>
               )}
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black text-white font-broadcast uppercase tracking-wide leading-tight drop-shadow-md truncate">
+            <h2 className="text-3xl sm:text-4xl font-title tracking-wider text-[#F2F2F0] uppercase leading-tight truncate">
               {currentItem.name}
             </h2>
 
             {currentItem.director && (
-              <span className="text-[11px] text-battle-muted block font-broadcast truncate">
-                Directed by <strong className="text-white">{currentItem.director}</strong> {currentItem.genre ? `• ${currentItem.genre}` : ''}
+              <span className="text-[11px] text-[#A3A3A3] block font-heading truncate">
+                Directed by <strong className="text-[#F2F2F0]">{currentItem.director}</strong> {currentItem.genre ? `• ${currentItem.genre}` : ''}
               </span>
             )}
           </div>
 
           {/* Base Price & Official Rating Capsules */}
           <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
-            <div className="px-2.5 py-1 rounded-xl bg-battle-surface/90 border border-battle-border backdrop-blur-md text-right">
-              <span className="text-[8px] text-battle-muted uppercase font-broadcast font-bold block leading-none mb-0.5">
+            <div className="px-2.5 py-1 rounded-lg bg-[#191919] border border-[#303030] text-right">
+              <span className="text-[8px] text-[#737373] uppercase font-heading font-bold block leading-none mb-0.5">
                 BASE PRICE
               </span>
-              <span className="font-mono text-sm sm:text-base font-black text-gold leading-none">
+              <span className="font-mono text-sm sm:text-base font-bold text-[#F2F2F0] leading-none">
                 {formatCurrency(currentItem.basePrice, currency)}
               </span>
             </div>
 
-            <div className="px-2.5 py-1 rounded-xl bg-battle-surface/90 border border-battle-border backdrop-blur-md text-right">
-              <span className="text-[8px] text-battle-muted uppercase font-broadcast font-bold block leading-none mb-0.5">
+            <div className="px-2.5 py-1 rounded-lg bg-[#191919] border border-[#303030] text-right">
+              <span className="text-[8px] text-[#737373] uppercase font-heading font-bold block leading-none mb-0.5">
                 RATING
               </span>
-              {/* BIDBATTLE 8.4: Ratings strictly hidden during active bidding across all auctions */}
-              <span className="font-mono text-[11px] text-sage flex items-center gap-1 font-bold">
-                <Lock className="w-3 h-3 text-gold" /> Hidden
+              {/* Ratings strictly hidden during active bidding across all auctions */}
+              <span className="font-mono text-[11px] text-[#A3A3A3] flex items-center gap-1 font-bold">
+                <Lock className="w-3 h-3 text-[#A3A3A3]" /> Hidden
               </span>
             </div>
           </div>
@@ -260,24 +260,18 @@ export const LiveAuctionCard = ({
       </div>
 
       {/* SECTION B: LIVE BID DISPLAY (Current Highest Bid + Next Calculated Bid) */}
-      <div className="my-1.5 p-3.5 sm:p-4 rounded-2xl bg-battle-bg border border-battle-border/90 shadow-inner text-center z-10 relative overflow-hidden shrink-0">
-        {/* Ambient Glow */}
-        <div 
-          className="absolute inset-0 opacity-15 pointer-events-none transition-colors duration-500"
-          style={{ backgroundColor: currentLeaderTeam?.color || '#9147FF' }}
-        />
-
-        <div className="flex items-center justify-between text-[11px] text-battle-muted font-broadcast font-bold mb-0.5 px-1">
+      <div className="my-1.5 p-3.5 sm:p-4 rounded-xl bg-[#111111] border border-[#303030] text-center z-10 relative overflow-hidden shrink-0">
+        <div className="flex items-center justify-between text-[11px] text-[#A3A3A3] font-heading font-semibold mb-0.5 px-1">
           <span className="uppercase tracking-widest text-[10px]">
             CURRENT HIGHEST BID
           </span>
-          <span className="text-brand-orange font-mono text-[10px]">
+          <span className="text-[#A3A3A3] font-mono text-[10px]">
             {currentTierLabel}
           </span>
         </div>
 
         {/* Animated Numerical Bid Value */}
-        <div className="font-broadcast text-5xl sm:text-6xl font-black tracking-wider bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent neon-text-gold py-0.5">
+        <div className="font-mono text-5xl sm:text-6xl font-bold tracking-tight text-[#F2F2F0] py-1">
           <AnimatedNumber
             value={currentBid}
             format={(v) => formatCurrency(v, currency)}
@@ -285,42 +279,40 @@ export const LiveAuctionCard = ({
         </div>
 
         {/* Live Leader Capsule */}
-        <div className="mt-1.5 flex flex-wrap items-center justify-center gap-2">
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
           {currentLeaderTeam ? (
             <div
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border shadow-md font-broadcast font-bold text-xs tracking-wide transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md border font-heading font-semibold text-xs tracking-wide transition-all bg-[#191919]"
               style={{
-                backgroundColor: `${currentLeaderTeam.color}20`,
                 borderColor: currentLeaderTeam.color,
                 color: currentLeaderTeam.color,
-                boxShadow: `0 0 14px ${currentLeaderTeam.color}30`,
               }}
             >
               <span className="text-sm">{currentLeaderTeam.logo || '🛡️'}</span>
               <span>{currentLeaderTeam.name}</span>
               <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />
-              <span className="text-[9px] uppercase tracking-wider font-mono px-1 py-0.2 rounded bg-battle-bg font-black">
+              <span className="text-[9px] uppercase tracking-wider font-mono px-1 py-0.2 rounded bg-[#090909] font-bold text-[#F2F2F0]">
                 LEADER
               </span>
             </div>
           ) : (
-            <span className="text-[11px] text-battle-muted font-medium italic font-broadcast">
+            <span className="text-[11px] text-[#737373] font-medium italic font-heading">
               Awaiting opening bid at base price ({formatCurrency(currentItem.basePrice, currency)})
             </span>
           )}
         </div>
 
         {/* NEXT CALCULATED BID — Prominently displayed right on the Centre Stage */}
-        <div className="mt-2 pt-2 border-t border-battle-border/60 flex items-center justify-between px-2 text-xs">
-          <span className="font-broadcast font-bold text-battle-muted flex items-center gap-1">
-            <Zap className="w-3.5 h-3.5 text-brand-cyan fill-current" />
+        <div className="mt-2.5 pt-2 border-t border-[#303030] flex items-center justify-between px-2 text-xs">
+          <span className="font-heading font-medium text-[#A3A3A3] flex items-center gap-1">
+            <Zap className="w-3.5 h-3.5 text-[#F2F2F0]" />
             <span>NEXT CALCULATED BID:</span>
           </span>
           <div className="flex items-center gap-1.5 font-mono font-bold">
-            <span className="text-brand-cyan text-sm sm:text-base">
+            <span className="text-[#F2F2F0] text-sm sm:text-base">
               {formatCurrency(nextCalculatedBid, currency)}
             </span>
-            <span className="text-[10px] text-battle-muted">
+            <span className="text-[10px] text-[#737373]">
               (+{currency.symbol}{currentIncrement.toFixed(2)} Cr tier)
             </span>
           </div>

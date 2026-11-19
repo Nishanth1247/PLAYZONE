@@ -1,25 +1,35 @@
 import React from 'react';
 
 const VARIANTS = {
-  gold: 'bg-[#C3A45D]/20 text-[#C3A45D] border-[#C3A45D]/40',
-  terracotta: 'bg-[#C66A45]/20 text-[#C66A45] border-[#C66A45]/40',
-  sage: 'bg-[#91A08B]/20 text-[#91A08B] border-[#91A08B]/40',
-  ivory: 'bg-[#E8E3D4]/15 text-[#E8E3D4] border-[#E8E3D4]/30',
-  slate: 'bg-[#24352C] text-[#91A08B] border-[#303832]',
-  forest: 'bg-[#18251F] text-[#E8E3D4] border-[#303832]',
-  // Franchise color identities
-  purple: 'bg-[#9147FF]/15 text-[#9147FF] border-[#9147FF]/35 shadow-sm',
-  cyan: 'bg-[#00D9FF]/15 text-[#00D9FF] border-[#00D9FF]/35 shadow-sm',
-  orange: 'bg-[#C66A45]/20 text-[#C66A45] border-[#C66A45]/40',
-  neon: 'bg-[#B7F34A]/15 text-[#B7F34A] border-[#B7F34A]/35 shadow-sm',
-  pink: 'bg-[#FF4FA3]/15 text-[#FF4FA3] border-[#FF4FA3]/35 shadow-sm',
+  // Monochrome system variants
+  default: 'bg-[#191919] text-[#F2F2F0] border-[#303030]',
+  mono: 'bg-[#191919] text-[#F2F2F0] border-[#303030]',
+  outline: 'bg-transparent text-[#A3A3A3] border-[#303030]',
+  subtle: 'bg-[#222222] text-[#A3A3A3] border-[#303030]',
+  dark: 'bg-[#090909] text-[#F2F2F0] border-[#303030]',
+  // Aliases mapping cleanly to monochrome
+  gold: 'bg-[#191919] text-[#F2F2F0] border-[#303030]',
+  terracotta: 'bg-[#191919] text-[#F2F2F0] border-[#303030]',
+  sage: 'bg-[#191919] text-[#A3A3A3] border-[#303030]',
+  ivory: 'bg-[#222222] text-[#F2F2F0] border-[#303030]',
+  slate: 'bg-[#191919] text-[#A3A3A3] border-[#303030]',
+  forest: 'bg-[#111111] text-[#F2F2F0] border-[#303030]',
+  // Muted franchise color identities
+  purple: 'bg-[#8875A8]/15 text-[#8875A8] border-[#8875A8]/30',
+  cyan: 'bg-[#71999B]/15 text-[#71999B] border-[#71999B]/30',
+  orange: 'bg-[#B68B68]/15 text-[#B68B68] border-[#B68B68]/30',
+  neon: 'bg-[#84977B]/15 text-[#84977B] border-[#84977B]/30',
+  nishanth: 'bg-[#8875A8]/15 text-[#8875A8] border-[#8875A8]/30',
+  ajmal: 'bg-[#71999B]/15 text-[#71999B] border-[#71999B]/30',
+  praneeth: 'bg-[#B68B68]/15 text-[#B68B68] border-[#B68B68]/30',
+  nagulan: 'bg-[#84977B]/15 text-[#84977B] border-[#84977B]/30',
 };
 
-export const Badge = ({ children, variant = 'purple', className = '', pulse = false, icon: Icon }) => {
+export const Badge = ({ children, variant = 'mono', className = '', pulse = false, icon: Icon }) => {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold tracking-wide border uppercase ${
-        VARIANTS[variant] || VARIANTS.purple
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-heading font-semibold tracking-wide border uppercase ${
+        VARIANTS[variant] || VARIANTS.mono
       } ${className}`}
     >
       {pulse && <span className="w-1.5 h-1.5 rounded-full bg-current animate-ping" />}

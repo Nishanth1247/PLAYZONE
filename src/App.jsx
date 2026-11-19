@@ -66,23 +66,23 @@ export function AppContent() {
       <Toaster />
 
       {/* Global Footer */}
-      <footer className="border-t border-battle-border bg-battle-bg/90 py-5 px-6 text-center text-xs text-battle-muted print:hidden">
+      <footer className="border-t border-[#303030] bg-[#090909] py-4 px-6 text-center text-xs text-[#737373] print:hidden">
         <div className="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 font-broadcast tracking-wide">
-            <span className="font-bold text-white">BIDBATTLE 7.3</span>
+          <div className="flex items-center gap-2 font-heading tracking-wide">
+            <span className="font-bold text-[#F2F2F0]">BIDBATTLE</span>
             <span>•</span>
-            <span className="text-brand-orange">Battle Arena</span>
+            <span className="text-[#A3A3A3]">Auction & Battle Arena</span>
             <span>•</span>
-            <span className="text-brand-cyan">Party & Auction Showdown</span>
+            <span className="text-[#737373]">Party Game Showdown</span>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-[11px] text-brand-neon font-bold font-broadcast tracking-wider">
-              <WifiOff className="w-3.5 h-3.5 text-brand-neon" />
+            <span className="flex items-center gap-1.5 text-[11px] text-[#A3A3A3] font-semibold font-heading tracking-wider">
+              <WifiOff className="w-3.5 h-3.5 text-[#A3A3A3]" />
               100% PASS-AND-PLAY OFFLINE
             </span>
             <span>•</span>
-            <span className="text-battle-muted">1 Laptop • 2–4 Friends • Zero Login</span>
+            <span className="text-[#737373]">1 Laptop • 2–4 Friends • Zero Login</span>
           </div>
         </div>
       </footer>

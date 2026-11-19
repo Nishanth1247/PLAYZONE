@@ -21,34 +21,30 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
   const { openGameLobby } = usePartyGame();
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-grid-pattern pb-16">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[350px] bg-terracotta/10 blur-[160px] pointer-events-none rounded-full" />
-      <div className="absolute top-1/3 left-1/4 w-[450px] h-[300px] bg-gold/10 blur-[140px] pointer-events-none rounded-full" />
-
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#090909] pb-16">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-10">
         
-        {/* 1. CINEMATIC HERO SECTION */}
+        {/* 1. MONOCHROME HERO SECTION */}
         <div className="text-center max-w-3xl mx-auto pt-4 space-y-4">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-pine border border-charcoal text-xs font-bold text-gold shadow-md">
-            <Sparkles className="w-4 h-4 text-gold" />
-            <span className="text-ivory">BIDBATTLE 8.4 • Party Arena</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-terracotta" />
-            <span className="text-terracotta font-black tracking-wider">2–4 LOCAL PLAYERS • 1 LAPTOP</span>
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#191919] border border-[#303030] text-xs font-heading font-bold text-[#A3A3A3] shadow-sm">
+            <Sparkles className="w-4 h-4 text-[#F2F2F0]" />
+            <span className="text-[#F2F2F0]">CHAMPIONSHIP • Party Arena</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#737373]" />
+            <span className="text-[#A3A3A3] font-mono tracking-wider">2–4 LOCAL PLAYERS • 1 LAPTOP</span>
           </div>
 
-          <h1 className="font-broadcast text-5xl sm:text-7xl font-black tracking-wider uppercase text-ivory leading-none">
-            PARTY <span className="text-gold">ARENA</span>
+          <h1 className="font-title text-5xl sm:text-7xl font-black tracking-wider uppercase text-[#F2F2F0] leading-none">
+            PARTY ARENA
           </h1>
 
-          <p className="text-sm sm:text-base text-battle-muted max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-[#A3A3A3] max-w-2xl mx-auto leading-relaxed">
             The ultimate local multiplayer party game night experience. Play high-stakes Dumb Charades with secret prompt passing or deduce identities in Who Am I? on a single shared screen!
           </p>
 
           {/* Quick Action Bar */}
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-battle-bg border border-battle-border text-xs font-mono text-battle-muted">
-              <Upload className="w-3.5 h-3.5 text-brand-neon" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#191919] border border-[#303030] text-xs font-mono text-[#A3A3A3]">
+              <Upload className="w-3.5 h-3.5 text-[#F2F2F0]" />
               <span>Universal JSON / CSV / TXT Import</span>
             </div>
 
@@ -57,7 +53,7 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
                 variant="ghost"
                 size="md"
                 onClick={onSwitchToAuction}
-                className="font-broadcast text-xs text-brand-orange hover:bg-brand-orange/10 flex items-center gap-2"
+                className="font-heading text-xs text-[#A3A3A3] hover:text-[#F2F2F0] hover:bg-[#191919] flex items-center gap-2"
               >
                 <Gavel className="w-4 h-4" />
                 <span>AUCTION ARENA →</span>
@@ -76,56 +72,44 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
                 key={game.id}
                 whileHover={{ y: -4, scale: 1.01 }}
                 transition={{ duration: 0.2 }}
-                className="battle-panel rounded-3xl p-6 sm:p-8 border transition-all duration-300 relative overflow-hidden flex flex-col justify-between group shadow-2xl"
-                style={{
-                  borderColor: `${game.accentColor}50`,
-                }}
+                className="bg-[#191919] rounded-3xl p-6 sm:p-8 border border-[#303030] hover:border-[#555555] transition-all duration-300 relative overflow-hidden flex flex-col justify-between group shadow-xl"
               >
-                {/* Glow highlight */}
-                <div
-                  className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-[100px] opacity-25 group-hover:opacity-45 transition-opacity pointer-events-none"
-                  style={{ backgroundColor: game.accentColor }}
-                />
-
                 <div className="space-y-5 relative z-10">
                   {/* Card Top Header */}
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div className="flex items-center gap-3.5">
-                      <span className="text-4xl p-3.5 rounded-2xl bg-battle-bg border border-battle-border shadow-inner">
+                      <span className="text-4xl p-3.5 rounded-2xl bg-[#111111] border border-[#303030] shadow-inner">
                         {game.icon}
                       </span>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className="text-xs font-mono font-black tracking-wider uppercase"
-                            style={{ color: game.accentColor }}
-                          >
+                          <span className="text-xs font-mono font-bold tracking-wider uppercase text-[#A3A3A3]">
                             Official Party Game
                           </span>
-                          <span className="text-battle-muted text-xs">•</span>
+                          <span className="text-[#737373] text-xs">•</span>
                           <Badge 
-                            variant={isDumbCharades ? 'purple' : 'cyan'} 
+                            variant="subtle" 
                             className="text-[10px] px-2 py-0"
                           >
                             {game.badge}
                           </Badge>
                         </div>
-                        <h2 className="font-broadcast text-2xl sm:text-3xl font-black text-white tracking-wide">
+                        <h2 className="font-heading text-2xl sm:text-3xl font-black text-[#F2F2F0] tracking-wide">
                           {game.title}
                         </h2>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 self-start sm:self-auto">
-                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-battle-bg border border-battle-border text-[11px] font-mono font-bold text-battle-muted">
-                        <Users className="w-3 h-3 text-brand-cyan" />
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111111] border border-[#303030] text-[11px] font-mono font-bold text-[#A3A3A3]">
+                        <Users className="w-3 h-3 text-[#F2F2F0]" />
                         <span>2–4 Franchises</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Description */}
-                  <p className="text-xs sm:text-sm text-battle-muted leading-relaxed min-h-[48px]">
+                  <p className="text-xs sm:text-sm text-[#A3A3A3] leading-relaxed min-h-[48px]">
                     {game.shortDesc}
                   </p>
 
@@ -134,28 +118,21 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
                     {game.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2.5 py-1 rounded-xl bg-battle-bg border border-battle-border text-[11px] font-mono text-battle-text"
+                        className="px-2.5 py-1 rounded-xl bg-[#111111] border border-[#303030] text-[11px] font-mono text-[#A3A3A3]"
                       >
                         {tag}
                       </span>
                     ))}
-                    <span 
-                      className="px-2.5 py-1 rounded-xl border text-[11px] font-mono font-bold"
-                      style={{
-                        backgroundColor: `${game.accentColor}15`,
-                        borderColor: `${game.accentColor}40`,
-                        color: game.accentColor,
-                      }}
-                    >
+                    <span className="px-2.5 py-1 rounded-xl border border-[#444444] bg-[#222222] text-[11px] font-mono font-bold text-[#F2F2F0]">
                       Universal Content Import
                     </span>
                   </div>
                 </div>
 
                 {/* Card Action Footer */}
-                <div className="pt-5 mt-6 border-t border-battle-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
-                  <span className="text-[11px] font-mono text-battle-muted flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-neon" />
+                <div className="pt-5 mt-6 border-t border-[#303030] flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
+                  <span className="text-[11px] font-mono text-[#737373] flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#F2F2F0]" />
                     <span>
                       {isDumbCharades
                         ? 'Pass-the-Laptop Privacy Screen'
@@ -167,12 +144,7 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
                     variant="primary"
                     size="lg"
                     onClick={() => openGameLobby(game.id)}
-                    className="font-broadcast text-xs font-black shadow-glow flex items-center justify-center gap-2 group-hover:scale-105 transition-transform"
-                    style={{
-                      backgroundColor: game.accentColor,
-                      borderColor: game.accentColor,
-                      color: '#080A12',
-                    }}
+                    className="font-heading text-xs font-black flex items-center justify-center gap-2 group-hover:scale-105 transition-transform bg-[#F2F2F0] text-[#090909] hover:bg-white"
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />
                     <span>PLAY {game.title.toUpperCase()}</span>

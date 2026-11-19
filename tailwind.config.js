@@ -8,57 +8,73 @@ export default {
   theme: {
     extend: {
       colors: {
-        // BIDBATTLE 8.4 — Championship Editorial & Sports Broadcast Palette
-        forest: '#18251F',     // Forest Ink – primary background
-        pine: '#24352C',       // Deep Pine – secondary surfaces
-        ivory: '#E8E3D4',      // Warm Ivory – primary typography & light surfaces
-        terracotta: '#C66A45', // Terracotta – main action accent
-        gold: '#C3A45D',       // Antique Gold – championship & premium details
-        sage: '#91A08B',       // Muted Sage – secondary information
-        charcoal: '#303832',   // Soft Charcoal – supporting borders & elements
+        // MONOCHROME CHAMPIONSHIP SYSTEM
+        mono: {
+          bg: '#090909',
+          surface: '#111111',
+          card: '#191919',
+          elevated: '#222222',
+          border: '#303030',
+          text: '#F2F2F0',
+          secondary: '#A3A3A3',
+          muted: '#737373',
+          action: '#F2F2F0',
+          actionDark: '#090909',
+          actionSec: '#303030',
+        },
 
-        // System-wide surface aliases mapped to the new palette
+        // System-wide surface aliases mapped directly to monochrome palette
         battle: {
-          bg: '#18251F',
-          surface: '#24352C',
-          card: '#24352C',
-          cardHover: '#303832',
-          border: '#303832',
-          borderLight: '#414D43',
-          text: '#E8E3D4',
-          muted: '#91A08B',
+          bg: '#090909',
+          surface: '#111111',
+          card: '#191919',
+          cardHover: '#222222',
+          border: '#303030',
+          borderLight: '#3a3a3a',
+          text: '#F2F2F0',
+          muted: '#A3A3A3',
         },
-        // Preserved 4 Predefined Franchises (used strictly for team identities)
+
+        // Muted Franchise Identities
         franchise: {
-          nishanth: '#9147FF',
-          ajmal: '#00D9FF',
-          praneeth: '#FF8A35',
-          nagulan: '#B7F34A',
+          nishanth: '#8875A8',
+          ajmal: '#71999B',
+          praneeth: '#B68B68',
+          nagulan: '#84977B',
         },
+
+        // Brand aliases mapped to muted franchise & monochrome tones
         brand: {
-          purple: '#9147FF',
-          cyan: '#00D9FF',
-          orange: '#FF8A35',
-          neon: '#B7F34A',
-          terracotta: '#C66A45',
-          gold: '#C3A45D',
-          sage: '#91A08B',
-          pink: '#FF4FA3',
-          blue: '#2B66FF',
+          purple: '#8875A8',
+          cyan: '#71999B',
+          orange: '#B68B68',
+          neon: '#84977B',
+          primary: '#F2F2F0',
+          secondary: '#A3A3A3',
+          muted: '#737373',
+          dark: '#090909',
+          border: '#303030',
         }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['Rajdhani', 'Impact', 'Teko', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        heading: ['"Space Grotesk"', 'sans-serif'],
+        display: ['"Space Grotesk"', 'sans-serif'],
+        broadcast: ['"Space Grotesk"', 'sans-serif'],
+        title: ['"Bebas Neue"', 'Impact', 'sans-serif'],
+        mono: ['"Space Mono"', 'monospace'],
       },
       boxShadow: {
-        'glow-purple': '0 0 25px -5px rgba(145, 71, 255, 0.4)',
-        'glow-cyan': '0 0 25px -5px rgba(0, 217, 255, 0.4)',
-        'glow-orange': '0 0 25px -5px rgba(255, 138, 53, 0.4)',
-        'glow-neon': '0 0 25px -5px rgba(183, 243, 74, 0.4)',
-        'glow-pink': '0 0 25px -5px rgba(255, 79, 163, 0.4)',
-        'card-elevated': '0 12px 30px -10px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.05)',
+        'mono-subtle': '0 2px 8px rgba(0, 0, 0, 0.4)',
+        'mono-card': '0 4px 16px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.05)',
+        'mono-elevated': '0 8px 24px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(255, 255, 255, 0.08)',
+        // Backwards compatibility aliases stripped of colorful neon glow
+        'glow-purple': '0 0 12px rgba(136, 117, 168, 0.25)',
+        'glow-cyan': '0 0 12px rgba(113, 153, 155, 0.25)',
+        'glow-orange': '0 0 12px rgba(182, 139, 104, 0.25)',
+        'glow-neon': '0 0 12px rgba(132, 151, 123, 0.25)',
+        'glow-pink': '0 0 12px rgba(255, 255, 255, 0.1)',
+        'card-elevated': '0 8px 24px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(255, 255, 255, 0.05)',
       },
       animation: {
         'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',

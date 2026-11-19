@@ -1,10 +1,10 @@
 // BIDBATTLE 4.0 — Curated Presets with 6 Tournaments & 4 Fixed Contenders
 
 export const FIXED_TEAMS = [
-  { id: 'team-nishanth', name: 'Nishanth', owner: 'Nishanth', shortName: 'NIS', color: '#9147FF', logo: '👑', initialPurse: 100, purse: 100 },
-  { id: 'team-ajmal', name: 'Ajmal', owner: 'Ajmal', shortName: 'AJM', color: '#00D9FF', logo: '⚡', initialPurse: 100, purse: 100 },
-  { id: 'team-praneeth', name: 'Praneeth', owner: 'Praneeth', shortName: 'PRA', color: '#FF8A35', logo: '🔥', initialPurse: 100, purse: 100 },
-  { id: 'team-nagulan', name: 'Nagulan', owner: 'Nagulan', shortName: 'NAG', color: '#B7F34A', logo: '🛡️', initialPurse: 100, purse: 100 },
+  { id: 'team-nishanth', name: 'Nishanth', owner: 'Nishanth', shortName: 'NIS', color: '#8875A8', logo: '👑', initialPurse: 100, purse: 100 },
+  { id: 'team-ajmal', name: 'Ajmal', owner: 'Ajmal', shortName: 'AJM', color: '#71999B', logo: '⚡', initialPurse: 100, purse: 100 },
+  { id: 'team-praneeth', name: 'Praneeth', owner: 'Praneeth', shortName: 'PRA', color: '#B68B68', logo: '🔥', initialPurse: 100, purse: 100 },
+  { id: 'team-nagulan', name: 'Nagulan', owner: 'Nagulan', shortName: 'NAG', color: '#84977B', logo: '🛡️', initialPurse: 100, purse: 100 },
 ];
 
 // Price band calculation based on rating

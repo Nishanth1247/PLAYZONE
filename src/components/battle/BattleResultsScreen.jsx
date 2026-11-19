@@ -138,10 +138,10 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
   };
 
   const rankBadges = [
-    { label: '🥇 1ST — CHAMPION', border: 'border-amber-500', glow: 'shadow-glow-orange text-amber-400 bg-amber-500/10' },
-    { label: '🥈 2ND — RUNNER-UP', border: 'border-brand-cyan', glow: 'shadow-glow-cyan text-brand-cyan bg-cyan-500/10' },
-    { label: '🥉 3RD PLACE', border: 'border-brand-purple', glow: 'shadow-glow-purple text-brand-purple bg-purple-500/10' },
-    { label: '4TH PLACE', border: 'border-battle-border', glow: 'text-battle-muted bg-battle-surface' },
+    { label: '🥇 1ST — CHAMPION', border: 'border-white', glow: 'text-[#F2F2F0] bg-white/10 border-white' },
+    { label: '🥈 2ND — RUNNER-UP', border: 'border-[#444444]', glow: 'text-[#A3A3A3] bg-[#222222] border-[#444444]' },
+    { label: '🥉 3RD PLACE', border: 'border-[#303030]', glow: 'text-[#737373] bg-[#191919] border-[#303030]' },
+    { label: '4TH PLACE', border: 'border-[#303030]', glow: 'text-[#737373] bg-[#191919] border-[#303030]' },
   ];
 
   return (
@@ -151,28 +151,23 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="rounded-3xl battle-panel p-8 sm:p-12 border-2 border-brand-orange/60 text-center relative overflow-hidden shadow-2xl space-y-4"
+        className="rounded-3xl bg-[#191919] p-8 sm:p-12 border border-[#303030] text-center relative overflow-hidden shadow-2xl space-y-4"
       >
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] blur-[140px] opacity-25 pointer-events-none rounded-full"
-          style={{ backgroundColor: champion.color }}
-        />
-
-        <div className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl shadow-glow-orange border-2 border-white/20"
+        <div className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl border border-white/20"
           style={{ backgroundColor: champion.color }}
         >
           {champion.logo}
         </div>
 
-        <Badge variant="gold" className="text-xs uppercase font-mono">
+        <Badge variant="subtle" className="text-xs uppercase font-mono">
           👑 BATTLE ARENA CHAMPION
         </Badge>
 
-        <h1 className="font-broadcast text-4xl sm:text-6xl font-black text-white uppercase tracking-wider">
+        <h1 className="font-title text-4xl sm:text-6xl font-black text-[#F2F2F0] uppercase tracking-wider">
           {champion.name} WINS!
         </h1>
 
-        <p className="text-sm font-mono text-brand-neon font-black">
+        <p className="text-sm font-mono text-[#A3A3A3] font-bold">
           {championStats?.points} Points • {championStats?.won} Wins • {championStats?.played} Matches Played
         </p>
 
@@ -182,9 +177,9 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
             variant="secondary"
             size="md"
             onClick={handleExportJSON}
-            className="font-broadcast text-xs border-brand-cyan/40 hover:border-brand-cyan text-brand-cyan flex items-center gap-2 bg-brand-cyan/10"
+            className="font-heading text-xs border border-[#303030] text-[#F2F2F0] flex items-center gap-2 bg-[#222222]"
           >
-            <Download className="w-4 h-4 text-brand-cyan" />
+            <Download className="w-4 h-4 text-[#F2F2F0]" />
             <span>DOWNLOAD BATTLE REPORT (JSON)</span>
           </Button>
 
@@ -192,7 +187,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
             variant="primary"
             size="md"
             onClick={resetBattleTournament}
-            className="font-broadcast text-xs shadow-glow-orange bg-brand-orange hover:bg-orange-600 text-black font-black flex items-center gap-2"
+            className="font-heading text-xs bg-[#F2F2F0] hover:bg-white text-[#090909] font-black flex items-center gap-2"
           >
             <RotateCcw className="w-4 h-4" />
             <span>NEW BATTLE TOURNAMENT</span>
@@ -200,11 +195,11 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
         </div>
       </motion.div>
 
-      {/* 2. DYNAMIC CHAMPIONSHIP PODIUM (2, 3 OR 4 TEAMS) (BIDBATTLE 7.7) */}
+      {/* 2. DYNAMIC CHAMPIONSHIP PODIUM (2, 3 OR 4 TEAMS) */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-amber-400" />
-          <h3 className="font-broadcast font-black text-xl text-white uppercase tracking-wide">
+          <Trophy className="w-5 h-5 text-[#F2F2F0]" />
+          <h3 className="font-heading font-black text-xl text-[#F2F2F0] uppercase tracking-wide">
             Championship Podium ({teams.length} Franchises)
           </h3>
         </div>
@@ -218,9 +213,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
               <motion.div
                 key={entry.team.id}
                 whileHover={{ y: -3 }}
-                className={`p-5 rounded-3xl battle-panel border-2 ${badgeStyle.border} relative overflow-hidden flex flex-col justify-between shadow-lg ${
-                  isWinner ? 'shadow-glow-orange' : ''
-                }`}
+                className={`p-5 rounded-3xl bg-[#191919] border ${badgeStyle.border} relative overflow-hidden flex flex-col justify-between shadow-lg`}
               >
                 <div className="absolute top-0 left-0 right-0 h-1.5" style={{ backgroundColor: entry.team.color }} />
 

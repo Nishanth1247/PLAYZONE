@@ -93,7 +93,7 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-battle-border/80 bg-battle-bg/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 w-full border-b border-[#303030] bg-[#090909]/95 backdrop-blur-md">
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
         
         {/* Brand Logo & Tag */}
@@ -109,62 +109,57 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
           }}
           className="flex items-center gap-3 cursor-pointer group flex-shrink-0"
         >
-          <div className="w-10 h-10 rounded-xl bg-charcoal border border-gold/40 p-[1.5px] shadow-md group-hover:border-gold transition-all duration-300">
-            <div className="w-full h-full bg-forest rounded-[10px] flex items-center justify-center">
+          <div className="w-9 h-9 rounded-lg bg-[#191919] border border-[#303030] p-[1px] shadow-sm group-hover:border-[#555555] transition-all">
+            <div className="w-full h-full bg-[#090909] rounded-[7px] flex items-center justify-center">
               {platformMode === 'party' ? (
-                <Gamepad2 className="w-5 h-5 text-gold group-hover:scale-110 transition-transform duration-300" />
+                <Gamepad2 className="w-4 h-4 text-[#F2F2F0] group-hover:scale-105 transition-transform" />
               ) : platformMode === 'battle' ? (
-                <Swords className="w-5 h-5 text-terracotta group-hover:scale-110 transition-transform duration-300" />
+                <Swords className="w-4 h-4 text-[#F2F2F0] group-hover:scale-105 transition-transform" />
               ) : (
-                <Gavel className="w-5 h-5 text-gold group-hover:rotate-12 transition-transform duration-300" />
+                <Gavel className="w-4 h-4 text-[#F2F2F0] group-hover:rotate-6 transition-transform" />
               )}
             </div>
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-broadcast text-xl sm:text-2xl font-black tracking-wider text-ivory">
-                BIDBATTLE
-              </span>
-              <span className="text-[10px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-terracotta/20 text-terracotta border border-terracotta/40 font-mono">
-                8.4
-              </span>
-            </div>
-            <p className="text-[11px] text-sage font-medium tracking-tight -mt-1 hidden sm:block">
+            <span className="font-heading text-lg sm:text-xl font-bold tracking-tight text-[#F2F2F0] block leading-tight">
+              BIDBATTLE
+            </span>
+            <p className="text-[11px] text-[#A3A3A3] font-medium tracking-tight -mt-0.5 hidden sm:block">
               {platformMode === 'party'
-                ? 'Party Arena • Local Multiplayer'
+                ? 'Party Arena • Local Pass & Play'
                 : platformMode === 'battle'
                 ? 'Battle Arena • Tactical Clash'
-                : 'IPL-Style Auction Arena'}
+                : 'Auction Arena • Franchise Bidding'}
             </p>
           </div>
         </div>
 
         {/* Global Platform Mode Switcher: Auction vs Party vs Battle Arena */}
-        <div className="flex items-center p-1 rounded-2xl bg-pine border border-charcoal font-broadcast text-xs font-bold shadow-inner">
+        <div className="flex items-center p-1 rounded-lg bg-[#191919] border border-[#303030] font-heading text-xs font-semibold">
           <button
             type="button"
             onClick={() => setPlatformMode('auction')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all ${
               platformMode === 'auction'
-                ? 'bg-terracotta text-ivory font-black shadow-md'
-                : 'text-sage hover:text-ivory'
+                ? 'bg-[#F2F2F0] text-[#090909] font-bold shadow-sm'
+                : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
             }`}
           >
             <Gavel className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">AUCTION</span>
             <span className="sm:hidden">AUCT</span>
             {hasLiveAuction && (
-              <span className="w-2 h-2 rounded-full bg-terracotta animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#090909] animate-ping" />
             )}
           </button>
 
           <button
             type="button"
             onClick={() => setPlatformMode('party')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all ${
               platformMode === 'party'
-                ? 'bg-terracotta text-ivory font-black shadow-md'
-                : 'text-sage hover:text-ivory'
+                ? 'bg-[#F2F2F0] text-[#090909] font-bold shadow-sm'
+                : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
             }`}
           >
             <Gamepad2 className="w-3.5 h-3.5" />
@@ -175,20 +170,20 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
           <button
             type="button"
             onClick={() => setPlatformMode('battle')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all ${
               platformMode === 'battle'
-                ? 'bg-terracotta text-ivory font-black shadow-md'
-                : 'text-sage hover:text-ivory'
+                ? 'bg-[#F2F2F0] text-[#090909] font-bold shadow-sm'
+                : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
             }`}
           >
-            <Swords className="w-3.5 h-3.5 text-gold" />
+            <Swords className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">BATTLE ARENA</span>
             <span className="sm:hidden">BATTLE</span>
           </button>
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="hidden lg:flex items-center gap-1 p-1 rounded-xl bg-battle-surface/90 border border-battle-border text-xs font-semibold relative">
+        <nav className="hidden lg:flex items-center gap-1 p-1 rounded-lg bg-[#191919] border border-[#303030] text-xs font-medium relative font-heading">
           {platformMode === 'party' ? (
             partyNavItems.map((item) => {
               const isActive = partyView === item.id;
@@ -198,11 +193,11 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                 <button
                   key={item.id}
                   onClick={item.onClick || (() => {})}
-                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors z-10 font-broadcast tracking-wide ${
-                    isActive ? 'text-white font-bold' : 'text-battle-muted hover:text-white'
+                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all z-10 ${
+                    isActive ? 'bg-[#222222] text-[#F2F2F0] font-semibold border border-[#3A3A3A]' : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${item.isLive ? 'text-brand-cyan animate-pulse' : ''}`} />
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
                 </button>
               );
@@ -216,14 +211,14 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                 <button
                   key={item.id}
                   onClick={() => setActivePage(item.id)}
-                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors z-10 font-broadcast tracking-wide ${
-                    isActive ? 'text-white font-bold' : 'text-battle-muted hover:text-white'
+                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all z-10 ${
+                    isActive ? 'bg-[#222222] text-[#F2F2F0] font-semibold border border-[#3A3A3A]' : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${item.isLive ? 'text-red-400 animate-pulse' : ''}`} />
+                  <Icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
                   {item.badge > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-brand-orange/20 text-brand-orange border border-brand-orange/40 font-bold">
+                    <span className="px-1.5 py-0.2 rounded text-[10px] bg-[#303030] text-[#F2F2F0] border border-[#444444] font-mono">
                       {item.badge}
                     </span>
                   )}
@@ -239,22 +234,22 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
           <button
             onClick={handleToggleSound}
             title={isMuted ? 'Unmute Sound FX' : 'Mute Sound FX'}
-            className={`p-2 rounded-xl border transition-all ${
+            className={`p-2 rounded-lg border transition-all ${
               isMuted
-                ? 'bg-red-950/40 border-red-800 text-red-400 hover:bg-red-900/50'
-                : 'bg-pine border-charcoal text-sage hover:text-ivory hover:border-gold/50'
+                ? 'bg-[#191919] border-rose-900/60 text-rose-300'
+                : 'bg-[#191919] border-[#303030] text-[#A3A3A3] hover:text-[#F2F2F0] hover:border-[#505050]'
             }`}
           >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-gold" />}
+            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-[#F2F2F0]" />}
           </button>
 
           {/* Fullscreen Toggle */}
           <button
             onClick={toggleFullscreen}
             title={isFullscreen ? 'Exit Fullscreen' : 'Enter Broadcast Fullscreen'}
-            className="p-2 rounded-xl bg-pine border border-charcoal text-sage hover:text-ivory hover:border-gold/50 transition-all hidden sm:flex"
+            className="p-2 rounded-lg bg-[#191919] border border-[#303030] text-[#A3A3A3] hover:text-[#F2F2F0] hover:border-[#505050] transition-all hidden sm:flex"
           >
-            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4 text-[#F2F2F0]" />}
           </button>
 
           {/* Host Menu for live tournament in Auction Mode */}
@@ -262,16 +257,16 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
             <div className="relative">
               <button
                 onClick={() => setShowExitConfirm(!showExitConfirm)}
-                className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl bg-battle-surface hover:bg-battle-card border border-battle-border text-battle-text hover:text-white transition-all font-broadcast tracking-wide"
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-[#191919] hover:bg-[#222222] border border-[#303030] text-[#F2F2F0] transition-all font-heading"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-brand-orange" />
+                <RotateCcw className="w-3.5 h-3.5 text-[#A3A3A3]" />
                 <span className="hidden sm:inline">Host Controls</span>
-                <ChevronDown className="w-3.5 h-3.5 text-battle-muted" />
+                <ChevronDown className="w-3.5 h-3.5 text-[#737373]" />
               </button>
 
               {showExitConfirm && (
-                <div className="absolute right-0 mt-2 w-60 rounded-2xl battle-panel border border-battle-border shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2">
-                  <div className="px-3 py-1.5 border-b border-battle-border text-[11px] font-bold text-battle-muted uppercase tracking-wider">
+                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-[#191919] border border-[#303030] shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2">
+                  <div className="px-3 py-1.5 border-b border-[#303030] text-[10px] font-bold text-[#737373] uppercase tracking-wider font-heading">
                     Tournament Admin
                   </div>
                   <button
@@ -279,9 +274,9 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                       finishAuction();
                       setShowExitConfirm(false);
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-medium text-battle-text hover:text-white hover:bg-brand-purple/20 rounded-lg flex items-center gap-2 mt-1"
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-[#F2F2F0] hover:bg-[#222222] rounded-md flex items-center gap-2 mt-1"
                   >
-                    <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                    <Trophy className="w-3.5 h-3.5 text-[#F2F2F0]" />
                     <span>Conclude Tournament</span>
                   </button>
                   <button
@@ -289,7 +284,7 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                       resetAuction();
                       setShowExitConfirm(false);
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-950/40 rounded-lg flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-rose-300 hover:bg-rose-950/30 rounded-md flex items-center gap-2"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Reset & Exit to Home</span>

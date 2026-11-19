@@ -7,11 +7,11 @@ export const Toaster = () => {
       position="top-right"
       toastOptions={{
         style: {
-          background: 'rgba(21, 26, 43, 0.95)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid #232A44',
-          color: '#F5F6FF',
-          boxShadow: '0 12px 30px -10px rgba(0, 0, 0, 0.7)',
+          background: '#191919',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid #303030',
+          color: '#F2F2F0',
+          boxShadow: '0 8px 24px -6px rgba(0, 0, 0, 0.8)',
         },
       }}
     />

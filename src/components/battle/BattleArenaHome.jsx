@@ -116,28 +116,23 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-grid-pattern pb-16">
-      {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[350px] bg-brand-orange/15 blur-[160px] pointer-events-none rounded-full" />
-      <div className="absolute top-1/3 left-1/4 w-[450px] h-[300px] bg-brand-purple/15 blur-[140px] pointer-events-none rounded-full" />
-      <div className="absolute top-2/3 right-1/4 w-[500px] h-[320px] bg-brand-cyan/15 blur-[150px] pointer-events-none rounded-full" />
-
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#090909] pb-16">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-10">
         
         {/* HERO TITLE SECTION */}
         <div className="text-center max-w-3xl mx-auto pt-4 space-y-4">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-battle-surface/90 border border-brand-orange/40 text-xs font-bold text-brand-orange shadow-glow-orange">
-            <Swords className="w-4 h-4 text-brand-orange" />
-            <span className="text-battle-text">BIDBATTLE 8.1 • Competitive Esports System</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-neon" />
-            <span className="text-brand-neon font-black tracking-wider">ROUND 1: AUCTION → ROUND 2: BATTLES</span>
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#191919] border border-[#303030] text-xs font-heading font-bold text-[#A3A3A3] shadow-sm">
+            <Swords className="w-4 h-4 text-[#F2F2F0]" />
+            <span className="text-[#F2F2F0]">CHAMPIONSHIP • Competitive Battle System</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#737373]" />
+            <span className="text-[#A3A3A3] font-mono tracking-wider">ROUND 1: AUCTION → ROUND 2: BATTLES</span>
           </div>
 
-          <h1 className="font-broadcast text-5xl sm:text-7xl font-black tracking-wider uppercase text-white leading-none">
-            BATTLE <span className="neon-text-orange">ARENA</span>
+          <h1 className="font-title text-5xl sm:text-7xl font-black tracking-wider uppercase text-[#F2F2F0] leading-none">
+            BATTLE ARENA
           </h1>
 
-          <p className="text-sm sm:text-base text-battle-muted max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-[#A3A3A3] max-w-2xl mx-auto leading-relaxed">
             Acquire your superstar roster through a strategic high-stakes auction, then clash head-to-head in tactical arena battles to crown the undisputed champion!
           </p>
         </div>
@@ -158,13 +153,13 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-5xl mx-auto">
           
           {/* LEFT: SQUAD & PURSE SETTINGS (6 COLS) */}
-          <div className="lg:col-span-6 battle-panel rounded-3xl p-6 sm:p-8 border border-brand-orange/40 shadow-xl space-y-6">
+          <div className="lg:col-span-6 bg-[#191919] rounded-3xl p-6 sm:p-8 border border-[#303030] shadow-xl space-y-6">
             
             {/* Squad Size Selector */}
             <div>
-              <label className="text-xs font-bold font-broadcast uppercase text-battle-muted tracking-wider block mb-3 flex items-center justify-between">
+              <label className="text-xs font-bold font-heading uppercase text-[#A3A3A3] tracking-wider block mb-3 flex items-center justify-between">
                 <span>Required Squad Size Per Team</span>
-                <span className="text-brand-neon font-mono font-black">{squadSize} Players</span>
+                <span className="text-[#F2F2F0] font-mono font-black">{squadSize} Players</span>
               </label>
 
               <div className="grid grid-cols-4 gap-2.5">
@@ -175,12 +170,12 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
                     onClick={() => setSquadSize(size)}
                     className={`py-2.5 rounded-2xl border font-mono text-xs transition-all text-center ${
                       squadSize === size
-                        ? 'bg-brand-cyan text-dark-950 font-black border-brand-cyan shadow-glow-cyan'
-                        : 'bg-battle-surface text-battle-muted hover:text-white border-battle-border'
+                        ? 'bg-[#F2F2F0] text-[#090909] font-black border-[#F2F2F0]'
+                        : 'bg-[#111111] text-[#A3A3A3] hover:text-[#F2F2F0] border-[#303030]'
                     }`}
                   >
                     <span className="block text-sm font-black">{size} Lots</span>
-                    <span className="text-[10px] font-broadcast block opacity-80">Equal Squad</span>
+                    <span className="text-[10px] font-heading block opacity-80">Equal Squad</span>
                   </button>
                 ))}
 
@@ -192,25 +187,25 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
                     max={12}
                     value={squadSize}
                     onChange={(e) => setSquadSize(Math.max(2, Math.min(12, Number(e.target.value) || 2)))}
-                    className="w-full h-full py-2 px-2 text-center rounded-2xl bg-battle-surface border border-battle-border text-white text-xs font-mono font-bold focus:border-brand-neon focus:outline-none"
+                    className="w-full h-full py-2 px-2 text-center rounded-2xl bg-[#111111] border border-[#303030] text-[#F2F2F0] text-xs font-mono font-bold focus:border-white focus:outline-none"
                     placeholder="Custom"
                   />
-                  <span className="text-[9px] text-battle-muted font-mono block text-center mt-1">
+                  <span className="text-[9px] text-[#737373] font-mono block text-center mt-1">
                     Custom Cap
                   </span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-battle-muted mt-2 italic">
+              <p className="text-[11px] text-[#737373] mt-2 italic">
                 Every team must acquire exactly {squadSize} players during Round 1 before battles can begin.
               </p>
             </div>
 
             {/* Starting Purse Configuration */}
             <div className="pt-2">
-              <label className="text-xs font-bold font-broadcast uppercase text-battle-muted tracking-wider block mb-2 flex items-center justify-between">
+              <label className="text-xs font-bold font-heading uppercase text-[#A3A3A3] tracking-wider block mb-2 flex items-center justify-between">
                 <span>Equal Starting Purse</span>
-                <span className="text-amber-400 font-mono font-bold">₹{startingPurse} Cr / Team</span>
+                <span className="text-[#F2F2F0] font-mono font-bold">₹{startingPurse} Cr / Team</span>
               </label>
 
               <div className="grid grid-cols-3 gap-2">
@@ -221,8 +216,8 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
                     onClick={() => setStartingPurse(amount)}
                     className={`py-2 rounded-xl border font-mono text-xs transition-all ${
                       startingPurse === amount
-                        ? 'bg-amber-400 text-dark-950 font-black border-amber-300 shadow-glow-orange'
-                        : 'bg-battle-surface text-battle-muted hover:text-white border-battle-border'
+                        ? 'bg-[#F2F2F0] text-[#090909] font-black border-[#F2F2F0]'
+                        : 'bg-[#111111] text-[#A3A3A3] hover:text-[#F2F2F0] border-[#303030]'
                     }`}
                   >
                     ₹{amount} Cr
@@ -365,8 +360,8 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
             {/* Launch Round 1 Auction Button */}
             <div className="pt-4 space-y-2">
               {!isSelectionValid && (
-                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-broadcast font-bold flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                <div className="p-3 rounded-xl bg-[#222222] border border-[#444444] text-[#A3A3A3] text-xs font-heading font-bold flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-[#F2F2F0]" />
                   <span>Select exactly {teamCount} franchises to start ({selectedTeamIds.length}/{teamCount} selected).</span>
                 </div>
               )}
@@ -375,7 +370,7 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
                 size="xl"
                 disabled={!isPoolSufficient || !isSelectionValid}
                 onClick={handleStartTournament}
-                className="w-full font-broadcast text-base shadow-glow-orange bg-brand-orange hover:bg-orange-600 text-dark-950 font-black flex items-center justify-center gap-2"
+                className="w-full font-heading text-base bg-[#F2F2F0] hover:bg-white text-[#090909] font-black flex items-center justify-center gap-2"
               >
                 <Play className="w-5 h-5 fill-current" />
                 <span>START ROUND 1: TEAM AUCTION</span>
