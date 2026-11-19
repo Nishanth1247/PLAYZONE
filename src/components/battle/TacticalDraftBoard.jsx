@@ -135,8 +135,11 @@ export const TacticalDraftBoard = () => {
 
   const handleAutoFill = () => {
     soundService?.playBid?.();
-    const unassigned = [...availableFighters];
     setAssignedSlots((prev) => {
+      const currentAssignedIds = prev.filter(Boolean).map((f) => f.id);
+      const unassigned = (currentTeam?.squad || []).filter(
+        (f) => !currentAssignedIds.includes(f.id)
+      );
       const next = [...prev];
       for (let i = 0; i < next.length; i++) {
         if (!next[i] && unassigned.length > 0) {

@@ -19,7 +19,6 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useBattleArena } from '../../context/BattleArenaContext';
 import { BattleReplayViewer } from './BattleReplayViewer';
-import { TacticalDraftBoard } from './TacticalDraftBoard';
 import { soundService } from '../../services/soundService';
 import { getTeamMatchSlotIndex } from '../../services/battleEngine';
 
@@ -44,6 +43,24 @@ export const BattleArenaMatch = () => {
     advanceToNextBattle,
   } = useBattleArena();
 
+  // Cinematic 3-2-1 Reveal Countdown handler (called unconditionally at top of component)
+  useEffect(() => {
+    let timer = null;
+    if (revealCountdown !== null && revealCountdown > 0) {
+      soundService?.playTick?.();
+      timer = setTimeout(() => {
+        setRevealCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+    } else if (revealCountdown === 0) {
+      soundService?.playSold?.();
+      initiateMatchReveal();
+      setRevealCountdown(null);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [revealCountdown, initiateMatchReveal]);
+
   const {
     schedule,
     currentMatchIndex,
@@ -55,11 +72,6 @@ export const BattleArenaMatch = () => {
     completedMatches,
     tacticalDraft,
   } = battleState;
-
-  // 1. If Tactical Draft is not completed or not yet in active matches, render TacticalDraftBoard
-  if (!tacticalDraft?.isLocked || tacticalDraft?.draftStage !== 'active_matches') {
-    return <TacticalDraftBoard />;
-  }
 
   const currentMatch = schedule[currentMatchIndex];
   if (!currentMatch) return null;
@@ -92,24 +104,6 @@ export const BattleArenaMatch = () => {
     currentMatchEvaluation ? 'evaluated' :
     'faceoff'
   );
-
-  // Cinematic 3-2-1 Reveal Countdown handler
-  useEffect(() => {
-    let timer = null;
-    if (revealCountdown !== null && revealCountdown > 0) {
-      soundService?.playTick?.();
-      timer = setTimeout(() => {
-        setRevealCountdown((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-    } else if (revealCountdown === 0) {
-      soundService?.playSold?.();
-      initiateMatchReveal();
-      setRevealCountdown(null);
-    }
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [revealCountdown, initiateMatchReveal]);
 
   return (
     <div className="min-h-[calc(100vh-4.5rem)] flex flex-col justify-between p-2 sm:p-4 max-w-[1750px] mx-auto select-none space-y-2.5">
