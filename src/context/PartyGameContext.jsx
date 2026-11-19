@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { GAME_REGISTRY, FIXED_PARTY_PLAYERS, getGameById } from '../services/party/gameRegistry';
-import { generateGameContent } from '../services/party/aiContentService';
 import { soundService } from '../services/soundService';
 import { toast } from 'sonner';
 
@@ -35,9 +34,9 @@ export const PartyGameProvider = ({ children }) => {
   // Privacy pass-the-laptop guard
   const [passLaptopState, setPassLaptopState] = useState(null);
 
-  // Safety: Ensure only Dumb Charades is active, intercepting any obsolete game states
+  // Safety: Ensure only supported official games in GAME_REGISTRY are active
   useEffect(() => {
-    if (!selectedGame || selectedGame.id !== 'party_dumb_charades') {
+    if (!selectedGame || !GAME_REGISTRY.some((g) => g.id === selectedGame.id)) {
       setSelectedGame(GAME_REGISTRY[0]);
     }
   }, [selectedGame]);
@@ -71,23 +70,8 @@ export const PartyGameProvider = ({ children }) => {
     setIsLoadingContent(true);
 
     try {
-      const generated = await generateGameContent({
-        gameId: targetGame.id,
-        universe: targetGame.universe,
-        difficulty: targetDifficulty,
-        category: targetCategory,
-        count: targetRounds * (targetGame.mechanic === 'rapid_fire' ? 8 : 1),
-        playerCount: targetPlayers.length,
-      });
-
-      setContentItems(generated.items || []);
-      setContentSource(generated.source || 'offline');
-
-      if (generated.notice) {
-        toast.info(generated.notice);
-      } else if (generated.source === 'ai') {
-        toast.success(`⚡ AI Content Generated for ${targetGame.title}!`);
-      }
+      setContentItems([]);
+      setContentSource('offline');
 
       // Initialize scoreboard
       const initialScores = {};

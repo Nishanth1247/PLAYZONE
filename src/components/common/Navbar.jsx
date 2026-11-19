@@ -24,7 +24,6 @@ import {
   Settings
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
-import { AISettingsModal } from '../party/AISettingsModal';
 
 export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
   const { 
@@ -46,7 +45,6 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const [showAISettings, setShowAISettings] = useState(false);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -313,12 +311,6 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
           )}
         </div>
       </div>
-
-      {/* AI Settings Modal */}
-      <AISettingsModal
-        isOpen={showAISettings}
-        onClose={() => setShowAISettings(false)}
-      />
     </header>
   );
 };

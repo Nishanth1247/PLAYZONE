@@ -248,3 +248,59 @@ Follow this exact structure:
 - Create an actual downloadable .json file.
 - Validate the file before sharing the download link.
 - State clearly that the output file is for BIDBATTLE Dumb Charades 2.0.`;
+
+export const WHO_AM_I_CHATGPT_PROMPT = `I want to create a custom character collection for BIDBATTLE Who Am I? (Party Arena).
+
+Act as an expert character collection generator for BIDBATTLE Who Am I?
+
+First ask me these 6 questions:
+1. Subject or topic (e.g. Tamil Cinema Legends, MCU Heroes & Villains, World Cricket Superstars, Hollywood Icons, Anime Titans, Cartoon Characters, Historical Personalities).
+2. Collection name (e.g. Kollywood Icons & Villains, Marvel Multiverse, Legendary Cricketers).
+3. Number of characters to generate (e.g. 20, 30, 40, 50).
+4. Difficulty level: Easy, Medium, Hard, or Mixed.
+5. Include a subtle clue/hint for each character (Yes / No).
+6. Categories, subcategories, or restrictions (e.g. only 90s era, no animated characters, only bowlers, etc.).
+
+### WHO AM I? GAMEPLAY CONTEXT
+- In BIDBATTLE Who Am I?, the Guesser stands behind the laptop facing AWAY from the screen.
+- Everyone else sits in front of the laptop and SEES the secret character name.
+- The Guesser asks Yes/No questions (e.g. "Am I a real human?", "Am I in sports?", "Am I still active?").
+- The audience answers YES, NO, or MAYBE until the Guesser guesses their identity or time expires.
+
+### REQUIRED JSON SCHEMA
+
+Follow this exact structure:
+
+{
+  "name": "COLLECTION NAME",
+  "category": "MAIN CATEGORY",
+  "characters": [
+    {
+      "id": "char_001",
+      "name": "Character Name",
+      "category": "SUBCATEGORY",
+      "difficulty": "Easy",
+      "hint": "Subtle clue without revealing the character name"
+    },
+    {
+      "id": "char_002",
+      "name": "Another Character",
+      "category": "SUBCATEGORY",
+      "difficulty": "Medium",
+      "hint": "Subtle clue without revealing the character name"
+    }
+  ]
+}
+
+### STRICT RULES
+- Every character must have a unique string ID (e.g. "char_001", "char_002").
+- Every character must have a non-empty name without numbers or prefixes (e.g. "Iron Man", not "1. Iron Man").
+- No duplicate character names.
+- Every character must have a category (e.g. "Avengers", "Villains", "Batsmen", "Pioneer").
+- Allowed difficulties: "Easy", "Medium", or "Hard".
+- Hints should be helpful clues that do not explicitly give away the name.
+- Generate exactly the requested number of characters.
+- Use valid JSON with double quotes.
+- Provide an actual downloadable .json file.
+- Validate the JSON before sharing the download link.
+- State clearly that the output file is 100% compatible with BIDBATTLE Who Am I? and can be imported via JSON, CSV, or TXT.`;

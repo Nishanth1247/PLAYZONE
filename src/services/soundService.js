@@ -34,6 +34,47 @@ class SoundService {
     this.volume = Math.max(0, Math.min(1, vol));
   }
 
+  // Generic sound dispatcher
+  play(soundName) {
+    if (this.muted) return;
+    try {
+      switch (soundName) {
+        case 'countdown_tick':
+        case 'timer_warning':
+        case 'tick':
+          this.playTick();
+          break;
+        case 'timer_expired':
+        case 'buzzer':
+        case 'unsold':
+          this.playUnsold();
+          break;
+        case 'round_start':
+        case 'success':
+        case 'fanfare':
+        case 'sold':
+          this.playSold();
+          break;
+        case 'bid_placed':
+        case 'button_click':
+        case 'chime':
+        case 'bid':
+          this.playBid();
+          break;
+        case 'bid_outbid':
+        case 'skip':
+        case 'outbid':
+          this.playOutbid();
+          break;
+        default:
+          this.playBid();
+          break;
+      }
+    } catch (e) {
+      console.warn('Audio playback suppressed:', e);
+    }
+  }
+
   // 1. Bid placed chime (uplifting electronic bell)
   playBid() {
     if (this.muted) return;
