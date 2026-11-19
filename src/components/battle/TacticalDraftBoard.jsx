@@ -383,7 +383,7 @@ export const TacticalDraftBoard = () => {
               <span className="text-[11px] font-mono text-[#F5F3EE]">Click to assign to next slot</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[500px] overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[400px] sm:max-h-[440px] overflow-y-auto pr-1">
               {availableFighters.length === 0 ? (
                 <div className="col-span-full p-6 text-center rounded-2xl bg-[#2C394C] border border-[#39465A] text-[#AEB9CC] text-xs">
                   <UserCheck className="w-8 h-8 text-[#F5F3EE] mx-auto mb-2 opacity-80" />
@@ -451,7 +451,7 @@ export const TacticalDraftBoard = () => {
             </div>
 
             {/* Slots List */}
-            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[400px] sm:max-h-[440px] overflow-y-auto pr-1">
               {assignedSlots.map((fighter, slotIdx) => {
                 const matchInfo = teamMatches[slotIdx];
                 const opponentId = matchInfo?.teamAId === currentTeam.id ? matchInfo?.teamBId : matchInfo?.teamAId;

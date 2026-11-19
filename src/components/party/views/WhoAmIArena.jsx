@@ -231,32 +231,32 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+    <div className="max-w-3xl mx-auto px-4 py-4 space-y-3.5 select-none">
       {/* Top Header / Progress Bar */}
-      <div className="flex items-center justify-between border-b border-battle-border pb-4">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between border-b border-[#39465A] pb-3">
+        <div className="flex items-center gap-2.5">
           <Button
             variant="ghost"
             size="sm"
             onClick={onExitToSetup}
-            className="text-battle-muted hover:text-white text-xs"
+            className="text-[#AEB9CC] hover:text-[#F5F3EE] text-xs font-mono"
           >
             ← Exit Setup
           </Button>
-          <div className="flex items-center gap-2">
-            <span className="text-lg">❓</span>
-            <span className="font-broadcast text-sm font-bold text-white tracking-wide">
+          <div className="flex items-center gap-1.5">
+            <span className="text-base">❓</span>
+            <span className="font-heading text-xs sm:text-sm font-bold text-[#F5F3EE] tracking-wide truncate max-w-[180px] sm:max-w-xs">
               {gameState.collectionName}
             </span>
           </div>
         </div>
 
         {stage !== 'podium' && (
-          <div className="flex items-center gap-2">
-            <Badge variant="cyan" className="font-mono text-xs">
+          <div className="flex items-center gap-1.5">
+            <Badge variant="subtle" className="font-mono text-[11px] py-0.5">
               Turn {currentTurnNum} / {totalTurns}
             </Badge>
-            <Badge variant="purple" className="font-mono text-xs">
+            <Badge variant="outline" className="font-mono text-[11px] py-0.5 border-[#39465A] text-[#AEB9CC]">
               Round {currentTurn?.roundNumber} / {gameState.roundsCount}
             </Badge>
           </div>
@@ -270,28 +270,28 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="battle-panel rounded-3xl p-8 border text-center space-y-6 shadow-2xl relative overflow-hidden"
-          style={{ borderColor: `${currentGuesser.color}60` }}
+          className="rounded-3xl bg-[#222F43] p-5 sm:p-7 border-2 text-center space-y-4 shadow-2xl relative overflow-hidden"
+          style={{ borderColor: `${currentGuesser.color}80` }}
         >
           {/* Ambient Lighting */}
           <div
-            className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full blur-[120px] opacity-25 pointer-events-none"
+            className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-[100px] opacity-20 pointer-events-none"
             style={{ backgroundColor: currentGuesser.color }}
           />
 
           {/* Turn Banner */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-battle-bg border border-battle-border text-xs font-mono font-bold text-battle-muted">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2C394C] border border-[#39465A] text-xs font-mono font-bold text-[#AEB9CC]">
             <span>ROUND {currentTurn?.roundNumber}</span>
             <span>•</span>
             <span>TURN {currentTurnNum} OF {totalTurns}</span>
           </div>
 
           {/* Guesser Spotlight Card */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div
-              className="w-24 h-24 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-xl border-2"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl mx-auto flex items-center justify-center text-3xl sm:text-4xl shadow-xl border-2"
               style={{
-                backgroundColor: `${currentGuesser.color}25`,
+                backgroundColor: `${currentGuesser.color}20`,
                 borderColor: currentGuesser.color,
                 color: currentGuesser.color,
               }}
@@ -299,64 +299,64 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
               {currentGuesser.avatar}
             </div>
             <div>
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-battle-muted">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#AEB9CC]">
                 CURRENT GUESSER
               </span>
               <h2
-                className="font-broadcast text-4xl sm:text-5xl font-black tracking-wide uppercase"
+                className="font-heading sm:font-broadcast text-3xl sm:text-4xl font-black tracking-wide uppercase"
                 style={{ color: currentGuesser.color }}
               >
                 {currentGuesser.name}
               </h2>
-              <span className="text-xs font-mono text-battle-muted">
+              <span className="text-xs font-mono text-[#AEB9CC]">
                 {currentGuesser.tagline}
               </span>
             </div>
           </div>
 
           {/* PHYSICAL INSTRUCTIONS BOX */}
-          <div className="max-w-xl mx-auto p-5 rounded-2xl bg-battle-bg border border-battle-border text-left space-y-3">
-            <div className="flex items-center gap-2 text-brand-orange font-broadcast text-xs font-bold tracking-wider uppercase">
-              <EyeOff className="w-4 h-4" />
+          <div className="max-w-lg mx-auto p-3.5 sm:p-4 rounded-2xl bg-[#2C394C] border border-[#39465A] text-left space-y-2">
+            <div className="flex items-center gap-2 text-[#D97858] font-heading text-xs font-bold tracking-wider uppercase">
+              <EyeOff className="w-3.5 h-3.5" />
               <span>PHYSICAL INSTRUCTIONS BEFORE REVEALING:</span>
             </div>
-            <ul className="text-xs sm:text-sm text-battle-text space-y-2 font-mono">
+            <ul className="text-xs text-[#AEB9CC] space-y-1.5 font-mono">
               <li className="flex items-start gap-2">
-                <span className="text-brand-cyan font-bold">1.</span>
+                <span className="text-[#91A98B] font-bold">1.</span>
                 <span>
-                  <strong>{currentGuesser.name}</strong> must stand behind the laptop facing <strong>AWAY</strong> from the screen!
+                  <strong className="text-[#F5F3EE]">{currentGuesser.name}</strong> must stand behind the device facing <strong>AWAY</strong> from the screen!
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-brand-purple font-bold">2.</span>
+                <span className="text-[#D4B879] font-bold">2.</span>
                 <span>
-                  All other players sit in front of the laptop. You will see the secret character!
+                  All other players sit in front of the screen. You will see the secret character!
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-brand-neon font-bold">3.</span>
+                <span className="text-[#D97858] font-bold">3.</span>
                 <span>
-                  {currentGuesser.name} asks Yes/No questions. Everyone answers: <strong>YES, NO, or MAYBE</strong>!
+                  {currentGuesser.name} asks Yes/No questions. Everyone answers: <strong className="text-[#F5F3EE]">YES, NO, or MAYBE</strong>!
                 </span>
               </li>
             </ul>
           </div>
 
           {/* START REVEAL BUTTON */}
-          <div className="pt-2">
+          <div className="pt-1">
             <Button
               variant="primary"
-              size="xl"
+              size="lg"
               onClick={handleStartReveal}
-              className="font-broadcast text-sm font-black shadow-glow flex items-center justify-center gap-2 mx-auto px-8"
+              className="font-heading text-xs sm:text-sm font-black shadow-xl flex items-center justify-center gap-2 mx-auto px-6 py-3"
               style={{
                 backgroundColor: currentGuesser.color,
                 borderColor: currentGuesser.color,
-                color: '#080A12',
+                color: '#111827',
               }}
             >
               <Eye className="w-4 h-4" />
-              <span>GUESSER IS IN POSITION — REVEAL CHARACTER</span>
+              <span>GUESSER IN POSITION — REVEAL CHARACTER</span>
             </Button>
           </div>
         </motion.div>
@@ -371,15 +371,15 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 1.4 }}
-          className="battle-panel rounded-3xl p-16 border border-brand-cyan/40 text-center space-y-4 shadow-2xl"
+          className="rounded-3xl bg-[#222F43] p-10 sm:p-14 border border-[#39465A] text-center space-y-3 shadow-2xl"
         >
-          <span className="text-xs font-mono font-bold tracking-widest text-battle-muted uppercase">
+          <span className="text-xs font-mono font-bold tracking-widest text-[#AEB9CC] uppercase">
             CHARACTER REVEALING IN
           </span>
-          <div className="font-broadcast text-8xl sm:text-9xl font-black neon-text-cyan">
+          <div className="font-heading sm:font-broadcast text-7xl sm:text-8xl font-black text-[#F5F3EE]">
             {countdownNum}
           </div>
-          <span className="text-sm font-mono text-brand-orange">
+          <span className="text-xs font-mono text-[#D97858]">
             Guesser face away now!
           </span>
         </motion.div>
@@ -389,10 +389,10 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
           STAGE 3: ACTIVE GUESSING ARENA (SHARED SCREEN)
           ========================================================================= */}
       {stage === 'guessing' && currentCharacter && currentGuesser && (
-        <div className="space-y-6">
+        <div className="space-y-3.5">
           {/* TOP WARNING BANNER */}
-          <div className="p-3 rounded-2xl bg-red-500/15 border border-red-500/40 text-center flex items-center justify-center gap-2 text-xs font-mono font-bold text-red-300 shadow-sm animate-pulse">
-            <AlertTriangle className="w-4 h-4 text-red-400" />
+          <div className="p-2 rounded-xl bg-red-500/15 border border-red-500/40 text-center flex items-center justify-center gap-2 text-xs font-mono font-bold text-red-300 shadow-sm animate-pulse">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
             <span>AUDIENCE ONLY: GUESSER MUST NOT LOOK AT THIS SCREEN!</span>
           </div>
 
@@ -400,30 +400,30 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="battle-panel rounded-3xl p-6 sm:p-8 border border-brand-cyan/50 text-center space-y-5 relative overflow-hidden shadow-2xl"
+            className="rounded-3xl bg-[#222F43] p-4 sm:p-6 border border-[#39465A] text-center space-y-3.5 relative overflow-hidden shadow-2xl"
           >
             {/* Ambient Lighting */}
-            <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-brand-cyan/15 rounded-full blur-[130px] pointer-events-none" />
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#D97858]/10 rounded-full blur-[100px] pointer-events-none" />
 
             {/* Badges Bar */}
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <Badge variant="cyan" className="font-mono text-xs">
+            <div className="flex flex-wrap items-center justify-center gap-1.5">
+              <Badge variant="subtle" className="font-mono text-[10px]">
                 {currentCharacter.category}
               </Badge>
               <Badge
                 variant={
                   currentCharacter.difficulty === 'Easy'
-                    ? 'neon'
+                    ? 'outline'
                     : currentCharacter.difficulty === 'Hard'
                     ? 'danger'
-                    : 'orange'
+                    : 'subtle'
                 }
-                className="font-mono text-xs"
+                className="font-mono text-[10px]"
               >
                 {currentCharacter.difficulty}
               </Badge>
               {isSpeedBonusEligible && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-[11px] font-bold">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D4B879]/15 border border-[#D4B879]/40 text-[#D4B879] font-mono text-[10px] font-bold">
                   <Zap className="w-3 h-3" />
                   Speed Bonus Eligible (+5 pts)
                 </span>
@@ -431,21 +431,21 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
             </div>
 
             {/* SECRET CHARACTER NAME */}
-            <div className="py-2">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-battle-muted block mb-1">
+            <div className="py-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#AEB9CC] block mb-0.5">
                 YOU ARE:
               </span>
-              <h1 className="font-broadcast text-4xl sm:text-6xl font-black text-white tracking-wider uppercase drop-shadow-md">
+              <h1 className="font-heading sm:font-broadcast text-3xl sm:text-5xl font-black text-[#F5F3EE] tracking-wider uppercase drop-shadow-md">
                 {currentCharacter.name}
               </h1>
             </div>
 
             {/* OPTIONAL HINT SECTION */}
             {currentCharacter.hint && (
-              <div className="pt-1">
+              <div>
                 {showHint ? (
-                  <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/40 max-w-lg mx-auto text-xs text-amber-200 font-mono flex items-center justify-center gap-2">
-                    <Lightbulb className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <div className="p-2.5 rounded-xl bg-[#D4B879]/10 border border-[#D4B879]/40 max-w-md mx-auto text-xs text-[#D4B879] font-mono flex items-center justify-center gap-2">
+                    <Lightbulb className="w-3.5 h-3.5 text-[#D4B879] flex-shrink-0" />
                     <span><strong>HINT:</strong> {currentCharacter.hint}</span>
                   </div>
                 ) : (
@@ -453,9 +453,9 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
                     variant="ghost"
                     size="xs"
                     onClick={() => setShowHint(true)}
-                    className="font-mono text-xs text-battle-muted hover:text-amber-300"
+                    className="font-mono text-xs text-[#AEB9CC] hover:text-[#D4B879]"
                   >
-                    <Lightbulb className="w-3.5 h-3.5 mr-1" />
+                    <Lightbulb className="w-3 h-3 mr-1" />
                     Reveal Hint to Audience
                   </Button>
                 )}
@@ -463,18 +463,18 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
             )}
 
             {/* TIMER & GUESSER STATUS STRIP */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-battle-border/80 max-w-2xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-3 border-t border-[#39465A] max-w-xl mx-auto">
               {/* Guesser pill */}
-              <div className="p-2.5 rounded-xl bg-battle-bg border border-battle-border flex items-center gap-2.5 text-left">
+              <div className="p-2 rounded-xl bg-[#2C394C] border border-[#39465A] flex items-center gap-2 text-left">
                 <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold text-white shadow-sm flex-shrink-0"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0"
                   style={{ backgroundColor: currentGuesser.color }}
                 >
                   {currentGuesser.avatar}
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[10px] font-mono text-battle-muted block">Guesser</span>
-                  <h4 className="font-broadcast text-xs font-bold text-white truncate">
+                  <span className="text-[9px] font-mono text-[#AEB9CC] block">Guesser</span>
+                  <h4 className="font-heading text-xs font-bold text-[#F5F3EE] truncate">
                     {currentGuesser.name}
                   </h4>
                 </div>
@@ -482,22 +482,22 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
 
               {/* Turn Timer */}
               <div
-                className={`p-2.5 rounded-xl border flex items-center justify-center gap-2 ${
+                className={`p-2 rounded-xl border flex items-center justify-center gap-1.5 ${
                   timeRemaining <= 10
                     ? 'bg-red-500/15 border-red-500/50 text-red-400 animate-pulse'
-                    : 'bg-battle-bg border-battle-border text-white'
+                    : 'bg-[#2C394C] border-[#39465A] text-[#F5F3EE]'
                 }`}
               >
-                <Clock className="w-4 h-4 text-brand-orange" />
-                <span className="font-mono text-lg font-black">{timeRemaining}s</span>
+                <Clock className="w-3.5 h-3.5 text-[#D97858]" />
+                <span className="font-mono text-base font-black">{timeRemaining}s</span>
               </div>
 
               {/* Questions tally count */}
-              <div className="col-span-2 sm:col-span-1 p-2.5 rounded-xl bg-battle-bg border border-battle-border flex items-center justify-center gap-2 text-xs font-mono text-battle-muted">
-                <HelpCircle className="w-4 h-4 text-brand-cyan" />
+              <div className="col-span-2 sm:col-span-1 p-2 rounded-xl bg-[#2C394C] border border-[#39465A] flex items-center justify-center gap-1.5 text-xs font-mono text-[#AEB9CC]">
+                <HelpCircle className="w-3.5 h-3.5 text-[#F5F3EE]" />
                 <span>
                   Questions:{' '}
-                  <strong className="text-white text-sm">{questionsCount}</strong>
+                  <strong className="text-[#F5F3EE] text-xs">{questionsCount}</strong>
                   {gameState.questionLimit > 0 && ` / ${gameState.questionLimit}`}
                 </span>
               </div>
@@ -505,19 +505,19 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
           </motion.div>
 
           {/* INTERACTIVE QUESTION TALLY BUTTONS (YES / NO / MAYBE) */}
-          <div className="battle-panel rounded-3xl p-5 border border-battle-border space-y-3">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-battle-muted block text-center">
+          <div className="rounded-3xl bg-[#222F43] p-3.5 sm:p-4 border border-[#39465A] space-y-2">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#AEB9CC] block text-center">
               AUDIENCE LIVE RESPONSE & QUESTION TRACKER:
             </span>
 
-            <div className="grid grid-cols-3 gap-3 max-w-lg mx-auto">
+            <div className="grid grid-cols-3 gap-2.5 max-w-md mx-auto">
               <button
                 type="button"
                 onClick={() => handleTallyQuestion('yes')}
-                className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 hover:bg-emerald-500/25 active:scale-95 transition-all text-center space-y-1 shadow-sm"
+                className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/40 hover:bg-emerald-500/25 active:scale-95 transition-all text-center space-y-0.5 shadow-sm"
               >
-                <ThumbsUp className="w-5 h-5 text-emerald-400 mx-auto" />
-                <span className="font-broadcast text-xs font-black text-emerald-300 block">
+                <ThumbsUp className="w-4 h-4 text-emerald-400 mx-auto" />
+                <span className="font-heading text-xs font-black text-emerald-300 block">
                   YES!
                 </span>
               </button>
@@ -525,10 +525,10 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
               <button
                 type="button"
                 onClick={() => handleTallyQuestion('no')}
-                className="p-3.5 rounded-2xl bg-red-500/15 border border-red-500/40 hover:bg-red-500/25 active:scale-95 transition-all text-center space-y-1 shadow-sm"
+                className="p-2.5 rounded-xl bg-red-500/15 border border-red-500/40 hover:bg-red-500/25 active:scale-95 transition-all text-center space-y-0.5 shadow-sm"
               >
-                <ThumbsDown className="w-5 h-5 text-red-400 mx-auto" />
-                <span className="font-broadcast text-xs font-black text-red-300 block">
+                <ThumbsDown className="w-4 h-4 text-red-400 mx-auto" />
+                <span className="font-heading text-xs font-black text-red-300 block">
                   NO!
                 </span>
               </button>
@@ -536,10 +536,10 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
               <button
                 type="button"
                 onClick={() => handleTallyQuestion('maybe')}
-                className="p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/40 hover:bg-amber-500/25 active:scale-95 transition-all text-center space-y-1 shadow-sm"
+                className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/40 hover:bg-amber-500/25 active:scale-95 transition-all text-center space-y-0.5 shadow-sm"
               >
-                <Meh className="w-5 h-5 text-amber-400 mx-auto" />
-                <span className="font-broadcast text-xs font-black text-amber-300 block">
+                <Meh className="w-4 h-4 text-amber-400 mx-auto" />
+                <span className="font-heading text-xs font-black text-amber-300 block">
                   MAYBE
                 </span>
               </button>
@@ -547,26 +547,26 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
           </div>
 
           {/* ACTION BUTTONS (CORRECT GUESS / SKIP) */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 pt-1">
             <Button
-              variant="ghost"
-              size="lg"
+              variant="secondary"
+              size="md"
               onClick={handleSkipTurn}
               disabled={isSettling}
-              className="text-battle-muted hover:text-white border-battle-border font-mono text-xs w-full sm:w-auto"
+              className="text-[#AEB9CC] hover:text-[#F5F3EE] bg-[#2C394C] border-[#39465A] font-mono text-xs w-full sm:w-auto"
             >
-              <FastForward className="w-4 h-4 mr-1.5" />
+              <FastForward className="w-3.5 h-3.5 mr-1" />
               <span>SKIP (0 PTS)</span>
             </Button>
 
             <Button
               variant="primary"
-              size="xl"
+              size="md"
               onClick={() => setShowConfirmCorrect(true)}
               disabled={isSettling}
-              className="font-broadcast text-sm font-black shadow-glow bg-emerald-500 hover:bg-emerald-400 border-emerald-500 text-battle-bg flex items-center justify-center gap-2 w-full sm:w-auto px-8"
+              className="font-heading text-xs font-black shadow-md bg-[#91A98B] hover:bg-emerald-400 border-[#91A98B] text-[#111827] flex items-center justify-center gap-1.5 w-full sm:w-auto px-6 py-2.5"
             >
-              <CheckCircle2 className="w-5 h-5 fill-current" />
+              <CheckCircle2 className="w-4 h-4 fill-current" />
               <span>CORRECT GUESS! (+{isSpeedBonusEligible ? '15' : '10'} PTS)</span>
             </Button>
           </div>
@@ -575,58 +575,58 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
 
       {/* CONFIRMATION MODAL FOR CORRECT GUESS */}
       {showConfirmCorrect && currentCharacter && currentGuesser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-battle-bg/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md p-6 rounded-3xl bg-battle-surface border border-emerald-500/60 shadow-2xl space-y-4 text-center"
+            className="w-full max-w-md p-5 rounded-3xl bg-[#222F43] border border-[#39465A] shadow-2xl space-y-3.5 text-center"
           >
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
 
             <div className="space-y-1">
-              <h3 className="font-broadcast text-lg font-bold text-white">
+              <h3 className="font-heading text-base font-bold text-[#F5F3EE]">
                 CONFIRM CORRECT GUESS
               </h3>
-              <p className="text-xs text-battle-muted font-mono">
+              <p className="text-xs text-[#AEB9CC] font-mono">
                 Did <strong>{currentGuesser.name}</strong> successfully guess{' '}
-                <strong className="text-white">"{currentCharacter.name}"</strong>?
+                <strong className="text-[#F5F3EE]">"{currentCharacter.name}"</strong>?
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-battle-bg border border-battle-border text-xs font-mono space-y-1">
+            <div className="p-2.5 rounded-xl bg-[#2C394C] border border-[#39465A] text-xs font-mono space-y-1">
               <div className="flex justify-between">
-                <span className="text-battle-muted">Base Points:</span>
-                <span className="text-white font-bold">+10 pts</span>
+                <span className="text-[#AEB9CC]">Base Points:</span>
+                <span className="text-[#F5F3EE] font-bold">+10 pts</span>
               </div>
               {isSpeedBonusEligible && (
-                <div className="flex justify-between text-amber-300 font-bold">
+                <div className="flex justify-between text-[#D4B879] font-bold">
                   <span>Speed Bonus (&gt;{speedBonusThreshold}s):</span>
                   <span>+5 pts</span>
                 </div>
               )}
-              <div className="flex justify-between border-t border-battle-border pt-1 text-emerald-400 font-black">
+              <div className="flex justify-between border-t border-[#39465A] pt-1 text-emerald-400 font-black">
                 <span>Total Award:</span>
                 <span>+{isSpeedBonusEligible ? 15 : 10} pts</span>
               </div>
             </div>
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2 pt-1">
               <Button
                 variant="ghost"
-                size="md"
+                size="sm"
                 onClick={() => setShowConfirmCorrect(false)}
-                className="flex-1 text-xs text-battle-muted hover:text-white"
+                className="flex-1 text-xs text-[#AEB9CC] hover:text-[#F5F3EE]"
               >
                 Cancel
               </Button>
               <Button
                 variant="primary"
-                size="md"
+                size="sm"
                 onClick={handleConfirmCorrect}
                 disabled={isSettling}
-                className="flex-1 font-broadcast text-xs font-black bg-emerald-500 text-battle-bg border-emerald-500 hover:bg-emerald-400"
+                className="flex-1 font-heading text-xs font-black bg-[#91A98B] text-[#111827] border-[#91A98B] hover:bg-emerald-400"
               >
                 CONFIRM & AWARD
               </Button>
@@ -642,18 +642,18 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="battle-panel rounded-3xl p-8 border text-center space-y-6 shadow-2xl"
+          className="rounded-3xl bg-[#222F43] p-5 sm:p-7 border text-center space-y-4 shadow-2xl"
           style={{
             borderColor:
               lastOutcome.outcome === 'correct'
-                ? '#10B98150'
-                : '#EF444450',
+                ? '#91A98B80'
+                : '#EF444480',
           }}
         >
           {/* Outcome Icon & Title */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <div
-              className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-lg border ${
+              className={`w-14 h-14 rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-lg border ${
                 lastOutcome.outcome === 'correct'
                   ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
                   : 'bg-red-500/20 text-red-400 border-red-500/40'
@@ -662,7 +662,7 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
               {lastOutcome.outcome === 'correct' ? '🎉' : lastOutcome.outcome === 'timeout' ? '⏰' : '⏭️'}
             </div>
 
-            <h2 className="font-broadcast text-3xl font-black text-white tracking-wide uppercase">
+            <h2 className="font-heading sm:font-broadcast text-2xl sm:text-3xl font-black text-[#F5F3EE] tracking-wide uppercase">
               {lastOutcome.outcome === 'correct'
                 ? 'CORRECT GUESS!'
                 : lastOutcome.outcome === 'timeout'
@@ -670,55 +670,55 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
                 : 'ROUND SKIPPED!'}
             </h2>
 
-            <p className="text-xs font-mono text-battle-muted">
+            <p className="text-xs font-mono text-[#AEB9CC]">
               {lastOutcome.playerName} was <strong>"{lastOutcome.characterName}"</strong>
             </p>
           </div>
 
           {/* Points summary banner */}
-          <div className="p-4 rounded-2xl bg-battle-bg border border-battle-border max-w-sm mx-auto space-y-1">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-battle-muted">
+          <div className="p-3 rounded-2xl bg-[#2C394C] border border-[#39465A] max-w-sm mx-auto space-y-1">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#AEB9CC]">
               POINTS AWARDED
             </span>
             <div
-              className={`font-broadcast text-4xl font-black ${
-                lastOutcome.pointsAwarded > 0 ? 'text-emerald-400' : 'text-battle-muted'
+              className={`font-heading sm:font-broadcast text-3xl font-black ${
+                lastOutcome.pointsAwarded > 0 ? 'text-[#91A98B]' : 'text-[#AEB9CC]'
               }`}
             >
               +{lastOutcome.pointsAwarded} PTS
             </div>
             {lastOutcome.speedBonus && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-amber-300 font-bold">
+              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#D4B879] font-bold">
                 <Zap className="w-3 h-3" /> Includes +5 Speed Bonus!
               </span>
             )}
-            <div className="text-[11px] font-mono text-battle-muted pt-1">
+            <div className="text-[10px] font-mono text-[#AEB9CC] pt-0.5">
               Time taken: {lastOutcome.timeTaken}s • Questions: {lastOutcome.questionsAsked}
             </div>
           </div>
 
           {/* Current Scoreboard Snapshot */}
-          <div className="max-w-md mx-auto space-y-2">
-            <span className="text-[11px] font-mono font-bold text-battle-muted uppercase tracking-wider block">
+          <div className="max-w-sm mx-auto space-y-1.5">
+            <span className="text-[10px] font-mono font-bold text-[#AEB9CC] uppercase tracking-wider block">
               CURRENT STANDINGS
             </span>
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               {standings.map((score, idx) => (
                 <div
                   key={score.playerId}
-                  className="p-2.5 rounded-xl bg-battle-bg border border-battle-border flex items-center justify-between text-xs font-mono"
+                  className="p-2 rounded-xl bg-[#2C394C] border border-[#39465A] flex items-center justify-between text-xs font-mono"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-battle-muted font-bold w-4">{idx + 1}.</span>
+                    <span className="text-[#AEB9CC] font-bold w-4 text-[11px]">{idx + 1}.</span>
                     <span
                       className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] text-white"
                       style={{ backgroundColor: score.color }}
                     >
                       {score.avatar}
                     </span>
-                    <span className="font-bold text-white">{score.name}</span>
+                    <span className="font-bold text-[#F5F3EE]">{score.name}</span>
                   </div>
-                  <span className="font-broadcast font-bold text-sm text-brand-cyan">
+                  <span className="font-heading font-bold text-xs text-[#F5F3EE]">
                     {score.totalScore} pts
                   </span>
                 </div>
@@ -727,12 +727,12 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
           </div>
 
           {/* Next Turn Button */}
-          <div className="pt-2">
+          <div className="pt-1">
             <Button
               variant="primary"
-              size="xl"
+              size="lg"
               onClick={handleNextTurn}
-              className="font-broadcast text-xs font-black shadow-glow-cyan bg-brand-cyan text-battle-bg border-brand-cyan hover:scale-105 transition-transform mx-auto px-8"
+              className="font-heading text-xs font-black shadow-md bg-[#D97858] text-[#F5F3EE] hover:bg-white hover:text-[#111827] mx-auto px-6 py-2.5"
             >
               <span>{gameState.isCompleted ? 'VIEW FINAL PODIUM' : 'NEXT GUESSER →'}</span>
             </Button>
@@ -747,27 +747,27 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="battle-panel rounded-3xl p-8 border border-brand-cyan/40 text-center space-y-8 shadow-2xl relative overflow-hidden"
+          className="rounded-3xl bg-[#222F43] p-6 sm:p-8 border border-[#39465A] text-center space-y-5 shadow-2xl relative overflow-hidden"
         >
           {/* Ambient Lighting */}
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-brand-cyan/15 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-48 bg-[#D97858]/10 rounded-full blur-[100px] pointer-events-none" />
 
           {/* Trophy Header */}
-          <div className="space-y-2">
-            <div className="w-20 h-20 rounded-3xl bg-brand-cyan/20 border border-brand-cyan/40 text-brand-cyan flex items-center justify-center mx-auto shadow-glow-cyan/40">
-              <Trophy className="w-10 h-10" />
+          <div className="space-y-1.5">
+            <div className="w-14 h-14 rounded-2xl bg-[#2C394C] border border-[#39465A] text-[#D97858] flex items-center justify-center mx-auto shadow-md">
+              <Trophy className="w-7 h-7" />
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-battle-bg border border-battle-border text-xs font-mono font-bold text-brand-neon">
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#2C394C] border border-[#39465A] text-xs font-mono font-bold text-[#91A98B]">
               <Sparkles className="w-3.5 h-3.5" />
               <span>TOURNAMENT COMPLETED</span>
             </div>
-            <h1 className="font-broadcast text-4xl sm:text-5xl font-black text-white tracking-wide uppercase">
-              WHO AM I? <span className="neon-text-cyan">CHAMPION</span>
+            <h1 className="font-heading sm:font-broadcast text-3xl sm:text-5xl font-black text-[#F5F3EE] tracking-wide uppercase">
+              WHO AM I? CHAMPION
             </h1>
           </div>
 
           {/* PODIUM GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-xl mx-auto pt-1">
             {standings.slice(0, 3).map((player, idx) => {
               const medalEmoji = idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉';
               const medalTitle = idx === 0 ? 'CHAMPION' : idx === 1 ? 'RUNNER UP' : '3RD PLACE';
@@ -776,37 +776,37 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
               return (
                 <div
                   key={player.playerId}
-                  className={`p-5 rounded-3xl border flex flex-col justify-between text-center relative overflow-hidden space-y-3 ${
+                  className={`p-4 rounded-2xl border flex flex-col justify-between text-center relative overflow-hidden space-y-2 ${
                     isWinner
-                      ? 'bg-battle-surface border-brand-cyan shadow-glow-cyan/30 sm:-translate-y-2'
-                      : 'bg-battle-bg border-battle-border'
+                      ? 'bg-[#2C394C] border-[#F5F3EE] ring-1 ring-[#F5F3EE]/20 shadow-md sm:-translate-y-1'
+                      : 'bg-[#2C394C] border-[#39465A]'
                   }`}
                 >
-                  <div className="text-2xl">{medalEmoji}</div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-battle-muted">
+                  <div className="text-xl">{medalEmoji}</div>
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-[#AEB9CC]">
                       {medalTitle}
                     </span>
                     <h3
-                      className="font-broadcast font-bold text-xl text-white truncate"
+                      className="font-heading font-bold text-base text-[#F5F3EE] truncate"
                       style={{ color: player.color }}
                     >
                       {player.name}
                     </h3>
                   </div>
 
-                  <div className="py-2 border-t border-b border-battle-border/60">
-                    <span className="font-broadcast text-3xl font-black text-white">
+                  <div className="py-1 border-t border-b border-[#39465A]">
+                    <span className="font-mono text-2xl font-black text-[#F5F3EE]">
                       {player.totalScore}
                     </span>
-                    <span className="text-xs font-mono text-battle-muted block">points</span>
+                    <span className="text-[10px] font-mono text-[#AEB9CC] block">points</span>
                   </div>
 
-                  <div className="text-[11px] font-mono text-battle-muted space-y-0.5">
-                    <div>Correct: <strong>{player.correctGuesses}</strong></div>
-                    <div>Speed Bonuses: <strong>{player.speedBonuses}</strong></div>
+                  <div className="text-[10px] font-mono text-[#AEB9CC] space-y-0.5">
+                    <div>Correct: <strong className="text-[#F5F3EE]">{player.correctGuesses}</strong></div>
+                    <div>Speed Bonus: <strong className="text-[#D4B879]">{player.speedBonuses}</strong></div>
                     {player.fastestGuessTime !== null && (
-                      <div>Fastest: <strong>{player.fastestGuessTime}s</strong></div>
+                      <div>Fastest: <strong className="text-[#F5F3EE]">{player.fastestGuessTime}s</strong></div>
                     )}
                   </div>
                 </div>
@@ -815,17 +815,17 @@ export const WhoAmIArena = ({ session, onExitToSetup }) => {
           </div>
 
           {/* Action buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-4 border-t border-battle-border">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 pt-3 border-t border-[#39465A]">
             <Button
               variant="secondary"
-              size="lg"
+              size="md"
               onClick={() => {
                 clearWhoAmIState();
                 onExitToSetup();
               }}
-              className="font-broadcast text-xs font-bold border-battle-border hover:border-brand-cyan text-white"
+              className="font-heading text-xs font-bold border-[#39465A] bg-[#2C394C] hover:bg-[#39465A] text-[#F5F3EE]"
             >
-              <RotateCcw className="w-4 h-4 mr-1.5" />
+              <RotateCcw className="w-3.5 h-3.5 mr-1" />
               <span>NEW TOURNAMENT SETUP</span>
             </Button>
           </div>

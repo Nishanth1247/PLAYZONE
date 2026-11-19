@@ -292,15 +292,15 @@ export const LiveAuction = () => {
         </div>
       </div>
 
-      {/* 2. MAIN SCREEN-FIT 3-COLUMN BROADCAST ARENA */}
+      {/* 2. MAIN 3-COLUMN BATTLE-STYLE SCREEN-FIT ARENA */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 items-stretch">
         
-        {/* LEFT COLUMN: TEAM INFORMATION & PURSE BOARD (3 cols) */}
-        <div className="lg:col-span-3 battle-panel rounded-3xl p-3.5 flex flex-col justify-between border border-battle-border overflow-hidden">
-          <div className="flex items-center justify-between mb-2 pb-2 border-b border-battle-border">
+        {/* LEFT COLUMN: TEAM INFORMATION & SQUAD SLOTS (3 cols) */}
+        <div className="lg:col-span-3 battle-panel rounded-3xl p-4 flex flex-col justify-between max-h-[660px] overflow-hidden border border-battle-border space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-battle-border">
             <span className="text-xs font-black text-battle-muted uppercase tracking-wider font-broadcast flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-brand-cyan" />
-              Franchise Purse Board ({teams.length})
+              <span>Squad Capacity ({teams.length})</span>
             </span>
             <button
               onClick={() => setActivePage('teams')}
@@ -310,10 +310,13 @@ export const LiveAuction = () => {
             </button>
           </div>
 
-          <div className="space-y-2 overflow-y-auto pr-1 flex-1">
+          <div className="space-y-2.5 overflow-y-auto pr-1 flex-1">
             {teams.map((t) => {
               const isLeading = highestBidder === t.id;
               const squadCount = auction.items.filter((i) => i.soldTo === t.id).length;
+              const targetSquad = rules.maxSquadSize || 8;
+              const isFull = squadCount >= targetSquad;
+              const remainingSlots = Math.max(0, targetSquad - squadCount);
               const pendingLots = auction.items.filter((i) => i.status === 'pending');
               const budget = calculateFranchiseBudgetHealth({
                 team: t,
@@ -326,95 +329,93 @@ export const LiveAuction = () => {
               return (
                 <div
                   key={t.id}
-                  className={`p-2.5 rounded-2xl border transition-all relative overflow-hidden ${
+                  className={`p-3.5 rounded-2xl border transition-all relative overflow-hidden ${
                     isLeading
-                      ? 'bg-[#222F43] border-[#F5F3EE] ring-1 ring-[#F5F3EE]/40 shadow-sm'
-                      : 'bg-[#222F43] border-[#39465A] hover:border-[#39465A]'
+                      ? 'bg-battle-surface border-brand-cyan shadow-glow-cyan'
+                      : isFull
+                      ? 'bg-battle-surface/40 border-battle-border opacity-70'
+                      : 'bg-battle-surface/70 border-battle-border'
                   }`}
                 >
-                  {/* Franchise color accent vertical bar */}
+                  {/* Accent vertical stripe */}
                   <div
                     className="absolute top-0 left-0 bottom-0 w-1.5"
                     style={{ backgroundColor: t.color }}
                   />
 
-                  <div className="flex items-center justify-between pl-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl p-1 rounded-xl bg-[#2C394C] border border-[#39465A] shadow-sm">
-                        {t.logo || '🛡️'}
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="font-heading font-bold text-xs text-[#F5F3EE] truncate max-w-[90px]">
-                            {t.name}
-                          </h4>
-                          {isLeading && (
-                            <Badge variant="subtle" className="px-1 py-0 text-[8px]">
-                              LEAD
-                            </Badge>
-                          )}
-                          <span
-                            className={`px-1 py-0.2 rounded text-[8px] font-heading font-bold uppercase border ${
-                              budget.status === 'critical'
-                                ? 'bg-rose-500/10 text-rose-300 border-rose-500/30'
-                                : budget.status === 'caution'
-                                ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
-                                : 'bg-[#2C394C] text-[#AEB9CC] border-[#39465A]'
-                            }`}
-                            title={budget.reason}
-                          >
-                            {budget.label}
+                  <div className="pl-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl p-1 rounded-xl bg-battle-bg border border-battle-border shadow-sm">
+                          {t.logo || '🛡️'}
+                        </span>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="font-broadcast font-bold text-sm text-white truncate max-w-[100px]">
+                              {t.name}
+                            </h4>
+                            {isFull ? (
+                              <Badge variant="neon" className="px-1.5 py-0 text-[8px]">
+                                READY
+                              </Badge>
+                            ) : isLeading ? (
+                              <Badge variant="subtle" className="px-1.5 py-0 text-[8px] uppercase">
+                                LEAD
+                              </Badge>
+                            ) : null}
+                          </div>
+                          <span className="text-[10px] text-battle-muted font-medium block">
+                            Purse: {formatCurrency(t.purse, currency)}
                           </span>
                         </div>
-                        <span className="text-[9px] text-[#AEB9CC] font-medium block">
-                          Squad: {budget.playersAcquired}/{rules.maxSquadSize || 8} • Spent: {currency.symbol}{budget.totalSpent} Cr
+                      </div>
+
+                      <div className="text-right">
+                        <span className={`font-mono text-sm font-black ${isFull ? 'text-brand-neon' : 'text-white'}`}>
+                          {squadCount} / {targetSquad}
+                        </span>
+                        <span className="text-[9px] text-battle-muted uppercase block font-bold">
+                          {isFull ? 'Full Squad' : `${remainingSlots} Slots Left`}
                         </span>
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <span className="text-[9px] text-[#AEB9CC] uppercase block font-heading font-bold">
-                        Purse
-                      </span>
-                      <span className="text-xs font-mono font-bold block text-[#F5F3EE]">
-                        {formatCurrency(t.purse, currency)}
-                      </span>
-                      <span className="text-[9px] text-[#AEB9CC] font-mono block">
-                        Avg: {currency.symbol}{budget.avgAvailablePerSlot} Cr
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Purse Health Bar */}
-                  <div className="mt-1.5 pl-2">
-                    <div className="w-full bg-battle-bg rounded-full h-1 overflow-hidden">
+                    {/* Squad capacity progress bar */}
+                    <div className="w-full bg-battle-bg rounded-full h-1.5 mt-2 overflow-hidden border border-battle-border/60">
                       <div
-                        className={`h-full rounded-full transition-all duration-300 ${
-                          budget.status === 'critical'
-                            ? 'bg-rose-500'
-                            : budget.status === 'caution'
-                            ? 'bg-amber-500'
-                            : 'bg-emerald-500'
-                        }`}
-                        style={{ width: `${Math.max(5, 100 - budget.purseConsumedPct)}%` }}
+                        className="h-full transition-all duration-300"
+                        style={{
+                          backgroundColor: isFull ? '#91A98B' : t.color,
+                          width: `${Math.min(100, (squadCount / targetSquad) * 100)}%`,
+                        }}
                       />
                     </div>
-                  </div>
 
-                  {!canAffordNext && !isLeading && (
-                    <div className="mt-1 pl-2 flex items-center gap-1 text-[9px] text-rose-400 font-broadcast font-bold">
-                      <AlertCircle className="w-2.5 h-2.5 shrink-0" />
-                      <span>Cannot afford next bid</span>
+                    <div className="flex items-center justify-between text-[9px] text-battle-muted mt-1.5 font-mono">
+                      <span>Spent: {currency.symbol}{budget.totalSpent} Cr</span>
+                      <span>Avg/slot: {currency.symbol}{budget.avgAvailablePerSlot} Cr</span>
                     </div>
-                  )}
+
+                    {!canAffordNext && !isLeading && (
+                      <div className="mt-1 flex items-center gap-1 text-[9px] text-rose-400 font-broadcast font-bold">
+                        <AlertCircle className="w-2.5 h-2.5 shrink-0" />
+                        <span>Cannot afford next bid</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
           </div>
+
+          <div className="p-2.5 rounded-xl bg-battle-surface/40 border border-battle-border text-[11px] text-battle-muted flex items-center justify-between">
+            <span>Target: {rules.maxSquadSize || 8} Slots Each</span>
+            <span className="text-emerald-400 font-bold font-mono">Solvency Guard Active</span>
+          </div>
         </div>
 
-        {/* CENTRE COLUMN: MAIN GAME STAGE (6 cols) */}
-        <div className="lg:col-span-6 flex flex-col justify-between">
+        {/* CENTRE COLUMN: THE STAGE & HIGHEST BID (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col justify-between">
           <LiveAuctionCard
             currentItem={currentItem}
             auction={auction}
@@ -429,44 +430,69 @@ export const LiveAuction = () => {
             currentTierLabel={currentTierLabel}
             isRatingHidden={isRatingHidden}
             currency={currency}
+            confirmSold={confirmSold}
+            markUnsold={markUnsold}
           />
         </div>
 
-        {/* RIGHT COLUMN: ACTIONS AND CONTROLS (3 cols) */}
-        <div className="lg:col-span-3 battle-panel rounded-3xl p-3.5 flex flex-col justify-between border border-battle-border overflow-hidden space-y-2.5">
+        {/* RIGHT COLUMN: PROGRESSIVE INCREMENT & BID TRIGGERS (4 cols) */}
+        <div className="lg:col-span-4 battle-panel rounded-3xl p-4 flex flex-col justify-between max-h-[660px] overflow-hidden border border-battle-border space-y-3">
           
-          {/* 1. FRANCHISE QUICK BIDDING TRIGGERS (4 Buttons with next calculated bid) */}
-          <div>
-            <div className="flex items-center justify-between text-xs mb-1.5 font-heading font-bold text-[#AEB9CC]">
-              <span>FRANCHISE QUICK BIDS</span>
-              <span className="text-[#F5F3EE] font-mono text-[10px]">
+          {/* Automatic Progressive Increment Banner */}
+          <div className="p-3 rounded-2xl bg-battle-bg border border-brand-orange/40 space-y-1.5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-brand-orange uppercase tracking-wider font-broadcast flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-brand-orange" />
+                Automatic Progressive Increment
+              </span>
+              <span className="text-xs font-mono text-brand-cyan font-black">
+                +{currency.symbol}{currentIncrement.toFixed(2)} Cr
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] font-mono text-battle-muted bg-battle-surface px-2.5 py-1 rounded-xl border border-battle-border">
+              <span className="truncate max-w-[220px]">{currentTierLabel}</span>
+              <span className="text-emerald-400 font-bold ml-1">Live</span>
+            </div>
+          </div>
+
+          {/* Participating Franchise Bid Buttons in 2x2 Grid */}
+          <div className="space-y-2 flex-1 flex flex-col justify-center">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-battle-muted uppercase font-bold tracking-wider font-broadcast">
+                Franchise Bid Triggers ({teams.length})
+              </span>
+              <span className="text-[10px] font-mono text-brand-cyan font-bold">
                 Next: {formatCurrency(nextCalculatedBid, currency)}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 gap-1.5">
+            <div className={`grid grid-cols-1 ${teams.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-2`}>
               {teams.map((team) => {
                 const isLeading = highestBidder === team.id;
                 const squadCount = auction.items.filter((i) => i.soldTo === team.id).length;
-                const squadFull = squadCount >= (rules.maxSquadSize || 8);
+                const targetSquad = rules.maxSquadSize || 8;
+                const isSquadFull = squadCount >= targetSquad;
                 const canAfford = team.purse >= nextCalculatedBid;
-                const isDisabled = !isTimerRunning || (isLeading && rules.antiSelfBidding) || !canAfford || squadFull || isSubmittingBid;
+                const isDisabled = !isTimerRunning || (isLeading && rules.antiSelfBidding) || !canAfford || isSquadFull || isSubmittingBid;
 
-                let actionText = `BID ${formatCurrency(nextCalculatedBid, currency)}`;
-                let statusText = `Purse: ${formatCurrency(team.purse, currency)}`;
+                let actionLabel = !highestBidder
+                  ? `BID ${formatCurrency(nextCalculatedBid, currency)}`
+                  : `BID ${formatCurrency(nextCalculatedBid, currency)}`;
+                let subReason = '';
 
                 if (isLeading && rules.antiSelfBidding) {
-                  actionText = '👑 LEADING';
-                  statusText = 'Active Leader';
+                  actionLabel = '👑 LEADING';
+                  subReason = 'Cannot outbid self';
+                } else if (isSquadFull) {
+                  actionLabel = 'SQUAD FULL';
+                  subReason = `Limit ${targetSquad} reached`;
                 } else if (!canAfford) {
-                  actionText = '⚠️ NO PURSE';
-                  statusText = `Has ${formatCurrency(team.purse, currency)}`;
-                } else if (squadFull) {
-                  actionText = 'SQUAD FULL';
-                  statusText = `Max ${rules.maxSquadSize || 8} reached`;
+                  actionLabel = '⚠️ NO PURSE';
+                  subReason = `Has ${formatCurrency(team.purse, currency)}`;
                 } else if (!isTimerRunning) {
-                  actionText = 'PAUSED';
-                  statusText = 'Resume clock to bid';
+                  actionLabel = 'PAUSED';
+                  subReason = 'Resume clock to bid';
                 }
 
                 return (
@@ -474,39 +500,44 @@ export const LiveAuction = () => {
                     key={team.id}
                     type="button"
                     disabled={isDisabled}
-                    whileHover={isDisabled ? undefined : { scale: 1.01 }}
+                    whileHover={isDisabled ? undefined : { scale: 1.02 }}
                     whileTap={isDisabled ? undefined : { scale: 0.98 }}
                     onClick={() => handleTeamBidClick(team.id)}
-                    className={`p-2 rounded-xl border text-left transition-all relative overflow-hidden flex items-center justify-between ${
-                      isLeading
-                        ? 'bg-[#222F43] border-[#F5F3EE] ring-1 ring-[#F5F3EE]/40 shadow-sm'
-                        : isDisabled
-                        ? 'bg-[#222F43]/40 border-[#39465A] opacity-45 cursor-not-allowed text-[#AEB9CC]'
-                        : 'bg-[#222F43] hover:bg-[#2C394C] cursor-pointer shadow-sm'
+                    title={subReason}
+                    className={`p-3 rounded-2xl border text-left transition-all duration-200 relative overflow-hidden flex flex-col justify-between ${
+                      isDisabled
+                        ? 'bg-battle-surface/40 border-battle-border opacity-45 cursor-not-allowed text-battle-muted'
+                        : 'bg-battle-surface shadow-md hover:shadow-xl cursor-pointer'
                     }`}
                     style={{
-                      borderColor: isLeading ? '#F5F3EE' : isDisabled ? undefined : team.color,
+                      borderColor: isDisabled ? undefined : team.color,
+                      boxShadow: isDisabled ? undefined : `0 4px 18px ${team.color}25`,
                     }}
                   >
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="text-base">{team.logo || '🛡️'}</span>
-                      <div className="min-w-0">
-                        <span className="font-heading font-bold text-xs text-[#F5F3EE] truncate block">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{team.logo || '🛡️'}</span>
+                        <span className="font-broadcast font-bold text-xs text-white truncate max-w-[90px]">
                           {team.name}
                         </span>
-                        <span className="text-[9px] font-mono text-[#AEB9CC] block">
-                          {statusText}
-                        </span>
                       </div>
+                      <span className="text-[10px] font-mono text-brand-neon font-bold">
+                        {formatCurrency(team.purse, currency)}
+                      </span>
                     </div>
 
-                    <div className="text-right shrink-0">
+                    <div className="flex items-center justify-between mt-1">
                       <span
-                        className="font-heading font-black text-xs uppercase tracking-wider block"
-                        style={{ color: isLeading ? '#F5F3EE' : isDisabled ? undefined : team.color }}
+                        className="font-black text-xs uppercase tracking-wider font-broadcast"
+                        style={{ color: isDisabled ? undefined : team.color }}
                       >
-                        {actionText}
+                        {actionLabel}
                       </span>
+                      {subReason && (
+                        <span className="text-[9px] text-battle-muted font-broadcast truncate max-w-[80px]">
+                          {subReason}
+                        </span>
+                      )}
                     </div>
                   </motion.button>
                 );
@@ -514,96 +545,72 @@ export const LiveAuction = () => {
             </div>
           </div>
 
-          {/* 2. QUICK UTILITIES (Pause/Resume, Undo, Queue) */}
-          <div className="grid grid-cols-3 gap-1.5 py-1.5 border-t border-b border-[#39465A]">
-            <button
-              onClick={toggleTimer}
-              title={isTimerRunning ? 'Pause Auction Clock' : 'Resume Clock'}
-              className="p-1.5 rounded-xl bg-[#222F43] hover:bg-[#2C394C] border border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE] flex flex-col items-center justify-center gap-0.5 text-[10px] font-heading font-bold"
-            >
-              {isTimerRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-              <span>{isTimerRunning ? 'Pause' : 'Resume'}</span>
-            </button>
+          {/* Quick Utilities & Mandatory Settlement Toolbar */}
+          <div className="p-2.5 rounded-2xl bg-battle-bg border border-battle-border space-y-2">
+            <div className="grid grid-cols-3 gap-1.5">
+              <button
+                onClick={toggleTimer}
+                title={isTimerRunning ? 'Pause Auction Clock' : 'Resume Clock'}
+                className="p-1.5 rounded-xl bg-battle-surface hover:bg-battle-card border border-battle-border text-battle-muted hover:text-white flex items-center justify-center gap-1 text-[11px] font-broadcast font-bold transition-all"
+              >
+                {isTimerRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+                <span>{isTimerRunning ? 'Pause' : 'Resume'}</span>
+              </button>
 
-            <button
-              onClick={requestUndo}
-              disabled={!canUndo}
-              title="Safe Undo Last Transaction"
-              className={`p-1.5 rounded-xl border flex flex-col items-center justify-center gap-0.5 text-[10px] font-heading font-bold ${
-                canUndo
-                  ? 'bg-[#222F43] hover:bg-[#2C394C] border-[#39465A] text-[#F5F3EE]'
-                  : 'bg-[#222F43]/30 border-[#39465A] text-[#AEB9CC]/40 cursor-not-allowed'
-              }`}
-            >
-              <Undo2 className="w-3.5 h-3.5" />
-              <span>Undo</span>
-            </button>
+              <button
+                onClick={requestUndo}
+                disabled={!canUndo}
+                title="Safe Undo Last Transaction"
+                className={`p-1.5 rounded-xl border flex items-center justify-center gap-1 text-[11px] font-broadcast font-bold transition-all ${
+                  canUndo
+                    ? 'bg-battle-surface hover:bg-battle-card border-battle-border text-white'
+                    : 'bg-battle-surface/30 border-battle-border text-battle-muted/40 cursor-not-allowed'
+                }`}
+              >
+                <Undo2 className="w-3.5 h-3.5" />
+                <span>Undo</span>
+              </button>
 
-            <button
-              onClick={() => setShowQueueDrawer(true)}
-              title="View Lot Queue"
-              className="p-1.5 rounded-xl bg-[#222F43] hover:bg-[#2C394C] border border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE] flex flex-col items-center justify-center gap-0.5 text-[10px] font-heading font-bold"
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>Queue</span>
-            </button>
-          </div>
+              <button
+                onClick={() => setShowQueueDrawer(true)}
+                title="View Lot Queue"
+                className="p-1.5 rounded-xl bg-battle-surface hover:bg-battle-card border border-battle-border text-battle-muted hover:text-white flex items-center justify-center gap-1 text-[11px] font-broadcast font-bold transition-all"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Queue</span>
+              </button>
+            </div>
 
-          {/* 3. HOST GAVEL HAMMER & SETTLEMENT CONTROLS */}
-          <div className="space-y-1.5">
-            {/* SOLD Hammer Button */}
-            <Button
-              variant="primary"
-              size="lg"
-              disabled={!highestBidder}
-              onClick={confirmSold}
-              className="w-full font-heading text-sm font-black py-2.5 flex items-center justify-center gap-1.5 bg-[#D97858] text-[#F5F3EE] hover:bg-white"
-            >
-              <Gavel className="w-4 h-4 fill-current" />
-              <span>SOLD! ({formatCurrency(currentBid, currency)})</span>
-            </Button>
-
-            {/* UNSOLD or MANDATORY LAST-BIDDER SPECIAL SETTLEMENT (BIDBATTLE 8.3) */}
+            {/* Mandatory Base Price Settlement trigger (BIDBATTLE 8.3) */}
             {highestBidder ? (
-              <Button
-                variant="secondary"
-                size="md"
+              <button
                 onClick={markUnsold}
-                className="w-full font-heading text-[11px] font-bold bg-[#39465A] text-[#F5F3EE] hover:bg-[#3a3a3a] border border-[#404040] py-2 flex items-center justify-center gap-1"
-                title="Mandatory Settlement: Award to last accepted bidder at original base price"
+                className="w-full py-1.5 px-2 rounded-xl bg-battle-surface hover:bg-battle-card border border-[#39465A] text-[10px] font-broadcast font-bold text-[#AEB9CC] hover:text-[#F5F3EE] flex items-center justify-center gap-1.5 transition-all"
+                title="Mandatory Settlement: Award lot to active bidder at original base price"
               >
-                <AlertTriangle className="w-3 h-3 text-[#AEB9CC]" />
-                <span>CLOSE LOT (SETTLE @ BASE PRICE)</span>
-              </Button>
+                <AlertTriangle className="w-3 h-3 text-[#D97858]" />
+                <span>Settle Lot @ Base Price ({formatCurrency(currentItem.basePrice, currency)})</span>
+              </button>
             ) : (
-              <Button
-                variant="secondary"
-                size="md"
+              <button
                 onClick={markUnsold}
-                className="w-full font-heading text-[11px] font-bold bg-[#39465A] text-[#F5F3EE] hover:bg-[#3a3a3a] border border-[#404040] py-2 flex items-center justify-center gap-1"
+                className="w-full py-1.5 px-2 rounded-xl bg-battle-surface hover:bg-battle-card border border-[#39465A] text-[10px] font-broadcast font-bold text-[#AEB9CC] hover:text-[#F5F3EE] flex items-center justify-center gap-1.5 transition-all"
               >
-                <XCircle className="w-3.5 h-3.5" />
-                <span>MARK UNSOLD (NO BIDS)</span>
-              </Button>
+                <XCircle className="w-3 h-3 text-[#AEB9CC]" />
+                <span>Mark Unsold / Pass Lot</span>
+              </button>
             )}
 
             {/* SKIP / NEXT LOT */}
-            <Button
-              variant="secondary"
-              size="sm"
+            <button
               onClick={advanceToNextItem}
-              className="w-full font-heading text-[11px] border border-[#39465A] bg-[#222F43] hover:bg-[#2C394C] text-[#AEB9CC] hover:text-[#F5F3EE] py-1.5 flex items-center justify-center gap-1"
+              className="w-full py-1 px-2 rounded-xl bg-transparent hover:bg-battle-surface text-[10px] font-broadcast font-bold text-[#AEB9CC] hover:text-[#F5F3EE] flex items-center justify-center gap-1 transition-all"
             >
               <span>Skip to Next Lot</span>
               <ChevronRight className="w-3 h-3" />
-            </Button>
+            </button>
           </div>
 
-          {/* 4. PROGRESSIVE TIER PILL */}
-          <div className="p-1.5 rounded-xl bg-battle-bg border border-battle-border/80 flex items-center justify-between text-[9px] font-mono shrink-0">
-            <span className="text-battle-muted uppercase">Increment Tier</span>
-            <span className="text-brand-orange font-bold">+{currency.symbol}{currentIncrement.toFixed(2)} Cr ({currentTierLabel})</span>
-          </div>
         </div>
 
       </div>
