@@ -26,6 +26,8 @@ import { soundService } from '../../services/soundService';
 
 export const BattleArenaMatch = () => {
   const [preMatchCountdown, setPreMatchCountdown] = useState(null);
+  const [revealCountdown, setRevealCountdown] = useState(null);
+  const [pendingTeamBPick, setPendingTeamBPick] = useState(null);
   const [showReplay, setShowReplay] = useState(false);
 
   const {
@@ -100,6 +102,25 @@ export const BattleArenaMatch = () => {
       if (timer) clearTimeout(timer);
     };
   }, [preMatchCountdown, startFighterSelection]);
+
+  // Cinematic 3-2-1 Reveal Countdown handler (BIDBATTLE 8.2)
+  React.useEffect(() => {
+    let timer = null;
+    if (revealCountdown !== null && revealCountdown > 0) {
+      soundService?.play?.('countdown_tick');
+      timer = setTimeout(() => {
+        setRevealCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+    } else if (revealCountdown === 0 && pendingTeamBPick) {
+      soundService?.play?.('round_start');
+      selectTeamBFighter(pendingTeamBPick);
+      setRevealCountdown(null);
+      setPendingTeamBPick(null);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [revealCountdown, pendingTeamBPick, selectTeamBFighter]);
 
   return (
     <div className="max-w-[1500px] mx-auto px-4 py-6 space-y-6">
@@ -415,81 +436,110 @@ export const BattleArenaMatch = () => {
 
           {/* STAGE 4: TEAM B PRIVATE FIGHTER SELECTION */}
           {stage === 'teamB_select' && (
-            <motion.div
-              key={`pick_${teamB.id}`}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-            >
-              <PassTheLaptopScreen
-                player={teamB}
-                phaseTitle="Private Fighter Selection (Team B)"
-                subInstruction={`Pass the laptop to ${teamB.name} to choose one fighter. Keep your pick hidden from ${teamA.name}!`}
-                revealButtonText="Open Available Squad"
+            revealCountdown !== null ? (
+              <motion.div
+                key="reveal_countdown_screen"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="battle-panel rounded-3xl p-10 border-2 border-brand-orange text-center space-y-4 shadow-2xl relative overflow-hidden"
               >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between text-xs font-mono font-bold text-battle-muted uppercase">
-                    <span>Choose 1 Fighter from Your Acquired Squad:</span>
-                    <span className="text-brand-cyan">{availableSquadB.length} available</span>
-                  </div>
+                <div className="w-20 h-20 mx-auto rounded-3xl bg-brand-orange/20 border border-brand-orange/50 text-brand-orange flex items-center justify-center shadow-glow-orange animate-pulse">
+                  <Swords className="w-10 h-10" />
+                </div>
+                <Badge variant="orange" pulse className="uppercase tracking-widest font-broadcast">
+                  Simultaneous Fighter Reveal
+                </Badge>
+                <h2 className="text-2xl sm:text-4xl font-black text-white font-broadcast uppercase tracking-wide">
+                  CLASH IMMINENT IN
+                </h2>
+                <div className="font-broadcast text-8xl sm:text-9xl font-black text-brand-orange animate-bounce">
+                  {revealCountdown}
+                </div>
+                <p className="text-xs font-mono text-battle-muted">
+                  Both secret selections locked. Decrypting combat ratings...
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={`pick_${teamB.id}`}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+              >
+                <PassTheLaptopScreen
+                  player={teamB}
+                  phaseTitle="Private Fighter Selection (Team B)"
+                  subInstruction={`Pass the laptop to ${teamB.name} to choose one fighter. Keep your pick hidden from ${teamA.name}!`}
+                  revealButtonText="Open Available Squad"
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between text-xs font-mono font-bold text-battle-muted uppercase">
+                      <span>Choose 1 Fighter from Your Acquired Squad:</span>
+                      <span className="text-brand-cyan">{availableSquadB.length} available</span>
+                    </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {teamB.squad.map((fighter) => {
-                      const isDeployed = usedPlayerIds.includes(fighter.id);
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {teamB.squad.map((fighter) => {
+                        const isDeployed = usedPlayerIds.includes(fighter.id);
 
-                      return (
-                        <button
-                          key={fighter.id}
-                          type="button"
-                          disabled={isDeployed}
-                          onClick={() => selectTeamBFighter(fighter.id)}
-                          className={`p-4 rounded-2xl border text-left transition-all group flex flex-col justify-between ${
-                            isDeployed
-                              ? 'bg-battle-surface/30 border-battle-border opacity-40 cursor-not-allowed'
-                              : 'border-battle-border hover:border-brand-cyan bg-battle-surface hover:bg-battle-surface/80 cursor-pointer shadow-md'
-                          }`}
-                        >
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xl">⚡</span>
-                              {isDeployed ? (
-                                <Badge variant="secondary" className="text-[9px] uppercase">
-                                  Already Deployed
-                                </Badge>
-                              ) : (
-                                <Badge variant="cyan" className="text-[10px]">
-                                  {fighter.role || 'Contender'}
-                                </Badge>
+                        return (
+                          <button
+                            key={fighter.id}
+                            type="button"
+                            disabled={isDeployed}
+                            onClick={() => {
+                              setPendingTeamBPick(fighter.id);
+                              setRevealCountdown(3);
+                            }}
+                            className={`p-4 rounded-2xl border text-left transition-all group flex flex-col justify-between ${
+                              isDeployed
+                                ? 'bg-battle-surface/30 border-battle-border opacity-40 cursor-not-allowed'
+                                : 'border-battle-border hover:border-brand-cyan bg-battle-surface hover:bg-battle-surface/80 cursor-pointer shadow-md'
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xl">⚡</span>
+                                {isDeployed ? (
+                                  <Badge variant="secondary" className="text-[9px] uppercase">
+                                    Already Deployed
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="cyan" className="text-[10px]">
+                                    {fighter.role || 'Contender'}
+                                  </Badge>
+                                )}
+                              </div>
+                              <h4 className="font-broadcast font-bold text-sm text-white group-hover:text-brand-cyan">
+                                {fighter.name}
+                              </h4>
+                              {fighter.movie && (
+                                <span className="text-[11px] text-battle-muted block">
+                                  {fighter.movie}
+                                </span>
                               )}
                             </div>
-                            <h4 className="font-broadcast font-bold text-sm text-white group-hover:text-brand-cyan">
-                              {fighter.name}
-                            </h4>
-                            {fighter.movie && (
-                              <span className="text-[11px] text-battle-muted block">
-                                {fighter.movie}
-                              </span>
-                            )}
-                          </div>
 
-                          <span className={`mt-3 text-xs font-mono font-bold ${isDeployed ? 'text-battle-muted' : 'text-brand-cyan'}`}>
-                            {isDeployed ? 'UNAVAILABLE' : 'DEPLOY FIGHTER →'}
-                          </span>
-                        </button>
-                      );
-                    })}
+                            <span className={`mt-3 text-xs font-mono font-bold ${isDeployed ? 'text-battle-muted' : 'text-brand-cyan'}`}>
+                              {isDeployed ? 'UNAVAILABLE' : 'DEPLOY FIGHTER →'}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              </PassTheLaptopScreen>
-            </motion.div>
+                </PassTheLaptopScreen>
+              </motion.div>
+            )
           )}
 
-          {/* STAGE 5 & 6: SIMULTANEOUS REVEAL, EVALUATION & RESULT CONFIRMATION (BIDBATTLE 7.7) */}
+          {/* STAGE 5 & 6: SIMULTANEOUS REVEAL, SYMMETRICAL VERSUS CARDS & RESULT CONFIRMATION (BIDBATTLE 8.2) */}
           {(stage === 'evaluated' || stage === 'confirmed') && currentMatchEvaluation && (
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="battle-panel rounded-3xl p-6 sm:p-8 border-2 border-brand-orange/60 shadow-2xl space-y-8 text-center"
+              className="battle-panel rounded-3xl p-6 sm:p-8 border-2 border-brand-orange/60 shadow-2xl space-y-6 text-center relative overflow-hidden"
             >
               {/* Top Faceoff Header */}
               <div className="flex items-center justify-center gap-3">
@@ -499,55 +549,70 @@ export const BattleArenaMatch = () => {
                 </h3>
               </div>
 
-              {/* Fighter 1 vs Fighter 2 Clash Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
+              {/* Symmetrical Versus Cards Grid (Team A vs Team B) */}
+              <div className="grid grid-cols-1 md:grid-cols-11 gap-4 items-center">
                 
-                {/* Team A Fighter Card */}
+                {/* Team A Symmetrical Card */}
                 <div
-                  className={`p-6 rounded-3xl border text-center space-y-4 relative overflow-hidden transition-all ${
+                  className={`md:col-span-5 p-5 sm:p-6 rounded-3xl border-2 text-center space-y-4 relative overflow-hidden transition-all shadow-xl ${
                     currentMatchEvaluation.winnerId === teamA.id
                       ? 'bg-battle-surface border-brand-neon shadow-glow-neon ring-2 ring-brand-neon/40'
                       : 'bg-battle-bg border-battle-border'
                   }`}
+                  style={{
+                    borderColor: currentMatchEvaluation.winnerId === teamA.id ? '#B7F34A' : `${teamA.color}80`,
+                  }}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-broadcast font-black text-xs" style={{ color: teamA.color }}>
-                      {teamA.name}
-                    </span>
-                    {currentMatchEvaluation.winnerId === teamA.id && (
-                      <Badge variant="neon" className="px-2 py-0 text-xs">
+                  <div className="flex items-center justify-between pb-2 border-b border-battle-border/80">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xl">{teamA.logo || '👑'}</span>
+                      <span className="font-broadcast font-black text-sm" style={{ color: teamA.color }}>
+                        {teamA.name}
+                      </span>
+                    </div>
+                    {currentMatchEvaluation.winnerId === teamA.id ? (
+                      <Badge variant="neon" className="px-2 py-0.5 text-xs font-mono font-bold animate-pulse">
                         VICTORY (+3 PTS)
                       </Badge>
+                    ) : currentMatchEvaluation.isDraw ? (
+                      <Badge variant="orange" className="px-2 py-0.5 text-xs font-mono">
+                        DRAW (+1 PT)
+                      </Badge>
+                    ) : (
+                      <span className="text-[10px] font-mono text-battle-muted uppercase">Defeated</span>
                     )}
                   </div>
 
-                  <div className="w-24 h-24 mx-auto rounded-2xl bg-battle-surface border border-battle-border flex items-center justify-center text-5xl shadow-md overflow-hidden">
+                  {/* Artwork Container with Dark Vignette */}
+                  <div className="w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-battle-bg border border-battle-border relative flex items-center justify-center shadow-inner group">
                     {currentMatchEvaluation.playerA.imageUrl ? (
                       <img
                         src={currentMatchEvaluation.playerA.imageUrl}
                         alt={currentMatchEvaluation.playerA.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
                       />
                     ) : (
-                      <span>🎭</span>
+                      <span className="text-6xl p-4 rounded-3xl bg-battle-surface/40 border border-battle-border">🎭</span>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/40 to-transparent pointer-events-none" />
+
+                    <div className="absolute bottom-2 left-3 right-3 text-left z-10">
+                      <h4 className="font-broadcast text-2xl font-black text-white drop-shadow-md">
+                        {currentMatchEvaluation.playerA.name}
+                      </h4>
+                      <span className="text-xs text-brand-purple font-mono block">
+                        {currentMatchEvaluation.playerA.role || currentMatchEvaluation.playerA.movie || 'Superstar Fighter'}
+                      </span>
+                    </div>
                   </div>
 
-                  <div>
-                    <h4 className="font-broadcast text-2xl font-black text-white">
-                      {currentMatchEvaluation.playerA.name}
-                    </h4>
-                    <span className="text-xs text-brand-purple font-mono block mt-0.5">
-                      {currentMatchEvaluation.playerA.role || currentMatchEvaluation.playerA.movie}
-                    </span>
-                  </div>
-
-                  {/* Revealed Battle Score & Internal Rating */}
-                  <div className="p-3 rounded-2xl bg-battle-bg border border-battle-border space-y-1">
+                  {/* Combat Rating Spotlight */}
+                  <div className="p-3 rounded-2xl bg-battle-surface border border-battle-border space-y-1">
                     <span className="text-[10px] font-mono text-battle-muted uppercase font-bold block">
-                      Battle Combat Rating:
+                      Combat Rating Score
                     </span>
-                    <span className="font-mono text-3xl font-black text-amber-300">
+                    <span className="font-mono text-4xl font-black text-amber-300 block">
                       {currentMatchEvaluation.scoreA}
                     </span>
                     <span className="text-[10px] font-mono text-brand-cyan block">
@@ -556,52 +621,77 @@ export const BattleArenaMatch = () => {
                   </div>
                 </div>
 
-                {/* Team B Fighter Card */}
+                {/* Central Symmetrical VS Clash Element */}
+                <div className="md:col-span-1 flex flex-col items-center justify-center my-2 md:my-0 space-y-2">
+                  <div className="w-16 h-16 rounded-full bg-battle-surface border-2 border-brand-orange text-brand-orange flex items-center justify-center shadow-glow-orange font-broadcast font-black text-xl animate-pulse">
+                    VS
+                  </div>
+                  <div className="px-2.5 py-1 rounded-xl bg-battle-bg border border-brand-orange/40 text-[10px] font-mono font-bold text-amber-300 text-center">
+                    DIFF: {currentMatchEvaluation.diff} PTS
+                  </div>
+                </div>
+
+                {/* Team B Symmetrical Card */}
                 <div
-                  className={`p-6 rounded-3xl border text-center space-y-4 relative overflow-hidden transition-all ${
+                  className={`md:col-span-5 p-5 sm:p-6 rounded-3xl border-2 text-center space-y-4 relative overflow-hidden transition-all shadow-xl ${
                     currentMatchEvaluation.winnerId === teamB.id
                       ? 'bg-battle-surface border-brand-neon shadow-glow-neon ring-2 ring-brand-neon/40'
                       : 'bg-battle-bg border-battle-border'
                   }`}
+                  style={{
+                    borderColor: currentMatchEvaluation.winnerId === teamB.id ? '#B7F34A' : `${teamB.color}80`,
+                  }}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-broadcast font-black text-xs" style={{ color: teamB.color }}>
-                      {teamB.name}
-                    </span>
-                    {currentMatchEvaluation.winnerId === teamB.id && (
-                      <Badge variant="neon" className="px-2 py-0 text-xs">
+                  <div className="flex items-center justify-between pb-2 border-b border-battle-border/80">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xl">{teamB.logo || '⚡'}</span>
+                      <span className="font-broadcast font-black text-sm" style={{ color: teamB.color }}>
+                        {teamB.name}
+                      </span>
+                    </div>
+                    {currentMatchEvaluation.winnerId === teamB.id ? (
+                      <Badge variant="neon" className="px-2 py-0.5 text-xs font-mono font-bold animate-pulse">
                         VICTORY (+3 PTS)
                       </Badge>
+                    ) : currentMatchEvaluation.isDraw ? (
+                      <Badge variant="orange" className="px-2 py-0.5 text-xs font-mono">
+                        DRAW (+1 PT)
+                      </Badge>
+                    ) : (
+                      <span className="text-[10px] font-mono text-battle-muted uppercase">Defeated</span>
                     )}
                   </div>
 
-                  <div className="w-24 h-24 mx-auto rounded-2xl bg-battle-surface border border-battle-border flex items-center justify-center text-5xl shadow-md overflow-hidden">
+                  {/* Artwork Container with Dark Vignette */}
+                  <div className="w-full h-48 sm:h-56 rounded-2xl overflow-hidden bg-battle-bg border border-battle-border relative flex items-center justify-center shadow-inner group">
                     {currentMatchEvaluation.playerB.imageUrl ? (
                       <img
                         src={currentMatchEvaluation.playerB.imageUrl}
                         alt={currentMatchEvaluation.playerB.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
                       />
                     ) : (
-                      <span>⚡</span>
+                      <span className="text-6xl p-4 rounded-3xl bg-battle-surface/40 border border-battle-border">⚡</span>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/40 to-transparent pointer-events-none" />
+
+                    <div className="absolute bottom-2 left-3 right-3 text-left z-10">
+                      <h4 className="font-broadcast text-2xl font-black text-white drop-shadow-md">
+                        {currentMatchEvaluation.playerB.name}
+                      </h4>
+                      <span className="text-xs text-brand-cyan font-mono block">
+                        {currentMatchEvaluation.playerB.role || currentMatchEvaluation.playerB.movie || 'Superstar Fighter'}
+                      </span>
+                    </div>
                   </div>
 
-                  <div>
-                    <h4 className="font-broadcast text-2xl font-black text-white">
-                      {currentMatchEvaluation.playerB.name}
-                    </h4>
-                    <span className="text-xs text-brand-cyan font-mono block mt-0.5">
-                      {currentMatchEvaluation.playerB.role || currentMatchEvaluation.playerB.movie}
-                    </span>
-                  </div>
-
-                  {/* Revealed Battle Score & Internal Rating */}
-                  <div className="p-3 rounded-2xl bg-battle-bg border border-battle-border space-y-1">
+                  {/* Combat Rating Spotlight */}
+                  <div className="p-3 rounded-2xl bg-battle-surface border border-battle-border space-y-1">
                     <span className="text-[10px] font-mono text-battle-muted uppercase font-bold block">
-                      Battle Combat Rating:
+                      Combat Rating Score
                     </span>
-                    <span className="font-mono text-3xl font-black text-amber-300">
+                    <span className="font-mono text-4xl font-black text-amber-300 block">
                       {currentMatchEvaluation.scoreB}
                     </span>
                     <span className="text-[10px] font-mono text-brand-cyan block">
@@ -613,19 +703,35 @@ export const BattleArenaMatch = () => {
               </div>
 
               {/* Match Result Verdict Strip */}
-              <div className="p-4 rounded-2xl bg-battle-bg border border-battle-border flex items-center justify-center gap-3">
-                {currentMatchEvaluation.isDraw ? (
-                  <span className="font-broadcast text-lg font-black text-amber-400">
-                    MATCH TIED! (+1 PT TO EACH FRANCHISE)
+              <div className="p-4 rounded-2xl bg-battle-bg border border-battle-border flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+                <div>
+                  <span className="text-[10px] font-mono text-battle-muted uppercase font-bold block">
+                    CLASH SCORECARD:
                   </span>
-                ) : (
-                  <span className="font-broadcast text-lg font-black text-brand-neon">
-                    {teams.find((t) => t.id === currentMatchEvaluation.winnerId)?.name} WINS THE BATTLE (+3 PTS)!
+                  <div className="font-broadcast text-xl font-black text-white">
+                    <span style={{ color: teamA.color }}>{teamA.name} ({currentMatchEvaluation.scoreA})</span>
+                    <span className="text-battle-muted mx-2">—</span>
+                    <span style={{ color: teamB.color }}>({currentMatchEvaluation.scoreB}) {teamB.name}</span>
+                  </div>
+                </div>
+
+                <div className="text-center sm:text-right">
+                  {currentMatchEvaluation.isDraw ? (
+                    <span className="font-broadcast text-lg font-black text-amber-400">
+                      MATCH TIED! (+1 PT TO EACH FRANCHISE)
+                    </span>
+                  ) : (
+                    <span className="font-broadcast text-lg font-black text-brand-neon">
+                      {teams.find((t) => t.id === currentMatchEvaluation.winnerId)?.name} WINS THE BATTLE (+3 PTS)!
+                    </span>
+                  )}
+                  <span className="text-[10px] font-mono text-battle-muted block">
+                    Official 3-1-0 Tournament Points System
                   </span>
-                )}
+                </div>
               </div>
 
-              {/* STEP 8: EXPLICIT CONFIRMATION BUTTON vs ADVANCE BUTTON */}
+              {/* EXPLICIT CONFIRMATION BUTTON vs ADVANCE BUTTON */}
               {stage === 'evaluated' ? (
                 <div className="space-y-2">
                   <Button
@@ -649,7 +755,7 @@ export const BattleArenaMatch = () => {
                   className="w-full font-broadcast text-base shadow-glow-orange bg-brand-orange hover:bg-orange-600 text-black font-black flex items-center justify-center gap-2 py-4"
                 >
                   <span>{currentMatchIndex + 1 < schedule.length ? 'NEXT MATCH' : 'VIEW TOURNAMENT CHAMPION PODIUM'}</span>
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-5 h-5 ml-1" />
                 </Button>
               )}
             </motion.div>

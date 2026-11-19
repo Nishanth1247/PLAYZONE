@@ -57,6 +57,7 @@ import { RandomEventModal } from './RandomEventModal';
 import { AuctionSettingsModal } from './AuctionSettingsModal';
 import { LotQueueDrawer } from './LotQueueDrawer';
 import { UndoConfirmModal } from './UndoConfirmModal';
+import { LiveAuctionCard } from './LiveAuctionCard';
 
 export const LiveAuction = () => {
   const {
@@ -567,204 +568,56 @@ export const LiveAuction = () => {
           </div>
         </div>
 
-        {/* CENTER COLUMN: MAIN AUCTION STAGE (5 cols) */}
-        <div className="lg:col-span-5 battle-panel rounded-3xl p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden border border-brand-purple/40">
-          
-          {/* Ambient Spotlight Lighting */}
-          <div 
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 rounded-full blur-3xl opacity-25 pointer-events-none transition-colors duration-500"
-            style={{ backgroundColor: currentLeaderTeam?.color || '#9147FF' }}
+        {/* CENTER COLUMN: MAIN REDESIGNED AUCTION STAGE (6 cols, BIDBATTLE 8.2) */}
+        <div className="lg:col-span-6">
+          <LiveAuctionCard
+            currentItem={currentItem}
+            auction={auction}
+            currentBid={currentBid}
+            highestBidder={highestBidder}
+            currentLeaderTeam={currentLeaderTeam}
+            timer={timer}
+            isTimerRunning={isTimerRunning}
+            toggleTimer={toggleTimer}
+            confirmSold={confirmSold}
+            markUnsold={markUnsold}
+            advanceToNextItem={advanceToNextItem}
+            onTeamBid={handleTeamBidClick}
+            onCustomBid={(teamId, amount) => {
+              if (!teamId) {
+                toast.error('Select a franchise first for jump bid');
+                return;
+              }
+              const parsed = Number(amount);
+              if (isNaN(parsed) || parsed <= 0) {
+                toast.error('Enter a valid positive number');
+                return;
+              }
+              const res = placeBid(teamId, parsed);
+              if (!res.success) {
+                toast.error(res.reason || 'Invalid custom bid');
+              } else {
+                toast.success(`Jump bid placed: ${res.team.name} bid ${formatCurrency(parsed, currency)}!`);
+              }
+            }}
+            nextCalculatedBid={nextCalculatedBid}
+            currentIncrement={currentIncrement}
+            currentTierLabel={currentTierLabel}
+            isRatingHidden={isRatingHidden}
+            teams={teams}
+            currency={currency}
           />
-
-          {/* Stage Top Strip: Lot number, Role, Timer */}
-          <div className="flex items-center justify-between mb-2 z-10">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1 rounded-xl bg-battle-surface border border-battle-border text-xs font-broadcast font-bold text-battle-text">
-                LOT #{auction.currentItemIndex + 1}
-              </span>
-              <Badge variant="purple">
-                {currentItem.role || 'Superstar'}
-              </Badge>
-              {currentItem.category && (
-                <Badge variant="cyan">
-                  {currentItem.category}
-                </Badge>
-              )}
-            </div>
-
-            {/* Glowing Countdown Clock with Urgency Pulse */}
-            <div className="flex items-center gap-2">
-              <motion.div
-                animate={timer <= 5 ? { scale: [1, 1.08, 1] } : {}}
-                transition={{ repeat: Infinity, duration: 0.6 }}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-2xl border font-mono font-bold transition-all ${
-                  timer <= 5
-                    ? 'bg-rose-950/80 border-rose-500 text-rose-300 shadow-lg shadow-rose-600/50 animate-pulse'
-                    : 'bg-battle-surface border-battle-border text-brand-cyan'
-                }`}
-              >
-                <Clock className={`w-4 h-4 ${timer <= 5 ? 'text-rose-400 animate-spin' : 'text-brand-cyan'}`} />
-                <span className="text-2xl font-black">{timer}s</span>
-              </motion.div>
-            </div>
-          </div>
-
-          {/* Lot Featured Media & Bio */}
-          <div className="text-center my-1 z-10">
-            {/* Featured Poster / Avatar */}
-            <div className="w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-3xl bg-gradient-to-tr from-battle-surface to-battle-card border-2 border-battle-border shadow-xl flex items-center justify-center text-5xl mb-2.5 shadow-glow-purple overflow-hidden">
-              {currentItem.imageUrl ? (
-                <img
-                  src={currentItem.imageUrl}
-                  alt={currentItem.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-              ) : (
-                <span>
-                  {currentItem.imdbRating ? '🍿' : currentItem.movie ? '🎭' : '⭐'}
-                </span>
-              )}
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl font-black text-white font-broadcast uppercase tracking-wide mb-1 leading-tight">
-              {currentItem.name}
-            </h2>
-
-            {/* Metadata Badges for Movies / Characters */}
-            {currentItem.movie && (
-              <div className="flex flex-wrap items-center justify-center gap-2 my-1">
-                <span className="px-3 py-0.5 rounded-xl bg-brand-purple/20 border border-brand-purple/40 text-purple-200 text-xs font-broadcast font-bold">
-                  🎬 Film: {currentItem.movie}
-                </span>
-                {currentItem.actor && (
-                  <span className="px-3 py-0.5 rounded-xl bg-brand-cyan/20 border border-brand-cyan/40 text-cyan-200 text-xs font-broadcast font-bold">
-                    🎭 Star: {currentItem.actor}
-                  </span>
-                )}
-              </div>
-            )}
-
-            {currentItem.director && (
-              <div className="flex flex-wrap items-center justify-center gap-2 my-1">
-                <span className="px-3 py-0.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-broadcast font-bold">
-                  🎬 Dir: {currentItem.director} ({currentItem.year})
-                </span>
-                {currentItem.genre && (
-                  <span className="px-3 py-0.5 rounded-xl bg-brand-cyan/20 border border-brand-cyan/40 text-cyan-200 text-xs font-broadcast font-bold">
-                    🍿 {currentItem.genre}
-                  </span>
-                )}
-                {currentItem.imdbId && (
-                  <span className="px-2 py-0.5 rounded-xl bg-battle-surface border border-battle-border text-battle-muted font-mono text-[11px]">
-                    ID: {currentItem.imdbId}
-                  </span>
-                )}
-              </div>
-            )}
-
-            <p className="text-xs text-battle-muted max-w-md mx-auto line-clamp-2 my-1 leading-relaxed">
-              {currentItem.desc || `Championship lot ready to make an immediate impact.`}
-            </p>
-
-            {/* Base price & info strip (Ratings strictly hidden during active auction) */}
-            <div className="inline-flex items-center gap-3 mt-1.5 px-4 py-1 rounded-full bg-battle-surface border border-battle-border text-xs text-battle-muted font-broadcast">
-              <div>
-                <span className="mr-1.5 text-battle-muted">BASE PRICE:</span>
-                <span className="font-mono font-bold text-amber-400">
-                  {formatCurrency(currentItem.basePrice, currency)}
-                </span>
-              </div>
-              <span className="text-battle-border">|</span>
-              <div>
-                <span className="mr-1.5 text-battle-muted">ROLE:</span>
-                <span className="font-mono font-bold text-brand-cyan">
-                  {currentItem.role || currentItem.category || 'Championship Lot'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* MASSIVE GLOWING BID DISPLAY */}
-          <div className="my-2 p-4 rounded-3xl bg-battle-bg border border-battle-border shadow-inner text-center z-10 relative overflow-hidden">
-            <span className="text-[11px] font-black uppercase tracking-widest text-battle-muted block mb-1 font-broadcast">
-              CURRENT HIGHEST BID
-            </span>
-
-            <div className="font-broadcast text-6xl sm:text-7xl font-black tracking-wider bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-400 bg-clip-text text-transparent neon-text-gold">
-              <AnimatedNumber
-                value={currentBid}
-                format={(v) => formatCurrency(v, currency)}
-              />
-            </div>
-
-            {/* Leading Team Spotlight Badge */}
-            <div className="mt-2 flex items-center justify-center">
-              {currentLeaderTeam ? (
-                <div
-                  className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border shadow-lg font-broadcast font-bold text-sm tracking-wide"
-                  style={{
-                    backgroundColor: `${currentLeaderTeam.color}20`,
-                    borderColor: currentLeaderTeam.color,
-                    color: currentLeaderTeam.color,
-                  }}
-                >
-                  <span className="text-lg">{currentLeaderTeam.logo}</span>
-                  <span>{currentLeaderTeam.name}</span>
-                  <span className="w-2 h-2 rounded-full bg-current animate-ping" />
-                </div>
-              ) : (
-                <span className="text-xs text-battle-muted font-medium italic font-broadcast">
-                  Awaiting opening bid at base price ({formatCurrency(currentItem.basePrice, currency)})
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* HOST GAVEL HAMMER CONTROLS */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 z-10">
-            <Button
-              variant="accent"
-              size="lg"
-              disabled={!highestBidder}
-              onClick={confirmSold}
-              className="font-broadcast text-lg shadow-glow-orange"
-            >
-              <Gavel className="w-5 h-5 fill-current" />
-              <span>SOLD!</span>
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={markUnsold}
-              className="font-broadcast text-sm"
-            >
-              <span>MARK UNSOLD</span>
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={advanceToNextItem}
-              className="font-broadcast text-sm"
-            >
-              <span>SKIP / NEXT</span>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-
         </div>
 
-        {/* RIGHT COLUMN: BIDDING CONTROL & FAST INCREMENTS (4 cols) */}
-        <div className="lg:col-span-4 battle-panel rounded-3xl p-4 flex flex-col justify-between max-h-[640px] overflow-hidden border border-battle-border space-y-3">
+        {/* RIGHT COLUMN: SUPPORTING INTELLIGENCE, TIMELINE & SAFE UNDO (3 cols, BIDBATTLE 8.2) */}
+        <div className="lg:col-span-3 battle-panel rounded-3xl p-4 flex flex-col justify-between max-h-[680px] overflow-hidden border border-battle-border space-y-3">
           
           {/* Automatic Progressive Increment Status Banner (BIDBATTLE 7.2) */}
           <div className="p-3 rounded-2xl bg-battle-bg border border-brand-orange/40 space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-black text-brand-orange uppercase tracking-wider font-broadcast flex items-center gap-1.5">
                 <Flame className="w-3.5 h-3.5 text-brand-orange" />
-                Automatic Progressive Increment
+                Progressive Increment Tier
               </span>
               <span className="text-xs font-mono text-brand-cyan font-black">
                 +{currency.symbol}{currentIncrement.toFixed(2)} Cr
@@ -772,141 +625,9 @@ export const LiveAuction = () => {
             </div>
 
             <div className="flex items-center justify-between text-[11px] font-mono text-battle-muted bg-battle-surface px-2.5 py-1 rounded-xl border border-battle-border">
-              <span className="truncate max-w-[220px]">{currentTierLabel}</span>
+              <span className="truncate max-w-[180px]">{currentTierLabel}</span>
               <span className="text-emerald-400 font-bold ml-1">Live</span>
             </div>
-          </div>
-
-          {/* 4 Large Franchise Bidding Buttons */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] text-battle-muted uppercase font-bold tracking-wider font-broadcast">
-                Franchise Bid Triggers ({teams.length})
-              </span>
-              <span className="text-[10px] font-mono text-brand-cyan font-bold">
-                Next: {formatCurrency(nextCalculatedBid, currency)}
-              </span>
-            </div>
-
-            <div className={`grid grid-cols-1 ${teams.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-2`}>
-              {teams.map((t) => {
-                const isLeading = highestBidder === t.id;
-                const squadCount = auction.items.filter((i) => i.soldTo === t.id).length;
-                const squadFull = squadCount >= rules.maxSquadSize;
-                const canAfford = t.purse >= nextCalculatedBid;
-                const isDisabled = (isLeading && rules.antiSelfBidding) || !canAfford || squadFull;
-
-                let actionLabel = !highestBidder
-                  ? `BID ${formatCurrency(nextCalculatedBid, currency)}`
-                  : `BID ${formatCurrency(nextCalculatedBid, currency)} (+${currency.symbol}${currentIncrement.toFixed(2)} Cr)`;
-                let subReason = '';
-
-                if (isLeading && rules.antiSelfBidding) {
-                  actionLabel = '👑 LEADING';
-                  subReason = 'Cannot outbid self';
-                } else if (!canAfford) {
-                  actionLabel = '⚠️ NO PURSE';
-                  subReason = `Has ${formatCurrency(t.purse, currency)}`;
-                } else if (squadFull) {
-                  actionLabel = 'SQUAD FULL';
-                  subReason = `Max ${rules.maxSquadSize} reached`;
-                }
-
-                return (
-                  <motion.button
-                    key={t.id}
-                    type="button"
-                    disabled={isDisabled}
-                    whileHover={isDisabled ? undefined : { scale: 1.02 }}
-                    whileTap={isDisabled ? undefined : { scale: 0.98 }}
-                    onClick={() => handleTeamBidClick(t.id)}
-                    title={subReason}
-                    className={`p-3 rounded-2xl border text-left transition-all duration-200 relative overflow-hidden flex flex-col justify-between ${
-                      isLeading
-                        ? 'bg-battle-surface/90 border-brand-cyan ring-2 ring-brand-cyan/80 shadow-glow-cyan cursor-not-allowed'
-                        : isDisabled
-                        ? 'bg-battle-surface/40 border-battle-border opacity-45 cursor-not-allowed text-battle-muted'
-                        : 'bg-battle-surface shadow-md hover:shadow-xl cursor-pointer'
-                    }`}
-                    style={{
-                      borderColor: isLeading ? '#00D9FF' : isDisabled ? undefined : t.color,
-                      boxShadow: isLeading ? '0 0 20px rgba(0, 217, 255, 0.35)' : isDisabled ? undefined : `0 4px 18px ${t.color}25`,
-                    }}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{t.logo || '🛡️'}</span>
-                        <span className="font-broadcast font-bold text-xs text-white truncate max-w-[90px]">
-                          {t.name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {isLeading && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan animate-ping" />
-                        )}
-                        <span className="text-[10px] font-mono text-brand-neon font-bold">
-                          {formatCurrency(t.purse, currency)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-1">
-                      <span
-                        className="font-black text-xs uppercase tracking-wider font-broadcast"
-                        style={{ color: isLeading ? '#00D9FF' : isDisabled ? undefined : t.color }}
-                      >
-                        {actionLabel}
-                      </span>
-                      {isLeading ? (
-                        <span className="text-[9px] text-brand-cyan font-broadcast font-bold uppercase tracking-wider">
-                          Active Lead
-                        </span>
-                      ) : subReason ? (
-                        <span className="text-[9px] text-battle-muted font-broadcast truncate max-w-[80px]">
-                          {subReason}
-                        </span>
-                      ) : null}
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Jump / Custom Bid Box */}
-          <div className="p-3 rounded-2xl bg-battle-surface/80 border border-battle-border">
-            <span className="text-[10px] font-black text-battle-muted uppercase tracking-wider block mb-1.5 font-broadcast">
-              Custom / Jump Bid
-            </span>
-
-            <form onSubmit={handleCustomBidSubmit} className="flex gap-2">
-              <select
-                value={selectedCustomTeam}
-                onChange={(e) => setSelectedCustomTeam(e.target.value)}
-                className="w-1/2 bg-battle-bg border border-battle-border rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-purple font-broadcast font-bold"
-              >
-                <option value="">Franchise...</option>
-                {teams.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name} ({formatCurrency(t.purse, currency)})
-                  </option>
-                ))}
-              </select>
-
-              <input
-                type="number"
-                step="any"
-                min="0"
-                value={customBidAmount}
-                onChange={(e) => setCustomBidAmount(e.target.value)}
-                placeholder={`> ${currentBid}`}
-                className="w-1/3 bg-battle-bg border border-battle-border rounded-xl px-2 py-1.5 text-xs text-amber-400 font-mono font-bold focus:outline-none focus:border-amber-400"
-              />
-
-              <Button variant="primary" size="sm" type="submit" className="shrink-0 text-xs px-3">
-                Jump
-              </Button>
-            </form>
           </div>
 
           {/* Bid History Feed & Timeline Tabs with Safe Undo (BIDBATTLE 7.7) */}

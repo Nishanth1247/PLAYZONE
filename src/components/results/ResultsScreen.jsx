@@ -75,7 +75,8 @@ export const ResultsScreen = () => {
     champion, 
     runnerUp, 
     winningMargin, 
-    explanation 
+    explanation,
+    conclusion 
   } = calculateTeamRankings(teams, items, maxSquadSize);
 
   const soldItems = items.filter((i) => i.status === 'sold');
@@ -178,8 +179,61 @@ export const ResultsScreen = () => {
           Scoring Mode: <strong>{scoreMetricLabel}</strong> • Best {maxSquadSize} Heroes Counted
         </p>
 
-        {/* CHAMPION PODIUM SPOTLIGHT CARD */}
-        {champion && (
+        {/* CHAMPION PODIUM SPOTLIGHT CARD (BIDBATTLE 8.2) */}
+        {conclusion?.isSharedChampion ? (
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="mt-8 p-8 rounded-3xl battle-panel border-2 border-amber-500/70 shadow-2xl relative overflow-hidden"
+          >
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Crown className="w-6 h-6 text-amber-400" />
+              <span className="text-xs font-black uppercase tracking-widest text-amber-400 font-broadcast">
+                OFFICIAL JOINT CHAMPIONS (TRUE TIE)
+              </span>
+            </div>
+
+            <h2 className="text-3xl sm:text-5xl font-black text-white font-broadcast uppercase tracking-wide mb-3">
+              {conclusion.champions.map((c) => c.name).join(' & ')}
+            </h2>
+
+            <p className="text-xs sm:text-sm text-battle-text max-w-2xl mx-auto mb-6 leading-relaxed">
+              {conclusion.conclusionNarrative}
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
+              {conclusion.champions.map((champ) => (
+                <div
+                  key={champ.id}
+                  className="p-4 rounded-2xl bg-battle-bg border-2 text-center space-y-2"
+                  style={{ borderColor: champ.color }}
+                >
+                  <span className="text-4xl p-2 rounded-2xl bg-battle-surface inline-block shadow">
+                    {champ.logo}
+                  </span>
+                  <h3 className="font-broadcast font-bold text-xl text-white" style={{ color: champ.color }}>
+                    {champ.name}
+                  </h3>
+                  <div className="flex justify-around text-xs font-mono pt-1 border-t border-battle-border">
+                    <div>
+                      <span className="text-battle-muted block text-[10px]">POINTS</span>
+                      <span className="font-bold text-amber-300 text-sm">{champ.totalPoints} pts</span>
+                    </div>
+                    <div>
+                      <span className="text-battle-muted block text-[10px]">PURSE</span>
+                      <span className="font-bold text-brand-cyan text-sm">{formatCurrency(champ.remainingPurse, currency)}</span>
+                    </div>
+                    <div>
+                      <span className="text-battle-muted block text-[10px]">MVP RATING</span>
+                      <span className="font-bold text-brand-neon text-sm">{champ.highestRating}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        ) : champion ? (
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -200,22 +254,27 @@ export const ResultsScreen = () => {
               </div>
 
               <div className="text-center sm:text-left">
-                <div className="flex items-center justify-center sm:justify-start gap-2 mb-1.5">
+                <div className="flex items-center justify-center sm:justify-start gap-2 mb-1.5 flex-wrap">
                   <Award className="w-5 h-5 text-amber-400" />
                   <span className="text-xs font-black uppercase tracking-widest text-amber-400 font-broadcast">
                     TOURNAMENT CHAMPION & SQUAD LEADER
                   </span>
+                  {conclusion?.tiebreakerUsed && conclusion.tiebreakerUsed !== 'None (Decided by Total Points)' && (
+                    <Badge variant="orange" className="text-[10px] uppercase font-mono">
+                      Decided by Tiebreaker: {conclusion.tiebreakerUsed}
+                    </Badge>
+                  )}
                 </div>
                 
                 <h2 className="text-4xl sm:text-6xl font-black text-white font-broadcast tracking-wide" style={{ color: champion.color }}>
                   {champion.name}
                 </h2>
 
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-3">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-3">
                   <div className="px-3.5 py-1.5 rounded-xl bg-battle-bg border border-battle-border">
                     <span className="text-[10px] text-battle-muted uppercase font-bold block font-broadcast">TOTAL TEAM SCORE</span>
                     <span className="text-2xl font-black text-amber-400 font-broadcast font-mono">
-                      {champion.totalScore} PTS
+                      {champion.totalPoints} PTS
                     </span>
                   </div>
 
@@ -232,19 +291,32 @@ export const ResultsScreen = () => {
                     <div className="px-3.5 py-1.5 rounded-xl bg-battle-bg border border-battle-border">
                       <span className="text-[10px] text-battle-muted uppercase font-bold block font-broadcast">STRONGEST HERO (MVP)</span>
                       <span className="text-sm font-bold text-white font-broadcast">
-                        {champion.strongestHero.name} ({champion.strongestHero.rating} pts)
+                        {champion.strongestHero.name} (★ {champion.highestRating})
                       </span>
                     </div>
                   )}
+
+                  <div className="px-3.5 py-1.5 rounded-xl bg-battle-bg border border-battle-border">
+                    <span className="text-[10px] text-battle-muted uppercase font-bold block font-broadcast">COMBINED SQUAD RATING</span>
+                    <span className="text-sm font-bold text-brand-cyan font-mono">
+                      {champion.combinedSquadRating} PTS
+                    </span>
+                  </div>
                 </div>
 
-                <p className="text-xs text-battle-text mt-3">
-                  Secured <strong>{champion.squad.length} superstars</strong> with <strong>{formatCurrency(champion.remainingPurse, currency)}</strong> remaining in purse.
-                </p>
+                {conclusion?.conclusionNarrative ? (
+                  <p className="text-xs text-battle-text mt-3 max-w-xl leading-relaxed">
+                    {conclusion.conclusionNarrative}
+                  </p>
+                ) : (
+                  <p className="text-xs text-battle-text mt-3">
+                    Secured <strong>{champion.squad.length} superstars</strong> with <strong>{formatCurrency(champion.remainingPurse, currency)}</strong> remaining in purse.
+                  </p>
+                )}
               </div>
             </div>
           </motion.div>
-        )}
+        ) : null}
 
         {/* Action Controls */}
         <div className="flex flex-wrap items-center justify-center gap-3 mt-8 print:hidden">
@@ -571,30 +643,37 @@ export const ResultsScreen = () => {
           </div>
         </div>
 
-        {/* Participating Franchise Balance & Audit Table */}
+        {/* Participating Franchise Balance & Audit Table (BIDBATTLE 8.2) */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-broadcast">
             <thead>
               <tr className="border-b border-battle-border text-battle-muted uppercase tracking-wider text-[10px]">
+                <th className="py-2.5 px-3">Rank</th>
                 <th className="py-2.5 px-3">Franchise</th>
-                <th className="py-2.5 px-3 text-center">Rank</th>
-                <th className="py-2.5 px-3 text-center">Squad</th>
+                <th className="py-2.5 px-3 text-right">Total Points</th>
                 <th className="py-2.5 px-3 text-right">Purse Left</th>
+                <th className="py-2.5 px-3 text-center">Highest Rating (MVP)</th>
+                <th className="py-2.5 px-3 text-center">Combined Rating</th>
+                <th className="py-2.5 px-3">Differentiating Reason</th>
+                <th className="py-2.5 px-3 text-center">Squad</th>
                 <th className="py-2.5 px-3 text-right">Total Spent</th>
-                <th className="py-2.5 px-3 text-center">Purse Used</th>
-                <th className="py-2.5 px-3 text-right">Score</th>
-                <th className="py-2.5 px-3 text-right">Avg / Hero</th>
-                <th className="py-2.5 px-3 text-right">ROI (Pts / ₹ Cr)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-battle-border/50">
               {rankedTeams.map((t) => {
                 const totalPurse = (t.remainingPurse || 0) + (t.totalSpent || 0);
-                const usedPct = Math.round(((t.totalSpent || 0) / (totalPurse || 100)) * 100);
-                const roi = t.totalSpent > 0 ? (t.totalScore / t.totalSpent).toFixed(1) : '∞';
 
                 return (
                   <tr key={t.id} className="hover:bg-battle-surface/40 transition-colors">
+                    <td className="py-3 px-3 font-bold">
+                      <span className={`px-2 py-0.5 rounded-lg border text-[10px] ${
+                        t.rank === 1 ? 'border-amber-500/60 bg-amber-500/10 text-amber-300' :
+                        t.rank === 2 ? 'border-cyan-500/60 bg-cyan-500/10 text-cyan-300' :
+                        'border-battle-border bg-battle-surface text-battle-muted'
+                      }`}>
+                        #{t.rank}
+                      </span>
+                    </td>
                     <td className="py-3 px-3">
                       <div className="flex items-center gap-2">
                         <span className="text-xl">{t.logo}</span>
@@ -606,35 +685,28 @@ export const ResultsScreen = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="py-3 px-3 text-center font-bold">
-                      <span className={`px-2 py-0.5 rounded-lg border text-[10px] ${
-                        t.rank === 1 ? 'border-amber-500/60 bg-amber-500/10 text-amber-300' :
-                        t.rank === 2 ? 'border-cyan-500/60 bg-cyan-500/10 text-cyan-300' :
-                        'border-battle-border bg-battle-surface text-battle-muted'
-                      }`}>
-                        #{t.rank}
+                    <td className="py-3 px-3 text-right font-mono font-black text-amber-400 text-sm">
+                      {t.totalPoints} PTS
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono font-bold text-brand-neon">
+                      {formatCurrency(t.remainingPurse, currency)}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono font-bold text-white">
+                      ★ {t.highestRating || '—'} {t.strongestHero ? `(${t.strongestHero.name})` : ''}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-brand-cyan font-bold">
+                      {t.combinedSquadRating} pts
+                    </td>
+                    <td className="py-3 px-3 text-[11px] font-mono text-battle-text">
+                      <span className="px-2 py-0.5 rounded bg-battle-bg border border-battle-border/80 inline-block">
+                        {t.differentiatingReason || '—'}
                       </span>
                     </td>
                     <td className="py-3 px-3 text-center font-mono">
                       {t.heroesCount} / {maxSquadSize}
                     </td>
-                    <td className="py-3 px-3 text-right font-mono font-bold text-brand-neon">
-                      {formatCurrency(t.remainingPurse, currency)}
-                    </td>
                     <td className="py-3 px-3 text-right font-mono font-bold text-battle-text">
                       {formatCurrency(t.totalSpent, currency)}
-                    </td>
-                    <td className="py-3 px-3 text-center font-mono text-battle-muted">
-                      {usedPct}%
-                    </td>
-                    <td className="py-3 px-3 text-right font-mono font-black text-amber-400 text-sm">
-                      {t.totalScore}
-                    </td>
-                    <td className="py-3 px-3 text-right font-mono text-white">
-                      {t.averageRating}
-                    </td>
-                    <td className="py-3 px-3 text-right font-mono font-bold text-brand-cyan">
-                      {roi}
                     </td>
                   </tr>
                 );
