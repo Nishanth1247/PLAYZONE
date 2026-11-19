@@ -23,23 +23,22 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
   return (
     <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-grid-pattern pb-16">
       {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[350px] bg-brand-purple/15 blur-[160px] pointer-events-none rounded-full" />
-      <div className="absolute top-1/3 left-1/4 w-[450px] h-[300px] bg-brand-cyan/15 blur-[140px] pointer-events-none rounded-full" />
-      <div className="absolute top-2/3 right-1/4 w-[500px] h-[320px] bg-brand-orange/15 blur-[150px] pointer-events-none rounded-full" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[350px] bg-terracotta/10 blur-[160px] pointer-events-none rounded-full" />
+      <div className="absolute top-1/3 left-1/4 w-[450px] h-[300px] bg-gold/10 blur-[140px] pointer-events-none rounded-full" />
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-10">
         
         {/* 1. CINEMATIC HERO SECTION */}
         <div className="text-center max-w-3xl mx-auto pt-4 space-y-4">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-battle-surface/90 border border-brand-purple/40 text-xs font-bold text-brand-purple shadow-glow-purple">
-            <Sparkles className="w-4 h-4 text-brand-cyan" />
-            <span className="text-battle-text">BIDBATTLE 8.0 • Party Arena</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-neon" />
-            <span className="text-brand-neon font-black tracking-wider">2–4 LOCAL PLAYERS • 1 LAPTOP</span>
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-pine border border-charcoal text-xs font-bold text-gold shadow-md">
+            <Sparkles className="w-4 h-4 text-gold" />
+            <span className="text-ivory">BIDBATTLE 8.4 • Party Arena</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-terracotta" />
+            <span className="text-terracotta font-black tracking-wider">2–4 LOCAL PLAYERS • 1 LAPTOP</span>
           </div>
 
-          <h1 className="font-broadcast text-5xl sm:text-7xl font-black tracking-wider uppercase text-white leading-none">
-            PARTY <span className="neon-text-purple">ARENA</span>
+          <h1 className="font-broadcast text-5xl sm:text-7xl font-black tracking-wider uppercase text-ivory leading-none">
+            PARTY <span className="text-gold">ARENA</span>
           </h1>
 
           <p className="text-sm sm:text-base text-battle-muted max-w-2xl mx-auto leading-relaxed">

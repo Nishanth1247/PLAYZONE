@@ -4,90 +4,99 @@
 
 @layer base {
   :root {
-    --color-bg: #080A12;
-    --color-surface: #101321;
-    --color-card: #151A2B;
+    --color-bg: #18251F;
+    --color-surface: #24352C;
+    --color-card: #24352C;
+    --color-ivory: #E8E3D4;
+    --color-terracotta: #C66A45;
+    --color-gold: #C3A45D;
+    --color-sage: #91A08B;
+    --color-charcoal: #303832;
     --color-purple: #9147FF;
     --color-cyan: #00D9FF;
     --color-orange: #FF8A35;
     --color-neon: #B7F34A;
-    --color-pink: #FF4FA3;
   }
 
   body {
-    background-color: #080A12;
-    color: #F5F6FF;
+    background-color: #18251F;
+    color: #E8E3D4;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
   }
 
-  /* Custom esports scrollbar */
+  /* Championship Editorial scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #080A12;
+    background: #18251F;
   }
   ::-webkit-scrollbar-thumb {
-    background: #232A44;
+    background: #303832;
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #9147FF;
+    background: #C3A45D;
   }
 }
 
 @layer components {
-  /* Esports atmospheric background grid */
+  /* Editorial subtle textured background grid */
   .bg-grid-pattern {
     background-size: 36px 36px;
     background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      linear-gradient(to right, rgba(232, 227, 212, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(232, 227, 212, 0.02) 1px, transparent 1px);
   }
 
-  /* High-end glassmorphism panel */
+  /* Championship Editorial Sports Broadcast panel */
   .battle-panel {
-    background: rgba(21, 26, 43, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    background: #24352C;
+    border: 1px solid #303832;
+    box-shadow: 0 6px 24px -4px rgba(0, 0, 0, 0.45);
   }
 
   .battle-panel-interactive {
-    background: rgba(21, 26, 43, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #24352C;
+    border: 1px solid #303832;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .battle-panel-interactive:hover {
-    background: rgba(27, 33, 55, 0.95);
-    border-color: rgba(145, 71, 255, 0.4);
-    box-shadow: 0 14px 40px -12px rgba(145, 71, 255, 0.25);
-    transform: translateY(-2px);
+    background: #2C3F35;
+    border-color: #C3A45D;
+    box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.5);
+    transform: translateY(-1.5px);
   }
 
-  /* Radiant glow borders */
+  /* Restrained accent borders */
   .glow-border-purple {
-    border: 1px solid rgba(145, 71, 255, 0.4);
-    box-shadow: 0 0 20px -3px rgba(145, 71, 255, 0.3);
+    border: 1px solid rgba(145, 71, 255, 0.5);
   }
 
   .glow-border-cyan {
     border: 1px solid rgba(0, 217, 255, 0.5);
-    box-shadow: 0 0 20px -3px rgba(0, 217, 255, 0.35);
   }
 
   .glow-border-orange {
-    border: 1px solid rgba(255, 138, 53, 0.5);
-    box-shadow: 0 0 20px -3px rgba(255, 138, 53, 0.35);
+    border: 1px solid rgba(198, 106, 69, 0.5);
   }
 
-  /* Broadcast typography & neon texts */
+  .glow-border-gold {
+    border: 1px solid rgba(195, 164, 93, 0.6);
+  }
+
+  /* Broadcast typography & antique gold accents */
+  .font-broadcast {
+    font-family: 'Rajdhani', Impact, -apple-system, sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  .neon-text-gold {
+    text-shadow: 0 0 12px rgba(195, 164, 93, 0.4);
+  }
   .font-broadcast {
     font-family: 'Rajdhani', Impact, -apple-system, sans-serif;
     letter-spacing: 0.06em;

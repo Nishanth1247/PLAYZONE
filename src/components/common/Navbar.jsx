@@ -109,52 +109,52 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
           }}
           className="flex items-center gap-3 cursor-pointer group flex-shrink-0"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-purple via-brand-pink to-brand-cyan p-[1.5px] shadow-lg shadow-brand-purple/20 group-hover:shadow-brand-cyan/40 transition-all duration-300">
-            <div className="w-full h-full bg-battle-bg rounded-[10px] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-charcoal border border-gold/40 p-[1.5px] shadow-md group-hover:border-gold transition-all duration-300">
+            <div className="w-full h-full bg-forest rounded-[10px] flex items-center justify-center">
               {platformMode === 'party' ? (
-                <Gamepad2 className="w-5 h-5 text-brand-cyan group-hover:scale-110 transition-transform duration-300" />
+                <Gamepad2 className="w-5 h-5 text-gold group-hover:scale-110 transition-transform duration-300" />
               ) : platformMode === 'battle' ? (
-                <Swords className="w-5 h-5 text-brand-orange group-hover:scale-110 transition-transform duration-300" />
+                <Swords className="w-5 h-5 text-terracotta group-hover:scale-110 transition-transform duration-300" />
               ) : (
-                <Gavel className="w-5 h-5 text-brand-cyan group-hover:rotate-12 transition-transform duration-300" />
+                <Gavel className="w-5 h-5 text-gold group-hover:rotate-12 transition-transform duration-300" />
               )}
             </div>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-broadcast text-xl sm:text-2xl font-black tracking-wider bg-gradient-to-r from-white via-cyan-200 to-brand-cyan bg-clip-text text-transparent">
+              <span className="font-broadcast text-xl sm:text-2xl font-black tracking-wider text-ivory">
                 BIDBATTLE
               </span>
-              <span className="text-[10px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-brand-orange/20 text-brand-orange border border-brand-orange/40 font-mono">
-                8.1
+              <span className="text-[10px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-terracotta/20 text-terracotta border border-terracotta/40 font-mono">
+                8.4
               </span>
             </div>
-            <p className="text-[11px] text-battle-muted font-medium tracking-tight -mt-1 hidden sm:block">
+            <p className="text-[11px] text-sage font-medium tracking-tight -mt-1 hidden sm:block">
               {platformMode === 'party'
                 ? 'Party Arena • Local Multiplayer'
                 : platformMode === 'battle'
-                ? 'Battle Arena • Tournament & Clash'
+                ? 'Battle Arena • Tactical Clash'
                 : 'IPL-Style Auction Arena'}
             </p>
           </div>
         </div>
 
         {/* Global Platform Mode Switcher: Auction vs Party vs Battle Arena */}
-        <div className="flex items-center p-1 rounded-2xl bg-battle-surface border border-battle-border font-broadcast text-xs font-bold shadow-inner">
+        <div className="flex items-center p-1 rounded-2xl bg-pine border border-charcoal font-broadcast text-xs font-bold shadow-inner">
           <button
             type="button"
             onClick={() => setPlatformMode('auction')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
               platformMode === 'auction'
-                ? 'bg-gradient-to-r from-brand-purple to-brand-cyan text-white shadow-glow-purple font-black'
-                : 'text-battle-muted hover:text-white'
+                ? 'bg-terracotta text-ivory font-black shadow-md'
+                : 'text-sage hover:text-ivory'
             }`}
           >
             <Gavel className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">AUCTION</span>
             <span className="sm:hidden">AUCT</span>
             {hasLiveAuction && (
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-terracotta animate-ping" />
             )}
           </button>
 
@@ -163,8 +163,8 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
             onClick={() => setPlatformMode('party')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
               platformMode === 'party'
-                ? 'bg-gradient-to-r from-brand-purple to-brand-cyan text-white shadow-glow-purple font-black'
-                : 'text-battle-muted hover:text-white'
+                ? 'bg-terracotta text-ivory font-black shadow-md'
+                : 'text-sage hover:text-ivory'
             }`}
           >
             <Gamepad2 className="w-3.5 h-3.5" />
@@ -177,11 +177,11 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
             onClick={() => setPlatformMode('battle')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
               platformMode === 'battle'
-                ? 'bg-gradient-to-r from-brand-orange to-red-600 text-white shadow-glow-orange font-black'
-                : 'text-battle-muted hover:text-white'
+                ? 'bg-terracotta text-ivory font-black shadow-md'
+                : 'text-sage hover:text-ivory'
             }`}
           >
-            <Swords className="w-3.5 h-3.5 text-amber-300" />
+            <Swords className="w-3.5 h-3.5 text-gold" />
             <span className="hidden sm:inline">BATTLE ARENA</span>
             <span className="sm:hidden">BATTLE</span>
           </button>
@@ -233,19 +233,8 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
           )}
         </nav>
 
-        {/* Right Controls: Sound, Fullscreen, AI Settings */}
+        {/* Right Controls: Sound, Fullscreen */}
         <div className="flex items-center gap-2">
-          {platformMode === 'party' && (
-            <button
-              onClick={() => setShowAISettings(true)}
-              title="AI Generation Settings"
-              className="p-2 rounded-xl bg-battle-surface border border-battle-border text-battle-muted hover:text-brand-cyan hover:border-brand-cyan/50 transition-all flex items-center gap-1 text-xs font-broadcast"
-            >
-              <Settings className="w-4 h-4" />
-              <span className="hidden xl:inline">AI Config</span>
-            </button>
-          )}
-
           {/* Sound Toggle */}
           <button
             onClick={handleToggleSound}
@@ -253,17 +242,17 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
             className={`p-2 rounded-xl border transition-all ${
               isMuted
                 ? 'bg-red-950/40 border-red-800 text-red-400 hover:bg-red-900/50'
-                : 'bg-battle-surface border-battle-border text-battle-muted hover:text-white hover:border-brand-cyan/50 hover:shadow-glow-cyan'
+                : 'bg-pine border-charcoal text-sage hover:text-ivory hover:border-gold/50'
             }`}
           >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-brand-cyan" />}
+            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-gold" />}
           </button>
 
           {/* Fullscreen Toggle */}
           <button
             onClick={toggleFullscreen}
             title={isFullscreen ? 'Exit Fullscreen' : 'Enter Broadcast Fullscreen'}
-            className="p-2 rounded-xl bg-battle-surface border border-battle-border text-battle-muted hover:text-white hover:border-slate-700 transition-all hidden sm:flex"
+            className="p-2 rounded-xl bg-pine border border-charcoal text-sage hover:text-ivory hover:border-gold/50 transition-all hidden sm:flex"
           >
             {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
           </button>

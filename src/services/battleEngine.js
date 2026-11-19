@@ -154,6 +154,22 @@ export const validateSchedule = (schedule, teams, squadSize) => {
 };
 
 /**
+ * Calculates which slot index a team is playing in for a given scheduled match.
+ * (e.g. 0 for their 1st match, 1 for their 2nd match, etc.)
+ */
+export const getTeamMatchSlotIndex = (schedule, matchIndex, teamId) => {
+  if (!schedule || matchIndex < 0) return 0;
+  let count = 0;
+  for (let i = 0; i < matchIndex; i++) {
+    const m = schedule[i];
+    if (m && (m.teamAId === teamId || m.teamBId === teamId)) {
+      count++;
+    }
+  }
+  return count;
+};
+
+/**
  * Evaluates a head-to-head battle between two selected players.
  * Uses underlying ratings and transparent match dynamics.
  */

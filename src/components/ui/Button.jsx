@@ -2,12 +2,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const VARIANTS = {
-  primary: 'bg-gradient-to-r from-brand-purple to-brand-cyan text-white shadow-lg shadow-brand-purple/25 hover:shadow-brand-cyan/40 border border-white/10',
-  secondary: 'bg-battle-surface hover:bg-battle-card border border-battle-border text-battle-text hover:border-brand-purple/50',
-  danger: 'bg-gradient-to-r from-red-600 to-brand-orange text-white shadow-lg shadow-red-600/30 hover:shadow-red-600/50',
-  accent: 'bg-gradient-to-r from-brand-orange via-amber-500 to-brand-neon text-dark-950 font-black shadow-lg shadow-brand-orange/30',
-  ghost: 'bg-transparent hover:bg-battle-surface/80 text-battle-muted hover:text-white',
-  cyan: 'bg-gradient-to-r from-brand-cyan to-blue-600 text-dark-950 font-black shadow-lg shadow-brand-cyan/30',
+  primary: 'bg-[#C66A45] hover:bg-[#B55A36] text-[#E8E3D4] font-bold shadow-md border border-[#D97D58]/40',
+  secondary: 'bg-[#24352C] hover:bg-[#303832] border border-[#303832] text-[#E8E3D4] hover:border-[#C3A45D]/50',
+  danger: 'bg-red-900/80 hover:bg-red-800 text-[#E8E3D4] shadow-md border border-red-700/60',
+  accent: 'bg-[#C3A45D] hover:bg-[#B2934D] text-[#18251F] font-black shadow-md border border-[#D8BC78]/50',
+  ghost: 'bg-transparent hover:bg-[#24352C] text-[#91A08B] hover:text-[#E8E3D4]',
+  cyan: 'bg-[#C66A45] hover:bg-[#B55A36] text-[#E8E3D4] font-bold shadow-md border border-[#D97D58]/40',
+  gold: 'bg-[#C3A45D] hover:bg-[#B2934D] text-[#18251F] font-black shadow-md border border-[#D8BC78]/50',
+  terracotta: 'bg-[#C66A45] hover:bg-[#B55A36] text-[#E8E3D4] font-bold shadow-md border border-[#D97D58]/40',
 };
 
 const SIZES = {

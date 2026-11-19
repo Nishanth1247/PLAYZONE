@@ -241,7 +241,7 @@ export const LiveAuctionCard = ({
               <span className="text-[8px] text-battle-muted uppercase font-broadcast font-bold block leading-none mb-0.5">
                 BASE PRICE
               </span>
-              <span className="font-mono text-sm sm:text-base font-black text-amber-400 leading-none">
+              <span className="font-mono text-sm sm:text-base font-black text-gold leading-none">
                 {formatCurrency(currentItem.basePrice, currency)}
               </span>
             </div>
@@ -250,15 +250,10 @@ export const LiveAuctionCard = ({
               <span className="text-[8px] text-battle-muted uppercase font-broadcast font-bold block leading-none mb-0.5">
                 RATING
               </span>
-              {isRatingHidden ? (
-                <span className="font-mono text-[11px] text-battle-muted flex items-center gap-1 font-bold">
-                  <Lock className="w-3 h-3 text-brand-purple" /> Hidden
-                </span>
-              ) : (
-                <span className="font-mono text-sm sm:text-base font-black text-brand-cyan leading-none">
-                  ★ {currentItem.rating || currentItem.power || 80}
-                </span>
-              )}
+              {/* BIDBATTLE 8.4: Ratings strictly hidden during active bidding across all auctions */}
+              <span className="font-mono text-[11px] text-sage flex items-center gap-1 font-bold">
+                <Lock className="w-3 h-3 text-gold" /> Hidden
+              </span>
             </div>
           </div>
         </div>

@@ -8,23 +8,42 @@ export default {
   theme: {
     extend: {
       colors: {
+        // BIDBATTLE 8.4 — Championship Editorial & Sports Broadcast Palette
+        forest: '#18251F',     // Forest Ink – primary background
+        pine: '#24352C',       // Deep Pine – secondary surfaces
+        ivory: '#E8E3D4',      // Warm Ivory – primary typography & light surfaces
+        terracotta: '#C66A45', // Terracotta – main action accent
+        gold: '#C3A45D',       // Antique Gold – championship & premium details
+        sage: '#91A08B',       // Muted Sage – secondary information
+        charcoal: '#303832',   // Soft Charcoal – supporting borders & elements
+
+        // System-wide surface aliases mapped to the new palette
         battle: {
-          bg: '#080A12',
-          surface: '#101321',
-          card: '#151A2B',
-          cardHover: '#1B2137',
-          border: '#232A44',
-          borderLight: '#323C61',
-          text: '#F5F6FF',
-          muted: '#9299B0',
+          bg: '#18251F',
+          surface: '#24352C',
+          card: '#24352C',
+          cardHover: '#303832',
+          border: '#303832',
+          borderLight: '#414D43',
+          text: '#E8E3D4',
+          muted: '#91A08B',
+        },
+        // Preserved 4 Predefined Franchises (used strictly for team identities)
+        franchise: {
+          nishanth: '#9147FF',
+          ajmal: '#00D9FF',
+          praneeth: '#FF8A35',
+          nagulan: '#B7F34A',
         },
         brand: {
           purple: '#9147FF',
           cyan: '#00D9FF',
           orange: '#FF8A35',
           neon: '#B7F34A',
+          terracotta: '#C66A45',
+          gold: '#C3A45D',
+          sage: '#91A08B',
           pink: '#FF4FA3',
-          gold: '#FFD027',
           blue: '#2B66FF',
         }
       },

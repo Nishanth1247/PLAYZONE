@@ -14,7 +14,8 @@ import {
   evaluateBattleMatch, 
   calculateLeaderboard, 
   getSavedBattleState, 
-  saveBattleState 
+  saveBattleState,
+  getTeamMatchSlotIndex
 } from '../services/battleEngine';
 import { soundService } from '../services/soundService';
 import { toast } from 'sonner';
@@ -58,6 +59,12 @@ export const BattleArenaProvider = ({ children }) => {
       privateFighterSelection: {}, // { [teamId]: playerId }
       currentMatchEvaluation: null,
       matchStage: 'faceoff', // 'faceoff' | 'teamA_select' | 'teamA_locked' | 'teamB_select' | 'evaluated' | 'confirmed'
+      tacticalDraft: {
+        isLocked: false,
+        draftingTeamIndex: 0,
+        draftStage: 'drafting', // 'drafting' | 'privacy_shield' | 'lineups_locked' | 'active_matches'
+        lineups: {}, // { [teamId]: [fighterId, ...] }
+      },
       leaderboard: [],
     };
   });
@@ -396,6 +403,12 @@ export const BattleArenaProvider = ({ children }) => {
       completedMatches: [],
       privateFighterSelection: {},
       currentMatchEvaluation: null,
+      tacticalDraft: {
+        isLocked: false,
+        draftingTeamIndex: 0,
+        draftStage: 'drafting',
+        lineups: {},
+      },
       leaderboard: initialLeaderboard,
     });
 
@@ -518,8 +531,137 @@ export const BattleArenaProvider = ({ children }) => {
       privateFighterSelection: {},
       currentMatchEvaluation: null,
       matchStage: 'faceoff',
+      tacticalDraft: prev.tacticalDraft?.isLocked
+        ? prev.tacticalDraft
+        : {
+            isLocked: false,
+            draftingTeamIndex: 0,
+            draftStage: 'drafting',
+            lineups: {},
+          },
     }));
     soundService.playBid();
+  };
+
+  // 7a. Tactical Draft: Save a team's ordered lineup
+  const saveTeamLineup = (teamId, orderedFighterIds) => {
+    setBattleState((prev) => {
+      const currentTeamIdx = prev.tacticalDraft?.draftingTeamIndex || 0;
+      const nextTeamIdx = currentTeamIdx + 1;
+      const isAllComplete = nextTeamIdx >= prev.teams.length;
+
+      const updatedLineups = {
+        ...(prev.tacticalDraft?.lineups || {}),
+        [teamId]: orderedFighterIds,
+      };
+
+      soundService.playSold();
+      toast.success('Tactical Lineup confirmed!');
+
+      return {
+        ...prev,
+        tacticalDraft: {
+          ...prev.tacticalDraft,
+          lineups: updatedLineups,
+          draftStage: isAllComplete ? 'lineups_locked' : 'privacy_shield',
+          isLocked: isAllComplete,
+        },
+      };
+    });
+  };
+
+  // 7b. Tactical Draft: Hand off device to next team
+  const proceedToNextTeamDraft = () => {
+    setBattleState((prev) => {
+      const nextTeamIdx = (prev.tacticalDraft?.draftingTeamIndex || 0) + 1;
+      return {
+        ...prev,
+        tacticalDraft: {
+          ...prev.tacticalDraft,
+          draftingTeamIndex: nextTeamIdx,
+          draftStage: 'drafting',
+        },
+      };
+    });
+    soundService.playBid();
+  };
+
+  // 7c. Tactical Draft: Start active battles once all lineups are locked
+  const startBattlePhaseFromLineups = () => {
+    setBattleState((prev) => ({
+      ...prev,
+      currentMatchIndex: 0,
+      matchStage: 'faceoff',
+      privateFighterSelection: {},
+      currentMatchEvaluation: null,
+      tacticalDraft: {
+        ...prev.tacticalDraft,
+        draftStage: 'active_matches',
+        isLocked: true,
+      },
+    }));
+    soundService.playSold();
+    toast.success('⚔️ Battle Phase Commencing! Match 1 ready for face-off.');
+  };
+
+  // 7d. Tactical Draft: Execute sequential 3-2-1 match reveal
+  const initiateMatchReveal = () => {
+    setBattleState((prev) => {
+      const currentMatch = prev.schedule[prev.currentMatchIndex];
+      if (!currentMatch) return prev;
+
+      const teamA = prev.teams.find((t) => t.id === currentMatch.teamAId);
+      const teamB = prev.teams.find((t) => t.id === currentMatch.teamBId);
+      if (!teamA || !teamB) return prev;
+
+      const slotA = getTeamMatchSlotIndex(prev.schedule, prev.currentMatchIndex, teamA.id);
+      const slotB = getTeamMatchSlotIndex(prev.schedule, prev.currentMatchIndex, teamB.id);
+
+      const fighterAId = prev.tacticalDraft?.lineups?.[teamA.id]?.[slotA];
+      const fighterBId = prev.tacticalDraft?.lineups?.[teamB.id]?.[slotB];
+
+      const playerA = teamA.squad.find((p) => p.id === fighterAId) || teamA.squad[slotA];
+      const playerB = teamB.squad.find((p) => p.id === fighterBId) || teamB.squad[slotB];
+
+      if (!playerA || !playerB) {
+        toast.error('Tactical lineup missing for current match.');
+        return prev;
+      }
+
+      const evaluation = evaluateBattleMatch(playerA, playerB);
+
+      let winnerId = null;
+      let isDraw = false;
+      if (evaluation.winner === 'A') {
+        winnerId = teamA.id;
+      } else if (evaluation.winner === 'B') {
+        winnerId = teamB.id;
+      } else {
+        isDraw = true;
+      }
+
+      if (isDraw) {
+        soundService.playGavel();
+      } else {
+        soundService.playSold();
+      }
+
+      return {
+        ...prev,
+        privateFighterSelection: {
+          [teamA.id]: playerA.id,
+          [teamB.id]: playerB.id,
+        },
+        currentMatchEvaluation: {
+          ...evaluation,
+          playerA,
+          playerB,
+          winnerId,
+          isDraw,
+        },
+        matchStage: 'evaluated',
+      };
+    });
   };
 
   // 8. Start Fighter Selection from Pre-Match Face-Off Screen (BIDBATTLE 7.7)
@@ -767,6 +909,12 @@ export const BattleArenaProvider = ({ children }) => {
       privateFighterSelection: {},
       currentMatchEvaluation: null,
       matchStage: 'faceoff',
+      tacticalDraft: {
+        isLocked: false,
+        draftingTeamIndex: 0,
+        draftStage: 'drafting',
+        lineups: {},
+      },
       leaderboard: [],
     });
     toast.info('Battle Arena reset to setup.');
@@ -788,6 +936,10 @@ export const BattleArenaProvider = ({ children }) => {
         selectTeamAFighter,
         proceedToTeamB,
         selectTeamBFighter,
+        saveTeamLineup,
+        proceedToNextTeamDraft,
+        startBattlePhaseFromLineups,
+        initiateMatchReveal,
         confirmMatchResult,
         selectPrivateFighter,
         advanceToNextBattle,

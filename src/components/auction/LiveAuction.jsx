@@ -115,7 +115,8 @@ export const LiveAuction = () => {
   const { currency, rules, teams, currentBid, highestBidder, timer, isTimerRunning, bidHistory } = auction;
   const currentLeaderTeam = highestBidder ? teams.find((t) => t.id === highestBidder) : null;
   const scoreMetricLabel = auction.scoreLabel || getScoreMetricLabel(auction.category);
-  const isRatingHidden = Boolean(rules?.hideRatingsDuringAuction);
+  // BIDBATTLE 8.4: Strict Rating Concealment globally during active auctions
+  const isRatingHidden = true;
 
   // Progressive Increment & Auction Mode
   const currentIncrement = getProgressiveIncrement(currentBid);

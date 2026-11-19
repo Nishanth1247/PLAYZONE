@@ -88,25 +88,25 @@ export const BattleAuctionStage = () => {
               </Badge>
             </div>
 
-            <div className="flex items-center gap-2 text-[11px] text-battle-muted font-broadcast font-medium mt-0.5">
-              <span className="text-brand-cyan font-bold">
+            <div className="flex items-center gap-2 text-[11px] text-sage font-broadcast font-medium mt-0.5">
+              <span className="text-gold font-bold">
                 LOT #{currentItemIndex + 1} OF {totalLots}
               </span>
               <span>•</span>
-              <span className="text-emerald-400 font-bold">{soldLotsCount} Sold</span>
+              <span className="text-gold font-bold">{soldLotsCount} Sold</span>
               <span>•</span>
-              <span className="text-rose-400 font-bold">{unsoldLotsCount} Unsold</span>
+              <span className="text-terracotta font-bold">{unsoldLotsCount} Unsold</span>
               <span>•</span>
-              <span className="text-brand-orange font-mono font-bold">{progressPercent}% Completed</span>
+              <span className="text-sage font-mono font-bold">{progressPercent}% Completed</span>
             </div>
           </div>
         </div>
 
         {/* Center: Progress Bar */}
         <div className="hidden xl:flex items-center gap-3 w-64">
-          <div className="w-full bg-battle-bg rounded-full h-2 overflow-hidden border border-battle-border">
+          <div className="w-full bg-forest rounded-full h-2 overflow-hidden border border-charcoal">
             <div
-              className="h-full bg-gradient-to-r from-brand-orange via-brand-purple to-brand-cyan transition-all duration-300"
+              className="h-full bg-gradient-to-r from-terracotta to-gold transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
