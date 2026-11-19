@@ -17,7 +17,8 @@ import {
   BookmarkPlus,
   HelpCircle as QuestionIcon,
   Shield,
-  RotateCcw
+  RotateCcw,
+  BookOpen
 } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { Badge } from '../../ui/Badge';
@@ -38,6 +39,7 @@ import {
 } from '../../../services/party/whoAmIEngine';
 import { CopyContentPromptCard } from '../../common/CopyContentPromptCard';
 import { WHO_AM_I_CHATGPT_PROMPT } from '../../../services/chatGptPrompts';
+import { openGameRules } from '../../rules/GameRules';
 import { toast } from 'sonner';
 
 export const WhoAmISetup = ({ onLaunchTournament, onBack }) => {
@@ -290,6 +292,16 @@ export const WhoAmISetup = ({ onLaunchTournament, onBack }) => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant="champagne"
+            size="sm"
+            onClick={() => openGameRules('whoami')}
+            className="font-heading text-xs flex items-center gap-1.5"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Who Am I? Rules</span>
+          </Button>
+
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-battle-surface border border-brand-cyan/40 text-xs font-mono font-bold text-brand-cyan">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Local Multiplayer</span>

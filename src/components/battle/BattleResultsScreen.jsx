@@ -65,7 +65,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
   // Export Comprehensive Battle Report as JSON (BIDBATTLE 7.7)
   const handleExportJSON = () => {
     const summary = {
-      title: 'BIDBATTLE 7.7 Official Battle Arena Tournament Report',
+      title: 'BIDBATTLE Official Battle Arena Tournament Report',
       tournamentName,
       date: new Date().toISOString(),
       podium: {
@@ -138,10 +138,10 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
   };
 
   const rankBadges = [
-    { label: '🥇 1ST — CHAMPION', border: 'border-white', glow: 'text-[#F2F2F0] bg-white/10 border-white' },
-    { label: '🥈 2ND — RUNNER-UP', border: 'border-[#444444]', glow: 'text-[#A3A3A3] bg-[#222222] border-[#444444]' },
-    { label: '🥉 3RD PLACE', border: 'border-[#303030]', glow: 'text-[#737373] bg-[#191919] border-[#303030]' },
-    { label: '4TH PLACE', border: 'border-[#303030]', glow: 'text-[#737373] bg-[#191919] border-[#303030]' },
+    { label: '🥇 1ST — CHAMPION', border: 'border-white', glow: 'text-[#F5F3EE] bg-white/10 border-white' },
+    { label: '🥈 2ND — RUNNER-UP', border: 'border-[#39465A]', glow: 'text-[#AEB9CC] bg-[#2C394C] border-[#39465A]' },
+    { label: '🥉 3RD PLACE', border: 'border-[#39465A]', glow: 'text-[#AEB9CC] bg-[#222F43] border-[#39465A]' },
+    { label: '4TH PLACE', border: 'border-[#39465A]', glow: 'text-[#AEB9CC] bg-[#222F43] border-[#39465A]' },
   ];
 
   return (
@@ -151,7 +151,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="rounded-3xl bg-[#191919] p-8 sm:p-12 border border-[#303030] text-center relative overflow-hidden shadow-2xl space-y-4"
+        className="rounded-3xl bg-[#222F43] p-8 sm:p-12 border border-[#39465A] text-center relative overflow-hidden shadow-2xl space-y-4"
       >
         <div className="w-20 h-20 mx-auto rounded-3xl flex items-center justify-center text-4xl border border-white/20"
           style={{ backgroundColor: champion.color }}
@@ -163,11 +163,11 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
           👑 BATTLE ARENA CHAMPION
         </Badge>
 
-        <h1 className="font-title text-4xl sm:text-6xl font-black text-[#F2F2F0] uppercase tracking-wider">
+        <h1 className="font-title text-4xl sm:text-6xl font-black text-[#F5F3EE] uppercase tracking-wider">
           {champion.name} WINS!
         </h1>
 
-        <p className="text-sm font-mono text-[#A3A3A3] font-bold">
+        <p className="text-sm font-mono text-[#AEB9CC] font-bold">
           {championStats?.points} Points • {championStats?.won} Wins • {championStats?.played} Matches Played
         </p>
 
@@ -177,9 +177,9 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
             variant="secondary"
             size="md"
             onClick={handleExportJSON}
-            className="font-heading text-xs border border-[#303030] text-[#F2F2F0] flex items-center gap-2 bg-[#222222]"
+            className="font-heading text-xs border border-[#39465A] text-[#F5F3EE] flex items-center gap-2 bg-[#2C394C]"
           >
-            <Download className="w-4 h-4 text-[#F2F2F0]" />
+            <Download className="w-4 h-4 text-[#F5F3EE]" />
             <span>DOWNLOAD BATTLE REPORT (JSON)</span>
           </Button>
 
@@ -187,7 +187,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
             variant="primary"
             size="md"
             onClick={resetBattleTournament}
-            className="font-heading text-xs bg-[#F2F2F0] hover:bg-white text-[#090909] font-black flex items-center gap-2"
+            className="font-heading text-xs bg-[#F5F3EE] hover:bg-white text-[#111827] font-black flex items-center gap-2"
           >
             <RotateCcw className="w-4 h-4" />
             <span>NEW BATTLE TOURNAMENT</span>
@@ -198,8 +198,8 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
       {/* 2. DYNAMIC CHAMPIONSHIP PODIUM (2, 3 OR 4 TEAMS) */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-[#F2F2F0]" />
-          <h3 className="font-heading font-black text-xl text-[#F2F2F0] uppercase tracking-wide">
+          <Trophy className="w-5 h-5 text-[#F5F3EE]" />
+          <h3 className="font-heading font-black text-xl text-[#F5F3EE] uppercase tracking-wide">
             Championship Podium ({teams.length} Franchises)
           </h3>
         </div>
@@ -213,7 +213,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
               <motion.div
                 key={entry.team.id}
                 whileHover={{ y: -3 }}
-                className={`p-5 rounded-3xl bg-[#191919] border ${badgeStyle.border} relative overflow-hidden flex flex-col justify-between shadow-lg`}
+                className={`p-5 rounded-3xl bg-[#222F43] border ${badgeStyle.border} relative overflow-hidden flex flex-col justify-between shadow-lg`}
               >
                 <div className="absolute top-0 left-0 right-0 h-1.5" style={{ backgroundColor: entry.team.color }} />
 

@@ -12,7 +12,8 @@ import {
   Upload, 
   CheckCircle2, 
   Layers,
-  ArrowRight
+  ArrowRight,
+  BookOpen
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -21,6 +22,7 @@ import { FranchiseSelector } from '../common/FranchiseSelector';
 import { useBattleArena } from '../../context/BattleArenaContext';
 import { storageService } from '../../services/storageService';
 import { BattleImportModal } from './BattleImportModal';
+import { openGameRules } from '../rules/GameRules';
 import { toast } from 'sonner';
 
 const BATTLE_TEAMS_STORAGE_KEY = 'bidbattle_battle_teams_selection';
@@ -116,25 +118,37 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#090909] pb-16">
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#111827] pb-16">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-10">
         
         {/* HERO TITLE SECTION */}
         <div className="text-center max-w-3xl mx-auto pt-4 space-y-4">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#191919] border border-[#303030] text-xs font-heading font-bold text-[#A3A3A3] shadow-sm">
-            <Swords className="w-4 h-4 text-[#F2F2F0]" />
-            <span className="text-[#F2F2F0]">CHAMPIONSHIP • Competitive Battle System</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#737373]" />
-            <span className="text-[#A3A3A3] font-mono tracking-wider">ROUND 1: AUCTION → ROUND 2: BATTLES</span>
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#222F43] border border-[#39465A] text-xs font-heading font-bold text-[#AEB9CC] shadow-sm">
+            <Swords className="w-4 h-4 text-[#D4B879]" />
+            <span className="text-[#F5F3EE]">Competitive Battle System</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#39465A]" />
+            <span className="text-[#AEB9CC] font-mono tracking-wider">ROUND 1: AUCTION → ROUND 2: BATTLES</span>
           </div>
 
-          <h1 className="font-title text-5xl sm:text-7xl font-black tracking-wider uppercase text-[#F2F2F0] leading-none">
+          <h1 className="font-title text-5xl sm:text-7xl font-black tracking-wider uppercase text-[#F5F3EE] leading-none">
             BATTLE ARENA
           </h1>
 
-          <p className="text-sm sm:text-base text-[#A3A3A3] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-[#AEB9CC] max-w-2xl mx-auto leading-relaxed">
             Acquire your superstar roster through a strategic high-stakes auction, then clash head-to-head in tactical arena battles to crown the undisputed champion!
           </p>
+
+          <div className="flex items-center justify-center gap-3 pt-1">
+            <Button
+              variant="champagne"
+              size="md"
+              onClick={() => openGameRules('battle')}
+              className="font-heading text-xs flex items-center gap-2"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>Battle Arena Rulebook</span>
+            </Button>
+          </div>
         </div>
 
         {/* DYNAMIC FRANCHISE SELECTION (STEP 1 & 2) */}
@@ -153,13 +167,13 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-5xl mx-auto">
           
           {/* LEFT: SQUAD & PURSE SETTINGS (6 COLS) */}
-          <div className="lg:col-span-6 bg-[#191919] rounded-3xl p-6 sm:p-8 border border-[#303030] shadow-xl space-y-6">
+          <div className="lg:col-span-6 bg-[#222F43] rounded-3xl p-6 sm:p-8 border border-[#39465A] shadow-xl space-y-6">
             
             {/* Squad Size Selector */}
             <div>
-              <label className="text-xs font-bold font-heading uppercase text-[#A3A3A3] tracking-wider block mb-3 flex items-center justify-between">
+              <label className="text-xs font-bold font-heading uppercase text-[#AEB9CC] tracking-wider mb-3 flex items-center justify-between">
                 <span>Required Squad Size Per Team</span>
-                <span className="text-[#F2F2F0] font-mono font-black">{squadSize} Players</span>
+                <span className="text-[#F5F3EE] font-mono font-black">{squadSize} Players</span>
               </label>
 
               <div className="grid grid-cols-4 gap-2.5">
@@ -170,8 +184,8 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
                     onClick={() => setSquadSize(size)}
                     className={`py-2.5 rounded-2xl border font-mono text-xs transition-all text-center ${
                       squadSize === size
-                        ? 'bg-[#F2F2F0] text-[#090909] font-black border-[#F2F2F0]'
-                        : 'bg-[#111111] text-[#A3A3A3] hover:text-[#F2F2F0] border-[#303030]'
+                        ? 'bg-[#D97858] text-[#F5F3EE] font-black border-[#D97858]'
+                        : 'bg-[#2C394C] text-[#AEB9CC] hover:text-[#F5F3EE] border-[#39465A]'
                     }`}
                   >
                     <span className="block text-sm font-black">{size} Lots</span>
@@ -187,16 +201,16 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
                     max={12}
                     value={squadSize}
                     onChange={(e) => setSquadSize(Math.max(2, Math.min(12, Number(e.target.value) || 2)))}
-                    className="w-full h-full py-2 px-2 text-center rounded-2xl bg-[#111111] border border-[#303030] text-[#F2F2F0] text-xs font-mono font-bold focus:border-white focus:outline-none"
+                    className="w-full h-full py-2 px-2 text-center rounded-2xl bg-[#2C394C] border border-[#39465A] text-[#F5F3EE] text-xs font-mono font-bold focus:border-[#D97858] focus:outline-none"
                     placeholder="Custom"
                   />
-                  <span className="text-[9px] text-[#737373] font-mono block text-center mt-1">
+                  <span className="text-[9px] text-[#AEB9CC] font-mono block text-center mt-1">
                     Custom Cap
                   </span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-[#737373] mt-2 italic">
+              <p className="text-[11px] text-[#AEB9CC] mt-2 italic">
                 Every team must acquire exactly {squadSize} players during Round 1 before battles can begin.
               </p>
             </div>
@@ -360,8 +374,8 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
             {/* Launch Round 1 Auction Button */}
             <div className="pt-4 space-y-2">
               {!isSelectionValid && (
-                <div className="p-3 rounded-xl bg-[#222222] border border-[#444444] text-[#A3A3A3] text-xs font-heading font-bold flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-[#F2F2F0]" />
+                <div className="p-3 rounded-xl bg-[#2C394C] border border-[#39465A] text-[#AEB9CC] text-xs font-heading font-bold flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-[#D97858]" />
                   <span>Select exactly {teamCount} franchises to start ({selectedTeamIds.length}/{teamCount} selected).</span>
                 </div>
               )}
@@ -370,7 +384,7 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
                 size="xl"
                 disabled={!isPoolSufficient || !isSelectionValid}
                 onClick={handleStartTournament}
-                className="w-full font-heading text-base bg-[#F2F2F0] hover:bg-white text-[#090909] font-black flex items-center justify-center gap-2"
+                className="w-full font-heading text-base font-black flex items-center justify-center gap-2 shadow-lg"
               >
                 <Play className="w-5 h-5 fill-current" />
                 <span>START ROUND 1: TEAM AUCTION</span>

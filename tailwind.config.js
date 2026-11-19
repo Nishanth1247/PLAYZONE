@@ -8,31 +8,49 @@ export default {
   theme: {
     extend: {
       colors: {
-        // MONOCHROME CHAMPIONSHIP SYSTEM
-        mono: {
-          bg: '#090909',
-          surface: '#111111',
-          card: '#191919',
-          elevated: '#222222',
-          border: '#303030',
-          text: '#F2F2F0',
-          secondary: '#A3A3A3',
-          muted: '#737373',
-          action: '#F2F2F0',
-          actionDark: '#090909',
-          actionSec: '#303030',
+        // NEW BIDBATTLE DESIGN SYSTEM (MIDNIGHT NAVY & SLATE)
+        navy: {
+          bg: '#111827',       // Midnight Navy (Main background)
+          deep: '#222F43',     // Deep Slate (Secondary background / Cards)
+          surface: '#2C394C',  // Slate Grey (Elevated surface)
+          light: '#F0EDE5',    // Soft Ivory (Light surface)
+          text: '#F5F3EE',     // Warm White (Main text on dark)
+          secondary: '#AEB9CC',// Muted Blue Grey (Secondary text)
+          coral: '#D97858',    // Terracotta Coral (Primary accent)
+          sage: '#91A98B',     // Sage (Secondary accent)
+          champagne: '#D4B879',// Champagne (Premium highlight)
+          border: '#39465A',   // Muted Slate (Borders)
         },
 
-        // System-wide surface aliases mapped directly to monochrome palette
+        // System-wide surface aliases mapped to the new palette
         battle: {
-          bg: '#090909',
-          surface: '#111111',
-          card: '#191919',
-          cardHover: '#222222',
-          border: '#303030',
-          borderLight: '#3a3a3a',
-          text: '#F2F2F0',
-          muted: '#A3A3A3',
+          bg: '#111827',
+          surface: '#222F43',
+          card: '#222F43',
+          cardHover: '#2C394C',
+          elevated: '#2C394C',
+          border: '#39465A',
+          borderLight: '#4B5A70',
+          text: '#F5F3EE',
+          muted: '#AEB9CC',
+          coral: '#D97858',
+          sage: '#91A98B',
+          champagne: '#D4B879',
+          ivory: '#F0EDE5',
+        },
+
+        mono: {
+          bg: '#111827',
+          surface: '#222F43',
+          card: '#222F43',
+          elevated: '#2C394C',
+          border: '#39465A',
+          text: '#F5F3EE',
+          secondary: '#AEB9CC',
+          muted: '#7E8B9F',
+          action: '#D97858',
+          actionDark: '#111827',
+          actionSec: '#2C394C',
         },
 
         // Muted Franchise Identities
@@ -43,26 +61,27 @@ export default {
           nagulan: '#84977B',
         },
 
-        // Brand aliases mapped to muted franchise & monochrome tones
+        // Brand aliases mapped to new palette
         brand: {
           purple: '#8875A8',
           cyan: '#71999B',
-          orange: '#B68B68',
-          neon: '#84977B',
-          primary: '#F2F2F0',
-          secondary: '#A3A3A3',
-          muted: '#737373',
-          dark: '#090909',
-          border: '#303030',
+          orange: '#D97858',
+          neon: '#91A98B',
+          gold: '#D4B879',
+          primary: '#F5F3EE',
+          secondary: '#AEB9CC',
+          muted: '#7E8B9F',
+          dark: '#111827',
+          border: '#39465A',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        heading: ['"Space Grotesk"', 'sans-serif'],
-        display: ['"Space Grotesk"', 'sans-serif'],
-        broadcast: ['"Space Grotesk"', 'sans-serif'],
-        title: ['"Bebas Neue"', 'Impact', 'sans-serif'],
-        mono: ['"Space Mono"', 'monospace'],
+        sans: ['"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        heading: ['"Outfit"', 'system-ui', 'sans-serif'],
+        display: ['"Outfit"', 'system-ui', 'sans-serif'],
+        broadcast: ['"Outfit"', 'system-ui', 'sans-serif'],
+        title: ['"Barlow Condensed"', 'Impact', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'monospace'],
       },
       boxShadow: {
         'mono-subtle': '0 2px 8px rgba(0, 0, 0, 0.4)',

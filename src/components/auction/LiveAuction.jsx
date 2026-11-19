@@ -26,12 +26,14 @@ import {
   AlertCircle,
   CheckCircle2,
   XCircle,
-  Activity
+  Activity,
+  BookOpen
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { formatCurrency } from '../common/CurrencyDisplay';
 import { getScoreMetricLabel } from '../../services/presets';
+import { openGameRules } from '../rules/GameRules';
 import { 
   calculateNextBid, 
   getProgressiveIncrement, 
@@ -206,8 +208,18 @@ export const LiveAuction = () => {
           </div>
         </div>
 
-        {/* Right: Actions (Queue, Event, Timer, Sound, Settings, Exit) */}
+        {/* Right: Actions (Rules, Queue, Event, Timer, Sound, Settings, Exit) */}
         <div className="flex items-center gap-1.5">
+          {/* Official Rulebook Trigger */}
+          <button
+            onClick={() => openGameRules('auction')}
+            className="px-2.5 py-1 rounded-xl bg-[#222F43] hover:bg-[#2C394C] border border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE] text-xs font-heading font-bold flex items-center gap-1.5 transition-all"
+            title="Inspect official auction rules and tiebreaker matrix"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-[#D4B879]" />
+            <span className="hidden md:inline">Rules</span>
+          </button>
+
           {/* Lot Queue Drawer Trigger */}
           <button
             onClick={() => setShowQueueDrawer(true)}
@@ -316,8 +328,8 @@ export const LiveAuction = () => {
                   key={t.id}
                   className={`p-2.5 rounded-2xl border transition-all relative overflow-hidden ${
                     isLeading
-                      ? 'bg-[#191919] border-[#F2F2F0] ring-1 ring-[#F2F2F0]/40 shadow-sm'
-                      : 'bg-[#191919] border-[#303030] hover:border-[#444444]'
+                      ? 'bg-[#222F43] border-[#F5F3EE] ring-1 ring-[#F5F3EE]/40 shadow-sm'
+                      : 'bg-[#222F43] border-[#39465A] hover:border-[#39465A]'
                   }`}
                 >
                   {/* Franchise color accent vertical bar */}
@@ -328,12 +340,12 @@ export const LiveAuction = () => {
 
                   <div className="flex items-center justify-between pl-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl p-1 rounded-xl bg-[#111111] border border-[#303030] shadow-sm">
+                      <span className="text-xl p-1 rounded-xl bg-[#2C394C] border border-[#39465A] shadow-sm">
                         {t.logo || '🛡️'}
                       </span>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <h4 className="font-heading font-bold text-xs text-[#F2F2F0] truncate max-w-[90px]">
+                          <h4 className="font-heading font-bold text-xs text-[#F5F3EE] truncate max-w-[90px]">
                             {t.name}
                           </h4>
                           {isLeading && (
@@ -347,27 +359,27 @@ export const LiveAuction = () => {
                                 ? 'bg-rose-500/10 text-rose-300 border-rose-500/30'
                                 : budget.status === 'caution'
                                 ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
-                                : 'bg-[#222222] text-[#A3A3A3] border-[#303030]'
+                                : 'bg-[#2C394C] text-[#AEB9CC] border-[#39465A]'
                             }`}
                             title={budget.reason}
                           >
                             {budget.label}
                           </span>
                         </div>
-                        <span className="text-[9px] text-[#737373] font-medium block">
+                        <span className="text-[9px] text-[#AEB9CC] font-medium block">
                           Squad: {budget.playersAcquired}/{rules.maxSquadSize || 8} • Spent: {currency.symbol}{budget.totalSpent} Cr
                         </span>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[9px] text-[#737373] uppercase block font-heading font-bold">
+                      <span className="text-[9px] text-[#AEB9CC] uppercase block font-heading font-bold">
                         Purse
                       </span>
-                      <span className="text-xs font-mono font-bold block text-[#F2F2F0]">
+                      <span className="text-xs font-mono font-bold block text-[#F5F3EE]">
                         {formatCurrency(t.purse, currency)}
                       </span>
-                      <span className="text-[9px] text-[#A3A3A3] font-mono block">
+                      <span className="text-[9px] text-[#AEB9CC] font-mono block">
                         Avg: {currency.symbol}{budget.avgAvailablePerSlot} Cr
                       </span>
                     </div>
@@ -425,9 +437,9 @@ export const LiveAuction = () => {
           
           {/* 1. FRANCHISE QUICK BIDDING TRIGGERS (4 Buttons with next calculated bid) */}
           <div>
-            <div className="flex items-center justify-between text-xs mb-1.5 font-heading font-bold text-[#A3A3A3]">
+            <div className="flex items-center justify-between text-xs mb-1.5 font-heading font-bold text-[#AEB9CC]">
               <span>FRANCHISE QUICK BIDS</span>
-              <span className="text-[#F2F2F0] font-mono text-[10px]">
+              <span className="text-[#F5F3EE] font-mono text-[10px]">
                 Next: {formatCurrency(nextCalculatedBid, currency)}
               </span>
             </div>
@@ -467,22 +479,22 @@ export const LiveAuction = () => {
                     onClick={() => handleTeamBidClick(team.id)}
                     className={`p-2 rounded-xl border text-left transition-all relative overflow-hidden flex items-center justify-between ${
                       isLeading
-                        ? 'bg-[#191919] border-[#F2F2F0] ring-1 ring-[#F2F2F0]/40 shadow-sm'
+                        ? 'bg-[#222F43] border-[#F5F3EE] ring-1 ring-[#F5F3EE]/40 shadow-sm'
                         : isDisabled
-                        ? 'bg-[#191919]/40 border-[#303030] opacity-45 cursor-not-allowed text-[#737373]'
-                        : 'bg-[#191919] hover:bg-[#222222] cursor-pointer shadow-sm'
+                        ? 'bg-[#222F43]/40 border-[#39465A] opacity-45 cursor-not-allowed text-[#AEB9CC]'
+                        : 'bg-[#222F43] hover:bg-[#2C394C] cursor-pointer shadow-sm'
                     }`}
                     style={{
-                      borderColor: isLeading ? '#F2F2F0' : isDisabled ? undefined : team.color,
+                      borderColor: isLeading ? '#F5F3EE' : isDisabled ? undefined : team.color,
                     }}
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
                       <span className="text-base">{team.logo || '🛡️'}</span>
                       <div className="min-w-0">
-                        <span className="font-heading font-bold text-xs text-[#F2F2F0] truncate block">
+                        <span className="font-heading font-bold text-xs text-[#F5F3EE] truncate block">
                           {team.name}
                         </span>
-                        <span className="text-[9px] font-mono text-[#737373] block">
+                        <span className="text-[9px] font-mono text-[#AEB9CC] block">
                           {statusText}
                         </span>
                       </div>
@@ -491,7 +503,7 @@ export const LiveAuction = () => {
                     <div className="text-right shrink-0">
                       <span
                         className="font-heading font-black text-xs uppercase tracking-wider block"
-                        style={{ color: isLeading ? '#F2F2F0' : isDisabled ? undefined : team.color }}
+                        style={{ color: isLeading ? '#F5F3EE' : isDisabled ? undefined : team.color }}
                       >
                         {actionText}
                       </span>
@@ -503,11 +515,11 @@ export const LiveAuction = () => {
           </div>
 
           {/* 2. QUICK UTILITIES (Pause/Resume, Undo, Queue) */}
-          <div className="grid grid-cols-3 gap-1.5 py-1.5 border-t border-b border-[#303030]">
+          <div className="grid grid-cols-3 gap-1.5 py-1.5 border-t border-b border-[#39465A]">
             <button
               onClick={toggleTimer}
               title={isTimerRunning ? 'Pause Auction Clock' : 'Resume Clock'}
-              className="p-1.5 rounded-xl bg-[#191919] hover:bg-[#222222] border border-[#303030] text-[#A3A3A3] hover:text-[#F2F2F0] flex flex-col items-center justify-center gap-0.5 text-[10px] font-heading font-bold"
+              className="p-1.5 rounded-xl bg-[#222F43] hover:bg-[#2C394C] border border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE] flex flex-col items-center justify-center gap-0.5 text-[10px] font-heading font-bold"
             >
               {isTimerRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
               <span>{isTimerRunning ? 'Pause' : 'Resume'}</span>
@@ -519,8 +531,8 @@ export const LiveAuction = () => {
               title="Safe Undo Last Transaction"
               className={`p-1.5 rounded-xl border flex flex-col items-center justify-center gap-0.5 text-[10px] font-heading font-bold ${
                 canUndo
-                  ? 'bg-[#191919] hover:bg-[#222222] border-[#444444] text-[#F2F2F0]'
-                  : 'bg-[#191919]/30 border-[#303030] text-[#737373]/40 cursor-not-allowed'
+                  ? 'bg-[#222F43] hover:bg-[#2C394C] border-[#39465A] text-[#F5F3EE]'
+                  : 'bg-[#222F43]/30 border-[#39465A] text-[#AEB9CC]/40 cursor-not-allowed'
               }`}
             >
               <Undo2 className="w-3.5 h-3.5" />
@@ -530,7 +542,7 @@ export const LiveAuction = () => {
             <button
               onClick={() => setShowQueueDrawer(true)}
               title="View Lot Queue"
-              className="p-1.5 rounded-xl bg-[#191919] hover:bg-[#222222] border border-[#303030] text-[#A3A3A3] hover:text-[#F2F2F0] flex flex-col items-center justify-center gap-0.5 text-[10px] font-heading font-bold"
+              className="p-1.5 rounded-xl bg-[#222F43] hover:bg-[#2C394C] border border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE] flex flex-col items-center justify-center gap-0.5 text-[10px] font-heading font-bold"
             >
               <Layers className="w-3.5 h-3.5" />
               <span>Queue</span>
@@ -545,7 +557,7 @@ export const LiveAuction = () => {
               size="lg"
               disabled={!highestBidder}
               onClick={confirmSold}
-              className="w-full font-heading text-sm font-black py-2.5 flex items-center justify-center gap-1.5 bg-[#F2F2F0] text-[#090909] hover:bg-white"
+              className="w-full font-heading text-sm font-black py-2.5 flex items-center justify-center gap-1.5 bg-[#D97858] text-[#F5F3EE] hover:bg-white"
             >
               <Gavel className="w-4 h-4 fill-current" />
               <span>SOLD! ({formatCurrency(currentBid, currency)})</span>
@@ -557,10 +569,10 @@ export const LiveAuction = () => {
                 variant="secondary"
                 size="md"
                 onClick={markUnsold}
-                className="w-full font-heading text-[11px] font-bold bg-[#303030] text-[#F2F2F0] hover:bg-[#3a3a3a] border border-[#404040] py-2 flex items-center justify-center gap-1"
+                className="w-full font-heading text-[11px] font-bold bg-[#39465A] text-[#F5F3EE] hover:bg-[#3a3a3a] border border-[#404040] py-2 flex items-center justify-center gap-1"
                 title="Mandatory Settlement: Award to last accepted bidder at original base price"
               >
-                <AlertTriangle className="w-3 h-3 text-[#A3A3A3]" />
+                <AlertTriangle className="w-3 h-3 text-[#AEB9CC]" />
                 <span>CLOSE LOT (SETTLE @ BASE PRICE)</span>
               </Button>
             ) : (
@@ -568,7 +580,7 @@ export const LiveAuction = () => {
                 variant="secondary"
                 size="md"
                 onClick={markUnsold}
-                className="w-full font-heading text-[11px] font-bold bg-[#303030] text-[#F2F2F0] hover:bg-[#3a3a3a] border border-[#404040] py-2 flex items-center justify-center gap-1"
+                className="w-full font-heading text-[11px] font-bold bg-[#39465A] text-[#F5F3EE] hover:bg-[#3a3a3a] border border-[#404040] py-2 flex items-center justify-center gap-1"
               >
                 <XCircle className="w-3.5 h-3.5" />
                 <span>MARK UNSOLD (NO BIDS)</span>
@@ -580,7 +592,7 @@ export const LiveAuction = () => {
               variant="secondary"
               size="sm"
               onClick={advanceToNextItem}
-              className="w-full font-heading text-[11px] border border-[#303030] bg-[#191919] hover:bg-[#222222] text-[#A3A3A3] hover:text-[#F2F2F0] py-1.5 flex items-center justify-center gap-1"
+              className="w-full font-heading text-[11px] border border-[#39465A] bg-[#222F43] hover:bg-[#2C394C] text-[#AEB9CC] hover:text-[#F5F3EE] py-1.5 flex items-center justify-center gap-1"
             >
               <span>Skip to Next Lot</span>
               <ChevronRight className="w-3 h-3" />

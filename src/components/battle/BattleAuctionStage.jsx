@@ -83,30 +83,30 @@ export const BattleAuctionStage = () => {
               <h1 className="font-broadcast font-bold text-white text-base sm:text-lg leading-tight truncate max-w-xs">
                 {tournamentName}
               </h1>
-              <Badge variant="outline" className="text-[10px] py-0 border-[#303030] text-[#A3A3A3]">
+              <Badge variant="outline" className="text-[10px] py-0 border-[#39465A] text-[#AEB9CC]">
                 Squad Quota: {squadSize} Lots / Team
               </Badge>
             </div>
 
-            <div className="flex items-center gap-2 text-[11px] text-[#A3A3A3] font-heading font-medium mt-0.5">
-              <span className="text-[#F2F2F0] font-bold">
+            <div className="flex items-center gap-2 text-[11px] text-[#AEB9CC] font-heading font-medium mt-0.5">
+              <span className="text-[#F5F3EE] font-bold">
                 LOT #{currentItemIndex + 1} OF {totalLots}
               </span>
               <span>•</span>
-              <span className="text-[#F2F2F0] font-bold">{soldLotsCount} Sold</span>
+              <span className="text-[#F5F3EE] font-bold">{soldLotsCount} Sold</span>
               <span>•</span>
-              <span className="text-[#A3A3A3] font-bold">{unsoldLotsCount} Unsold</span>
+              <span className="text-[#AEB9CC] font-bold">{unsoldLotsCount} Unsold</span>
               <span>•</span>
-              <span className="text-[#737373] font-mono font-bold">{progressPercent}% Completed</span>
+              <span className="text-[#AEB9CC] font-mono font-bold">{progressPercent}% Completed</span>
             </div>
           </div>
         </div>
 
         {/* Center: Progress Bar */}
         <div className="hidden xl:flex items-center gap-3 w-64">
-          <div className="w-full bg-[#111111] rounded-full h-2 overflow-hidden border border-[#303030]">
+          <div className="w-full bg-[#2C394C] rounded-full h-2 overflow-hidden border border-[#39465A]">
             <div
-              className="h-full bg-[#F2F2F0] transition-all duration-300"
+              className="h-full bg-[#F5F3EE] transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -321,12 +321,12 @@ export const BattleAuctionStage = () => {
           </div>
 
           {/* MASSIVE GLOWING BID DISPLAY */}
-          <div className="my-2 p-4 rounded-3xl bg-[#111111] border border-[#303030] shadow-inner text-center z-10 relative overflow-hidden">
-            <span className="text-[11px] font-black uppercase tracking-widest text-[#737373] block mb-1 font-heading">
+          <div className="my-2 p-4 rounded-3xl bg-[#2C394C] border border-[#39465A] shadow-inner text-center z-10 relative overflow-hidden">
+            <span className="text-[11px] font-black uppercase tracking-widest text-[#AEB9CC] block mb-1 font-heading">
               CURRENT HIGHEST BID
             </span>
 
-            <div className="font-mono text-5xl sm:text-6xl font-black tracking-wider text-[#F2F2F0]">
+            <div className="font-mono text-5xl sm:text-6xl font-black tracking-wider text-[#F5F3EE]">
               <AnimatedNumber
                 value={currentBid}
                 format={(v) => formatCurrency(v, currency)}
@@ -341,7 +341,7 @@ export const BattleAuctionStage = () => {
                   style={{
                     backgroundColor: `${currentLeaderTeam.color}20`,
                     borderColor: currentLeaderTeam.color,
-                    color: '#F2F2F0',
+                    color: '#F5F3EE',
                   }}
                 >
                   <span className="text-lg">{currentLeaderTeam.logo}</span>
@@ -349,7 +349,7 @@ export const BattleAuctionStage = () => {
                   <span className="w-2 h-2 rounded-full bg-white animate-ping" />
                 </div>
               ) : (
-                <span className="text-xs text-[#737373] font-medium italic font-heading">
+                <span className="text-xs text-[#AEB9CC] font-medium italic font-heading">
                   Awaiting opening bid at base price ({formatCurrency(currentItem.basePrice, currency)})
                 </span>
               )}
@@ -363,7 +363,7 @@ export const BattleAuctionStage = () => {
               size="lg"
               disabled={!highestBidder}
               onClick={confirmBattleSold}
-              className="font-heading text-base bg-[#F2F2F0] hover:bg-white text-[#090909] font-black"
+              className="font-heading text-base bg-[#F5F3EE] hover:bg-white text-[#111827] font-black"
             >
               <Gavel className="w-5 h-5 fill-current" />
               <span>SOLD!</span>
@@ -373,7 +373,7 @@ export const BattleAuctionStage = () => {
               variant="secondary"
               size="lg"
               onClick={markBattleUnsold}
-              className="font-heading text-sm bg-[#303030] text-[#F2F2F0] hover:bg-[#3a3a3a] border border-[#404040]"
+              className="font-heading text-sm bg-[#39465A] text-[#F5F3EE] hover:bg-[#3a3a3a] border border-[#404040]"
             >
               <span>MARK UNSOLD</span>
             </Button>

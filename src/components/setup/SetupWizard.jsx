@@ -22,7 +22,8 @@ import {
   Layers,
   FileSpreadsheet,
   Palette,
-  CheckCircle2
+  CheckCircle2,
+  BookOpen
 } from 'lucide-react';
 import { AUCTION_PRESETS, FIXED_TEAMS } from '../../services/presets';
 import { Button } from '../ui/Button';
@@ -31,6 +32,7 @@ import { Card } from '../ui/Card';
 import { formatCurrency } from '../common/CurrencyDisplay';
 import { TeamBudgetConfig } from './TeamBudgetConfig';
 import { FranchiseSelector } from '../common/FranchiseSelector';
+import { openGameRules } from '../rules/GameRules';
 
 const CATEGORIES = ['Cricket', 'Football', 'Movies', 'Celebrities', 'Gaming', 'Friends / Custom'];
 
@@ -398,8 +400,18 @@ export const SetupWizard = () => {
           </h1>
         </div>
 
-        {/* Quick Presets Picker */}
+        {/* Quick Presets Picker & Rulebook */}
         <div className="flex items-center gap-2">
+          <Button
+            variant="champagne"
+            size="sm"
+            onClick={() => openGameRules('auction')}
+            className="font-heading text-xs flex items-center gap-1.5"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Official Rules</span>
+          </Button>
+
           <select
             onChange={(e) => {
               if (e.target.value) {

@@ -1,19 +1,21 @@
 import React from 'react';
 
 const VARIANTS = {
-  // Monochrome system variants
-  default: 'bg-[#191919] text-[#F2F2F0] border-[#303030]',
-  mono: 'bg-[#191919] text-[#F2F2F0] border-[#303030]',
-  outline: 'bg-transparent text-[#A3A3A3] border-[#303030]',
-  subtle: 'bg-[#222222] text-[#A3A3A3] border-[#303030]',
-  dark: 'bg-[#090909] text-[#F2F2F0] border-[#303030]',
-  // Aliases mapping cleanly to monochrome
-  gold: 'bg-[#191919] text-[#F2F2F0] border-[#303030]',
-  terracotta: 'bg-[#191919] text-[#F2F2F0] border-[#303030]',
-  sage: 'bg-[#191919] text-[#A3A3A3] border-[#303030]',
-  ivory: 'bg-[#222222] text-[#F2F2F0] border-[#303030]',
-  slate: 'bg-[#191919] text-[#A3A3A3] border-[#303030]',
-  forest: 'bg-[#111111] text-[#F2F2F0] border-[#303030]',
+  // Midnight Navy & Deep Slate system variants
+  default: 'bg-[#222F43] text-[#F5F3EE] border-[#39465A]',
+  mono: 'bg-[#222F43] text-[#F5F3EE] border-[#39465A]',
+  outline: 'bg-transparent text-[#AEB9CC] border-[#39465A]',
+  subtle: 'bg-[#2C394C] text-[#AEB9CC] border-[#39465A]',
+  dark: 'bg-[#111827] text-[#F5F3EE] border-[#39465A]',
+  primary: 'bg-[#D97858] text-[#F5F3EE] border-[#D97858]',
+  coral: 'bg-[#D97858]/15 text-[#D97858] border-[#D97858]/35',
+  terracotta: 'bg-[#D97858]/15 text-[#D97858] border-[#D97858]/35',
+  sage: 'bg-[#91A98B]/15 text-[#91A98B] border-[#91A98B]/35',
+  champagne: 'bg-[#D4B879]/15 text-[#D4B879] border-[#D4B879]/35',
+  gold: 'bg-[#D4B879]/15 text-[#D4B879] border-[#D4B879]/35',
+  ivory: 'bg-[#F0EDE5] text-[#111827] border-[#F0EDE5]',
+  slate: 'bg-[#2C394C] text-[#AEB9CC] border-[#39465A]',
+  forest: 'bg-[#222F43] text-[#91A98B] border-[#39465A]',
   // Muted franchise color identities
   purple: 'bg-[#8875A8]/15 text-[#8875A8] border-[#8875A8]/30',
   cyan: 'bg-[#71999B]/15 text-[#71999B] border-[#71999B]/30',

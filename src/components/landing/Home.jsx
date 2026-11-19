@@ -34,7 +34,8 @@ import {
   AlertTriangle,
   FolderDown,
   FileCode2,
-  Sliders
+  Sliders,
+  BookOpen
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -43,6 +44,7 @@ import { formatCurrency } from '../common/CurrencyDisplay';
 import { TournamentLaunchModal } from './TournamentLaunchModal';
 import { ImportTournamentModal } from '../custom/ImportTournamentModal';
 import { TournamentEditorModal } from '../custom/TournamentEditorModal';
+import { openGameRules } from '../rules/GameRules';
 
 export const Home = ({ onSwitchToParty }) => {
   const { 
@@ -141,31 +143,31 @@ export const Home = ({ onSwitchToParty }) => {
   const currentSoldCount = auction?.items?.filter(i => i.status === 'sold').length || 0;
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#090909]">
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#111827]">
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
 
-        {/* 1. MONOCHROME CHAMPIONSHIP HERO SECTION */}
+        {/* 1. MIDNIGHT NAVY & SLATE HERO SECTION */}
         <div className="text-center max-w-4xl mx-auto mb-16">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#191919] border border-[#303030] text-xs font-heading font-bold text-[#A3A3A3] mb-6 shadow-sm"
+            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#222F43] border border-[#39465A] text-xs font-heading font-bold text-[#AEB9CC] mb-6 shadow-sm"
           >
-            <Sparkles className="w-4 h-4 text-[#F2F2F0]" />
-            <span className="text-[#F2F2F0]">Real-time Local Multiplayer</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#737373]" />
-            <span className="text-[#A3A3A3] font-mono tracking-wider">100% OFFLINE</span>
+            <Sparkles className="w-4 h-4 text-[#D4B879]" />
+            <span className="text-[#F5F3EE]">Real-time Local Multiplayer</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#39465A]" />
+            <span className="text-[#AEB9CC] font-mono tracking-wider">100% OFFLINE</span>
           </motion.div>
 
           <motion.h1 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-title text-6xl sm:text-8xl font-black tracking-wider uppercase text-[#F2F2F0] leading-none mb-5"
+            className="font-title text-6xl sm:text-8xl font-black tracking-wider uppercase text-[#F5F3EE] leading-none mb-5"
           >
             THE ULTIMATE <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F2F2F0] via-[#D4D4D4] to-[#A3A3A3]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5F3EE] via-[#D4B879] to-[#D97858]">
               AUCTION SHOWDOWN
             </span>
           </motion.h1>
@@ -174,7 +176,7 @@ export const Home = ({ onSwitchToParty }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-base sm:text-lg text-[#A3A3A3] font-normal max-w-2xl mx-auto leading-relaxed mb-10"
+            className="text-base sm:text-lg text-[#AEB9CC] font-normal max-w-2xl mx-auto leading-relaxed mb-10"
           >
             Gather your friends around one laptop. Manage franchise purses, outbid your rivals, slam the gavel, and recruit the ultimate dream roster in high-stakes championship style.
           </motion.p>
@@ -216,7 +218,7 @@ export const Home = ({ onSwitchToParty }) => {
               size="xl"
               onClick={handleCreateCustom}
             >
-              <PlusCircle className="w-5 h-5 text-brand-neon" />
+              <PlusCircle className="w-5 h-5 text-[#91A98B]" />
               <span>Create Custom</span>
             </Button>
 
@@ -225,21 +227,21 @@ export const Home = ({ onSwitchToParty }) => {
                 variant="secondary"
                 size="xl"
                 onClick={onSwitchToParty}
-                className="border-brand-cyan/40 text-brand-cyan hover:bg-brand-cyan/10 shadow-glow-cyan"
+                className="border-[#39465A] text-[#F5F3EE] hover:bg-[#2C394C]"
               >
-                <Zap className="w-5 h-5 text-brand-cyan" />
+                <Zap className="w-5 h-5 text-[#D97858]" />
                 <span>Party Arena</span>
               </Button>
             )}
 
             <Button
-              variant="ghost"
+              variant="champagne"
               size="xl"
-              onClick={() => setShowHowToPlay(true)}
-              className="text-battle-text hover:text-white"
+              onClick={() => openGameRules('auction')}
+              className="font-heading"
             >
-              <HelpCircle className="w-5 h-5 text-brand-cyan" />
-              <span>How To Play</span>
+              <BookOpen className="w-5 h-5" />
+              <span>Auction Rulebook</span>
             </Button>
           </motion.div>
         </div>
@@ -542,8 +544,8 @@ export const Home = ({ onSwitchToParty }) => {
               onClick={() => setSelectedFilter('all')}
               className={`px-4 py-1.5 rounded-full text-xs font-heading font-bold tracking-wider uppercase transition-all ${
                 selectedFilter === 'all'
-                  ? 'bg-[#F2F2F0] text-[#090909]'
-                  : 'bg-[#191919] text-[#A3A3A3] hover:text-[#F2F2F0] border border-[#303030]'
+                  ? 'bg-[#D97858] text-[#F5F3EE] shadow-sm'
+                  : 'bg-[#222F43] text-[#AEB9CC] hover:text-[#F5F3EE] border border-[#39465A]'
               }`}
             >
               All Tournaments (6)
@@ -552,8 +554,8 @@ export const Home = ({ onSwitchToParty }) => {
               onClick={() => setSelectedFilter('tamil')}
               className={`px-4 py-1.5 rounded-full text-xs font-heading font-bold tracking-wider uppercase transition-all ${
                 selectedFilter === 'tamil'
-                  ? 'bg-[#F2F2F0] text-[#090909]'
-                  : 'bg-[#191919] text-[#A3A3A3] hover:text-[#F2F2F0] border border-[#303030]'
+                  ? 'bg-[#D97858] text-[#F5F3EE] shadow-sm'
+                  : 'bg-[#222F43] text-[#AEB9CC] hover:text-[#F5F3EE] border border-[#39465A]'
               }`}
             >
               Tamil Cinema Specials (3)
@@ -562,8 +564,8 @@ export const Home = ({ onSwitchToParty }) => {
               onClick={() => setSelectedFilter('multiverse')}
               className={`px-4 py-1.5 rounded-full text-xs font-heading font-bold tracking-wider uppercase transition-all ${
                 selectedFilter === 'multiverse'
-                  ? 'bg-[#F2F2F0] text-[#090909]'
-                  : 'bg-[#191919] text-[#A3A3A3] hover:text-[#F2F2F0] border border-[#303030]'
+                  ? 'bg-[#D97858] text-[#F5F3EE] shadow-sm'
+                  : 'bg-[#222F43] text-[#AEB9CC] hover:text-[#F5F3EE] border border-[#39465A]'
               }`}
             >
               Heroes & Multiverse (3)

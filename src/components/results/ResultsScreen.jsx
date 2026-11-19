@@ -96,7 +96,7 @@ export const ResultsScreen = () => {
   // BIDBATTLE 7.7: Auction Completion Report JSON exporter
   const handleDownloadCompletionReportJSON = () => {
     const reportData = {
-      title: 'BIDBATTLE 7.7 Official Auction Completion Report',
+      title: 'BIDBATTLE Official Auction Completion Report',
       tournamentId: auction.id,
       tournamentName: auction.name,
       category: auction.category,
@@ -157,10 +157,10 @@ export const ResultsScreen = () => {
   };
 
   const rankBadges = [
-    { label: '1ST PLACE — CHAMPION', color: 'mono', glow: 'border-white text-[#F2F2F0] bg-white/10' },
-    { label: '2ND PLACE — RUNNER UP', color: 'mono', glow: 'border-[#444444] text-[#A3A3A3] bg-[#222222]' },
-    { label: '3RD PLACE', color: 'mono', glow: 'border-[#303030] text-[#737373] bg-[#191919]' },
-    { label: '4TH PLACE', color: 'mono', glow: 'border-[#303030] text-[#737373] bg-[#191919]' },
+    { label: '1ST PLACE — CHAMPION', color: 'mono', glow: 'border-white text-[#F5F3EE] bg-white/10' },
+    { label: '2ND PLACE — RUNNER UP', color: 'mono', glow: 'border-[#39465A] text-[#AEB9CC] bg-[#2C394C]' },
+    { label: '3RD PLACE', color: 'mono', glow: 'border-[#39465A] text-[#AEB9CC] bg-[#222F43]' },
+    { label: '4TH PLACE', color: 'mono', glow: 'border-[#39465A] text-[#AEB9CC] bg-[#222F43]' },
   ];
 
   return (
@@ -171,16 +171,16 @@ export const ResultsScreen = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#191919] border border-[#303030] text-[#F2F2F0] text-xs font-bold uppercase tracking-wider mb-4 font-heading"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#222F43] border border-[#39465A] text-[#F5F3EE] text-xs font-bold uppercase tracking-wider mb-4 font-heading"
         >
-          <Trophy className="w-4 h-4 text-[#F2F2F0]" />
+          <Trophy className="w-4 h-4 text-[#F5F3EE]" />
           <span>OFFICIAL TOURNAMENT PODIUM & SCORING SUMMARY</span>
         </motion.div>
 
-        <h1 className="text-5xl sm:text-7xl font-black text-[#F2F2F0] font-title uppercase tracking-wider mb-2">
+        <h1 className="text-5xl sm:text-7xl font-black text-[#F5F3EE] font-title uppercase tracking-wider mb-2">
           {name}
         </h1>
-        <p className="text-sm text-[#A3A3A3]">
+        <p className="text-sm text-[#AEB9CC]">
           Scoring Mode: <strong>{scoreMetricLabel}</strong> • Best {maxSquadSize} Heroes Counted
         </p>
 
@@ -456,8 +456,8 @@ export const ResultsScreen = () => {
               <motion.div
                 key={team.id}
                 whileHover={{ y: -4 }}
-                className={`p-6 rounded-3xl bg-[#191919] border relative overflow-hidden flex flex-col justify-between ${
-                  isChamp ? 'border-white shadow-md' : 'border-[#303030]'
+                className={`p-6 rounded-3xl bg-[#222F43] border relative overflow-hidden flex flex-col justify-between ${
+                  isChamp ? 'border-white shadow-md' : 'border-[#39465A]'
                 }`}
               >
                 {/* Accent top stripe */}

@@ -14,7 +14,8 @@ import {
   Eye, 
   Play, 
   ArrowLeft,
-  Film
+  Film,
+  BookOpen
 } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { Badge } from '../../ui/Badge';
@@ -24,6 +25,7 @@ import { DUMB_CHARADES_TAMIL, DUMB_CHARADES_MCU } from '../../../services/party/
 import { getSavedDumbCharadesState, clearDumbCharadesState, createDumbCharadesTournament } from '../../../services/party/dumbCharadesEngine';
 import { CopyContentPromptCard } from '../../common/CopyContentPromptCard';
 import { DUMB_CHARADES_CHATGPT_PROMPT } from '../../../services/chatGptPrompts';
+import { openGameRules } from '../../rules/GameRules';
 import { toast } from 'sonner';
 
 export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
@@ -246,15 +248,23 @@ export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="text-xs text-battle-muted hover:text-white"
+          className="text-xs text-[#AEB9CC] hover:text-[#F5F3EE]"
         >
           <ArrowLeft className="w-4 h-4 mr-1.5" />
           <span>Exit to Party Arena</span>
         </Button>
 
         <div className="flex items-center gap-2">
-          <Badge variant="purple">DUMB CHARADES 2.0</Badge>
-          <Badge variant="neon">TOURNAMENT EDITION</Badge>
+          <Button
+            variant="champagne"
+            size="sm"
+            onClick={() => openGameRules('charades')}
+            className="font-heading text-xs flex items-center gap-1.5"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Dumb Charades Rules</span>
+          </Button>
+          <Badge variant="subtle" className="text-xs bg-[#2C394C] text-[#D4B879] border-[#39465A]">TOURNAMENT EDITION</Badge>
         </div>
       </div>
 

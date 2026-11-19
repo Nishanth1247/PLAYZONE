@@ -4,14 +4,18 @@
 
 @layer base {
   :root {
-    --color-bg: #090909;
-    --color-surface: #111111;
-    --color-card: #191919;
-    --color-elevated: #222222;
-    --color-border: #303030;
-    --color-text: #F2F2F0;
-    --color-secondary: #A3A3A3;
-    --color-muted: #737373;
+    --color-bg: #111827;
+    --color-surface: #222F43;
+    --color-card: #222F43;
+    --color-elevated: #2C394C;
+    --color-light: #F0EDE5;
+    --color-border: #39465A;
+    --color-text: #F5F3EE;
+    --color-secondary: #AEB9CC;
+    --color-muted: #7E8B9F;
+    --color-accent: #D97858;
+    --color-sage: #91A98B;
+    --color-champagne: #D4B879;
     --franchise-nishanth: #8875A8;
     --franchise-ajmal: #71999B;
     --franchise-praneeth: #B68B68;
@@ -19,26 +23,26 @@
   }
 
   body {
-    background-color: #090909;
-    color: #F2F2F0;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #111827;
+    color: #F5F3EE;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
   }
 
-  /* Monochrome scrollbar */
+  /* Custom subtle scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #090909;
+    background: #111827;
   }
   ::-webkit-scrollbar-thumb {
-    background: #303030;
+    background: #39465A;
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #505050;
+    background: #D97858;
   }
 }
 
@@ -47,41 +51,49 @@
   .bg-grid-pattern {
     background-size: 32px 32px;
     background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   }
 
-  /* Structural Graphite Panels */
+  /* Structural Deep Slate Panels */
   .battle-panel {
-    background: #191919;
-    border: 1px solid #303030;
-    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.7);
+    background: #222F43;
+    border: 1px solid #39465A;
+    box-shadow: 0 4px 16px -2px rgba(10, 15, 26, 0.5);
   }
 
   .battle-panel-interactive {
-    background: #191919;
-    border: 1px solid #303030;
+    background: #222F43;
+    border: 1px solid #39465A;
     transition: all 0.15s ease-in-out;
   }
 
   .battle-panel-interactive:hover {
-    background: #222222;
-    border-color: #555555;
+    background: #2C394C;
+    border-color: #4B5A70;
     transform: translateY(-1px);
   }
 
-  /* Clean headings & championship typography */
+  /* Typography utilities */
   .font-heading {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Outfit', system-ui, sans-serif;
   }
 
   .font-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
-    letter-spacing: 0.03em;
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.02em;
+  }
+
+  .font-sans {
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'IBM Plex Mono', monospace;
   }
 
   .font-broadcast {
-    font-family: 'Space Grotesk', sans-serif;
-    letter-spacing: 0.02em;
+    font-family: 'Outfit', system-ui, sans-serif;
+    letter-spacing: 0.01em;
   }
 }

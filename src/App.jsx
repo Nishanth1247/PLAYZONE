@@ -15,16 +15,41 @@ import { PartyGameLobby } from './components/party/PartyGameLobby';
 import { PartyGameRunner } from './components/party/PartyGameRunner';
 import { PartyResultsScreen } from './components/party/PartyResultsScreen';
 import { BattleArenaManager } from './components/battle/BattleArenaManager';
+import { GameRules } from './components/rules/GameRules';
+import { GAME_REGISTRY } from './services/party/gameRegistry';
 import { Toaster } from './components/ui/Toaster';
-import { WifiOff, Heart } from 'lucide-react';
+import { WifiOff, Heart, BookOpen } from 'lucide-react';
 
-const MainContent = ({ platformMode, setPlatformMode }) => {
-  const { activePage } = useAuction();
-  const { partyView } = usePartyGame();
+const MainContent = ({ platformMode, setPlatformMode, rulesTab, setRulesTab, previousMode }) => {
+  const { activePage, setActivePage } = useAuction();
+  const { partyView, openGameLobby } = usePartyGame();
 
   return (
     <main className="flex-1 pb-12">
-      {platformMode === 'party' ? (
+      {platformMode === 'rules' ? (
+        <div key={`rules_${rulesTab}`} className="transition-opacity duration-300">
+          <GameRules
+            initialTab={rulesTab}
+            onClose={() => setPlatformMode(previousMode || 'auction')}
+            onNavigateToGame={(game) => {
+              if (game === 'auction') {
+                setPlatformMode('auction');
+                setActivePage('setup');
+              } else if (game === 'battle') {
+                setPlatformMode('battle');
+              } else if (game === 'charades') {
+                setPlatformMode('party');
+                const charadesGame = GAME_REGISTRY.find(g => g.id === 'party_dumb_charades');
+                if (charadesGame) openGameLobby(charadesGame);
+              } else if (game === 'whoami') {
+                setPlatformMode('party');
+                const whoAmIGame = GAME_REGISTRY.find(g => g.id === 'party_who_am_i');
+                if (whoAmIGame) openGameLobby(whoAmIGame);
+              }
+            }}
+          />
+        </div>
+      ) : platformMode === 'party' ? (
         <div key={`party_${partyView}`} className="transition-opacity duration-300">
           {partyView === 'arena' && (
             <PartyArenaHome onSwitchToAuction={() => setPlatformMode('auction')} />
@@ -57,32 +82,77 @@ const MainContent = ({ platformMode, setPlatformMode }) => {
 };
 
 export function AppContent() {
-  const [platformMode, setPlatformMode] = useState('party'); // 'party' | 'auction' | 'battle'
+  const [platformMode, setPlatformMode] = useState('party'); // 'party' | 'auction' | 'battle' | 'rules'
+  const [previousMode, setPreviousMode] = useState('party');
+  const [rulesTab, setRulesTab] = useState('auction');
+
+  React.useEffect(() => {
+    const handleOpenRules = (e) => {
+      if (platformMode !== 'rules') {
+        setPreviousMode(platformMode);
+      }
+      setRulesTab(e.detail?.tab || 'auction');
+      setPlatformMode('rules');
+    };
+    window.addEventListener('bidbattle_open_rules', handleOpenRules);
+    return () => window.removeEventListener('bidbattle_open_rules', handleOpenRules);
+  }, [platformMode]);
+
+  const handleModeChange = (mode) => {
+    if (mode === 'rules') {
+      if (platformMode !== 'rules') {
+        setPreviousMode(platformMode);
+      }
+      setPlatformMode('rules');
+    } else {
+      setPlatformMode(mode);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-battle-bg text-battle-text flex flex-col font-sans selection:bg-brand-purple selection:text-white relative">
-      <Navbar platformMode={platformMode} setPlatformMode={setPlatformMode} />
-      <MainContent platformMode={platformMode} setPlatformMode={setPlatformMode} />
+    <div className="min-h-screen bg-[#111827] text-[#F5F3EE] flex flex-col font-sans selection:bg-[#D97858] selection:text-[#F5F3EE] relative">
+      <Navbar 
+        platformMode={platformMode} 
+        setPlatformMode={handleModeChange} 
+      />
+      <MainContent 
+        platformMode={platformMode} 
+        setPlatformMode={handleModeChange}
+        rulesTab={rulesTab}
+        setRulesTab={setRulesTab}
+        previousMode={previousMode}
+      />
       <Toaster />
 
       {/* Global Footer */}
-      <footer className="border-t border-[#303030] bg-[#090909] py-4 px-6 text-center text-xs text-[#737373] print:hidden">
+      <footer className="border-t border-[#39465A] bg-[#111827] py-4 px-6 text-center text-xs text-[#AEB9CC] print:hidden">
         <div className="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2 font-heading tracking-wide">
-            <span className="font-bold text-[#F2F2F0]">BIDBATTLE</span>
+            <span className="font-bold text-[#F5F3EE]">BIDBATTLE</span>
             <span>•</span>
-            <span className="text-[#A3A3A3]">Auction & Battle Arena</span>
+            <span className="text-[#AEB9CC]">Auction & Battle Arena</span>
             <span>•</span>
-            <span className="text-[#737373]">Party Game Showdown</span>
+            <span className="text-[#AEB9CC]">Party Game Showdown</span>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-[11px] text-[#A3A3A3] font-semibold font-heading tracking-wider">
-              <WifiOff className="w-3.5 h-3.5 text-[#A3A3A3]" />
+            <button
+              onClick={() => {
+                if (platformMode !== 'rules') setPreviousMode(platformMode);
+                setPlatformMode('rules');
+              }}
+              className="flex items-center gap-1.5 text-[11px] text-[#D4B879] hover:text-[#F5F3EE] font-semibold font-heading tracking-wider transition-colors"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              OFFICIAL RULEBOOKS
+            </button>
+            <span>•</span>
+            <span className="flex items-center gap-1.5 text-[11px] text-[#AEB9CC] font-semibold font-heading tracking-wider">
+              <WifiOff className="w-3.5 h-3.5 text-[#AEB9CC]" />
               100% PASS-AND-PLAY OFFLINE
             </span>
             <span>•</span>
-            <span className="text-[#737373]">1 Laptop • 2–4 Friends • Zero Login</span>
+            <span className="text-[#AEB9CC]">1 Laptop • 2–4 Friends • Zero Login</span>
           </div>
         </div>
       </footer>

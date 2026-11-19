@@ -2,15 +2,18 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const VARIANTS = {
-  primary: 'bg-[#F2F2F0] hover:bg-[#E2E2E0] text-[#090909] font-bold border border-[#F2F2F0] shadow-sm',
-  secondary: 'bg-[#303030] hover:bg-[#3D3D3D] text-[#F2F2F0] font-semibold border border-[#3E3E3E]',
-  danger: 'bg-[#191919] hover:bg-rose-950/50 text-rose-300 border border-rose-900/40',
-  accent: 'bg-[#F2F2F0] hover:bg-[#E2E2E0] text-[#090909] font-bold border border-[#F2F2F0] shadow-sm',
-  ghost: 'bg-transparent hover:bg-[#191919] text-[#A3A3A3] hover:text-[#F2F2F0]',
-  outline: 'bg-transparent hover:bg-[#191919] border border-[#303030] text-[#F2F2F0] hover:border-[#505050]',
-  cyan: 'bg-[#F2F2F0] hover:bg-[#E2E2E0] text-[#090909] font-bold border border-[#F2F2F0]',
-  gold: 'bg-[#F2F2F0] hover:bg-[#E2E2E0] text-[#090909] font-bold border border-[#F2F2F0]',
-  terracotta: 'bg-[#F2F2F0] hover:bg-[#E2E2E0] text-[#090909] font-bold border border-[#F2F2F0]',
+  primary: 'bg-[#D97858] hover:bg-[#C86747] text-[#F5F3EE] font-bold border border-[#D97858] shadow-sm',
+  secondary: 'bg-[#2C394C] hover:bg-[#34445A] text-[#F5F3EE] font-semibold border border-[#39465A]',
+  ivory: 'bg-[#F0EDE5] hover:bg-[#E4E0D6] text-[#111827] font-bold border border-[#F0EDE5] shadow-sm',
+  danger: 'bg-[#222F43] hover:bg-rose-950/50 text-rose-300 border border-rose-900/40',
+  accent: 'bg-[#D97858] hover:bg-[#C86747] text-[#F5F3EE] font-bold border border-[#D97858] shadow-sm',
+  ghost: 'bg-transparent hover:bg-[#2C394C] text-[#AEB9CC] hover:text-[#F5F3EE]',
+  outline: 'bg-transparent hover:bg-[#222F43] border border-[#39465A] text-[#F5F3EE] hover:border-[#4B5A70]',
+  sage: 'bg-[#91A98B] hover:bg-[#80997A] text-[#111827] font-bold border border-[#91A98B]',
+  champagne: 'bg-[#D4B879] hover:bg-[#C5A866] text-[#111827] font-bold border border-[#D4B879]',
+  cyan: 'bg-[#2C394C] hover:bg-[#34445A] text-[#71999B] border border-[#71999B]/40',
+  gold: 'bg-[#D4B879] hover:bg-[#C5A866] text-[#111827] font-bold border border-[#D4B879]',
+  terracotta: 'bg-[#D97858] hover:bg-[#C86747] text-[#F5F3EE] font-bold border border-[#D97858]',
 };
 
 const SIZES = {

@@ -173,29 +173,29 @@ export const TacticalDraftBoard = () => {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-xl w-full bg-[#191919] border-2 border-[#303030] rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden"
+          className="max-w-xl w-full bg-[#222F43] border-2 border-[#39465A] rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden"
         >
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#111111] border border-[#303030] mx-auto flex items-center justify-center mb-5 text-[#F2F2F0] shadow-lg">
-            <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-[#F2F2F0]" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#2C394C] border border-[#39465A] mx-auto flex items-center justify-center mb-5 text-[#F5F3EE] shadow-lg">
+            <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-[#F5F3EE]" />
           </div>
 
           <Badge variant="subtle" className="font-mono text-xs uppercase px-3 py-1 font-bold mb-3">
             Tactical Privacy Shield Active
           </Badge>
 
-          <h2 className="text-2xl sm:text-3xl font-heading font-black text-[#F2F2F0] tracking-wide mb-2">
+          <h2 className="text-2xl sm:text-3xl font-heading font-black text-[#F5F3EE] tracking-wide mb-2">
             LINEUP LOCKED & SECURED
           </h2>
 
-          <p className="text-[#A3A3A3] text-sm leading-relaxed mb-6">
+          <p className="text-[#AEB9CC] text-sm leading-relaxed mb-6">
             <span style={{ color: prevTeam?.color }} className="font-bold">{prevTeam?.name}</span>'s tactical order is now encrypted and sealed. No opposing franchise can view this deployment.
           </p>
 
-          <div className="p-4 rounded-2xl bg-[#111111] border border-[#303030] mb-6 text-center">
-            <span className="text-xs uppercase tracking-widest text-[#737373] font-bold block mb-1">
+          <div className="p-4 rounded-2xl bg-[#2C394C] border border-[#39465A] mb-6 text-center">
+            <span className="text-xs uppercase tracking-widest text-[#AEB9CC] font-bold block mb-1">
               DEVICE HANDOFF REQUIRED
             </span>
-            <p className="text-[#F2F2F0] font-heading text-lg sm:text-xl font-black">
+            <p className="text-[#F5F3EE] font-heading text-lg sm:text-xl font-black">
               Please hand the device to <span style={{ color: nextTeam?.color }}>{nextTeam?.name}</span> ({nextTeam?.owner})
             </p>
           </div>
@@ -204,14 +204,14 @@ export const TacticalDraftBoard = () => {
             variant="primary"
             size="lg"
             onClick={proceedToNextTeamDraft}
-            className="w-full text-base font-heading font-bold tracking-wider py-4 shadow-xl flex items-center justify-center gap-2 bg-[#F2F2F0] text-[#090909] hover:bg-white"
+            className="w-full text-base font-heading font-bold tracking-wider py-4 shadow-xl flex items-center justify-center gap-2 bg-[#D97858] text-[#F5F3EE] hover:bg-white"
           >
             <span>I AM READY TO DRAFT ({nextTeam?.name})</span>
             <ArrowRight className="w-5 h-5" />
           </Button>
 
-          <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[#737373]">
-            <EyeOff className="w-3.5 h-3.5 text-[#A3A3A3]" />
+          <div className="mt-4 flex items-center justify-center gap-2 text-xs text-[#AEB9CC]">
+            <EyeOff className="w-3.5 h-3.5 text-[#AEB9CC]" />
             <span>Combat ratings & opponent choices remain strictly hidden</span>
           </div>
         </motion.div>
@@ -228,20 +228,20 @@ export const TacticalDraftBoard = () => {
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-3xl w-full bg-[#191919] border border-[#303030] rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5"
+          className="max-w-3xl w-full bg-[#222F43] border border-[#39465A] rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5"
         >
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="w-14 h-14 rounded-2xl bg-[#111111] border border-[#444444] mx-auto flex items-center justify-center text-[#F2F2F0] shadow-md">
-              <CheckCircle2 className="w-7 h-7 text-[#F2F2F0]" />
+            <div className="w-14 h-14 rounded-2xl bg-[#2C394C] border border-[#39465A] mx-auto flex items-center justify-center text-[#F5F3EE] shadow-md">
+              <CheckCircle2 className="w-7 h-7 text-[#F5F3EE]" />
             </div>
             <Badge variant="subtle" className="font-mono text-xs uppercase px-3 py-1 font-bold">
               Round 2 Draft Phase Complete
             </Badge>
-            <h2 className="text-2xl sm:text-3xl font-heading font-black text-[#F2F2F0] tracking-wide">
+            <h2 className="text-2xl sm:text-3xl font-heading font-black text-[#F5F3EE] tracking-wide">
               BOTH LINEUPS LOCKED & CLASSIFIED
             </h2>
-            <p className="text-[#A3A3A3] text-xs sm:text-sm max-w-lg mx-auto">
+            <p className="text-[#AEB9CC] text-xs sm:text-sm max-w-lg mx-auto">
               All tactical lineups have been secretly recorded. Fighters will be revealed sequentially during active match combat.
             </p>
           </div>
@@ -255,10 +255,10 @@ export const TacticalDraftBoard = () => {
               return (
                 <div
                   key={match.id || idx}
-                  className="p-3 rounded-2xl bg-[#111111] border border-[#303030] flex items-center justify-between gap-3 text-xs"
+                  className="p-3 rounded-2xl bg-[#2C394C] border border-[#39465A] flex items-center justify-between gap-3 text-xs"
                 >
-                  <div className="flex items-center gap-2 font-mono font-bold text-[#A3A3A3]">
-                    <span className="w-6 h-6 rounded-lg bg-[#191919] flex items-center justify-center text-[#F2F2F0] border border-[#303030]">
+                  <div className="flex items-center gap-2 font-mono font-bold text-[#AEB9CC]">
+                    <span className="w-6 h-6 rounded-lg bg-[#222F43] flex items-center justify-center text-[#F5F3EE] border border-[#39465A]">
                       {idx + 1}
                     </span>
                     <span className="uppercase text-[11px]">MATCH {idx + 1}</span>
@@ -268,18 +268,18 @@ export const TacticalDraftBoard = () => {
                     {/* Team A Slot */}
                     <div className="flex items-center gap-1.5" style={{ color: teamA?.color }}>
                       <span>{teamA?.name}</span>
-                      <span className="px-2 py-0.5 rounded bg-[#191919] text-[#A3A3A3] border border-[#303030] font-mono text-[10px] flex items-center gap-1">
-                        <Lock className="w-2.5 h-2.5 text-[#F2F2F0]" />
+                      <span className="px-2 py-0.5 rounded bg-[#222F43] text-[#AEB9CC] border border-[#39465A] font-mono text-[10px] flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5 text-[#F5F3EE]" />
                         <span>CLASSIFIED</span>
                       </span>
                     </div>
 
-                    <span className="text-[#737373] font-mono text-xs font-black">VS</span>
+                    <span className="text-[#AEB9CC] font-mono text-xs font-black">VS</span>
 
                     {/* Team B Slot */}
                     <div className="flex items-center gap-1.5" style={{ color: teamB?.color }}>
-                      <span className="px-2 py-0.5 rounded bg-[#191919] text-[#A3A3A3] border border-[#303030] font-mono text-[10px] flex items-center gap-1">
-                        <Lock className="w-2.5 h-2.5 text-[#F2F2F0]" />
+                      <span className="px-2 py-0.5 rounded bg-[#222F43] text-[#AEB9CC] border border-[#39465A] font-mono text-[10px] flex items-center gap-1">
+                        <Lock className="w-2.5 h-2.5 text-[#F5F3EE]" />
                         <span>CLASSIFIED</span>
                       </span>
                       <span>{teamB?.name}</span>
@@ -296,9 +296,9 @@ export const TacticalDraftBoard = () => {
               variant="primary"
               size="lg"
               onClick={startBattlePhaseFromLineups}
-              className="w-full text-base font-heading font-bold tracking-wider py-4 shadow-xl flex items-center justify-center gap-2 bg-[#F2F2F0] text-[#090909] hover:bg-white"
+              className="w-full text-base font-heading font-bold tracking-wider py-4 shadow-xl flex items-center justify-center gap-2 bg-[#D97858] text-[#F5F3EE] hover:bg-white"
             >
-              <Swords className="w-5 h-5 text-[#090909]" />
+              <Swords className="w-5 h-5 text-[#111827]" />
               <span>START BATTLE PHASE (ROUND 1)</span>
               <ArrowRight className="w-5 h-5" />
             </Button>
@@ -315,7 +315,7 @@ export const TacticalDraftBoard = () => {
     <div className="min-h-[calc(100vh-4.5rem)] flex flex-col justify-between p-2 sm:p-4 max-w-[1750px] mx-auto select-none space-y-3">
       
       {/* 1. TOP HEADER: CURRENT FRANCHISE TURN */}
-      <div className="battle-panel rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 border border-[#303030] shadow-md shrink-0">
+      <div className="battle-panel rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 border border-[#39465A] shadow-md shrink-0">
         <div className="flex items-center gap-3">
           <div 
             className="w-9 h-9 rounded-xl border flex items-center justify-center text-lg font-bold shadow-md"
@@ -336,12 +336,12 @@ export const TacticalDraftBoard = () => {
               >
                 TEAM {currentTeamIndex + 1} OF {teams.length} PRIVATE DRAFT
               </Badge>
-              <span className="text-[#A3A3A3] text-xs">•</span>
-              <span className="text-sm sm:text-base font-heading font-black text-[#F2F2F0]">
+              <span className="text-[#AEB9CC] text-xs">•</span>
+              <span className="text-sm sm:text-base font-heading font-black text-[#F5F3EE]">
                 <span style={{ color: currentTeam?.color }}>{currentTeam?.name}</span> ({currentTeam?.owner})
               </span>
             </div>
-            <p className="text-[11px] text-[#A3A3A3]">
+            <p className="text-[11px] text-[#AEB9CC]">
               Assign and order your fighters into sequential match slots. Ratings remain strictly secret.
             </p>
           </div>
@@ -353,17 +353,17 @@ export const TacticalDraftBoard = () => {
             variant="ghost"
             size="xs"
             onClick={handleAutoFill}
-            className="text-xs font-mono text-[#A3A3A3] hover:text-[#F2F2F0]"
+            className="text-xs font-mono text-[#AEB9CC] hover:text-[#F5F3EE]"
             title="Auto-fill open slots with remaining fighters"
           >
-            <Shuffle className="w-3.5 h-3.5 mr-1 text-[#F2F2F0]" />
+            <Shuffle className="w-3.5 h-3.5 mr-1 text-[#F5F3EE]" />
             <span>Auto-Fill</span>
           </Button>
           <Button
             variant="ghost"
             size="xs"
             onClick={handleClearAll}
-            className="text-xs font-mono text-[#A3A3A3] hover:text-red-400"
+            className="text-xs font-mono text-[#AEB9CC] hover:text-red-400"
             title="Clear all assigned slots"
           >
             <Trash2 className="w-3.5 h-3.5 mr-1" />
@@ -376,17 +376,17 @@ export const TacticalDraftBoard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 overflow-hidden">
         
         {/* LEFT COLUMN: AVAILABLE SQUAD ROSTER (5 cols) */}
-        <div className="lg:col-span-5 battle-panel rounded-2xl p-3.5 flex flex-col justify-between border border-[#303030] overflow-hidden space-y-3">
+        <div className="lg:col-span-5 battle-panel rounded-2xl p-3.5 flex flex-col justify-between border border-[#39465A] overflow-hidden space-y-3">
           <div>
-            <div className="flex items-center justify-between text-xs font-heading font-bold text-[#A3A3A3] mb-2">
+            <div className="flex items-center justify-between text-xs font-heading font-bold text-[#AEB9CC] mb-2">
               <span className="uppercase tracking-wider">AVAILABLE SQUAD ({availableFighters.length})</span>
-              <span className="text-[11px] font-mono text-[#F2F2F0]">Click to assign to next slot</span>
+              <span className="text-[11px] font-mono text-[#F5F3EE]">Click to assign to next slot</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[500px] overflow-y-auto pr-1">
               {availableFighters.length === 0 ? (
-                <div className="col-span-full p-6 text-center rounded-2xl bg-[#111111] border border-[#303030] text-[#A3A3A3] text-xs">
-                  <UserCheck className="w-8 h-8 text-[#F2F2F0] mx-auto mb-2 opacity-80" />
+                <div className="col-span-full p-6 text-center rounded-2xl bg-[#2C394C] border border-[#39465A] text-[#AEB9CC] text-xs">
+                  <UserCheck className="w-8 h-8 text-[#F5F3EE] mx-auto mb-2 opacity-80" />
                   <span>All squad fighters have been deployed to match slots!</span>
                 </div>
               ) : (
@@ -394,10 +394,10 @@ export const TacticalDraftBoard = () => {
                   <div
                     key={fighter.id}
                     onClick={() => handleQuickAdd(fighter)}
-                    className="p-2.5 rounded-xl bg-[#111111] border border-[#303030] hover:border-[#666666] cursor-pointer transition-all flex items-center gap-2.5 group shadow-sm"
+                    className="p-2.5 rounded-xl bg-[#2C394C] border border-[#39465A] hover:border-[#666666] cursor-pointer transition-all flex items-center gap-2.5 group shadow-sm"
                   >
                     {/* Image */}
-                    <div className="w-12 h-12 rounded-lg bg-[#191919] overflow-hidden shrink-0 border border-[#303030]">
+                    <div className="w-12 h-12 rounded-lg bg-[#222F43] overflow-hidden shrink-0 border border-[#39465A]">
                       {fighter.imageUrl ? (
                         <img 
                           src={fighter.imageUrl} 
@@ -405,7 +405,7 @@ export const TacticalDraftBoard = () => {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-[#A3A3A3]">
+                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-[#AEB9CC]">
                           ⚔️
                         </div>
                       )}
@@ -413,18 +413,18 @@ export const TacticalDraftBoard = () => {
 
                     {/* Details (Strictly NO rating!) */}
                     <div className="min-w-0 flex-1">
-                      <div className="font-heading font-bold text-xs sm:text-sm text-[#F2F2F0] truncate">
+                      <div className="font-heading font-bold text-xs sm:text-sm text-[#F5F3EE] truncate">
                         {fighter.name}
                       </div>
-                      <div className="text-[10px] text-[#A3A3A3] truncate">
+                      <div className="text-[10px] text-[#AEB9CC] truncate">
                         {fighter.category || fighter.role || 'Superstar Fighter'}
                       </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[9px] font-mono font-bold text-[#F2F2F0]">
+                        <span className="text-[9px] font-mono font-bold text-[#F5F3EE]">
                           ₹{fighter.basePrice} Cr
                         </span>
-                        <span className="text-[9px] font-mono text-[#A3A3A3] flex items-center gap-0.5">
-                          <Lock className="w-2.5 h-2.5 text-[#F2F2F0]" /> Hidden
+                        <span className="text-[9px] font-mono text-[#AEB9CC] flex items-center gap-0.5">
+                          <Lock className="w-2.5 h-2.5 text-[#F5F3EE]" /> Hidden
                         </span>
                       </div>
                     </div>
@@ -434,18 +434,18 @@ export const TacticalDraftBoard = () => {
             </div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-[#111111] border border-[#303030] text-[11px] text-[#A3A3A3] flex items-center gap-2">
-            <Lock className="w-3.5 h-3.5 text-[#F2F2F0] shrink-0" />
+          <div className="p-2.5 rounded-xl bg-[#2C394C] border border-[#39465A] text-[11px] text-[#AEB9CC] flex items-center gap-2">
+            <Lock className="w-3.5 h-3.5 text-[#F5F3EE] shrink-0" />
             <span>Combat ratings remain concealed to guarantee pure tactical strategy.</span>
           </div>
         </div>
 
         {/* RIGHT COLUMN: SEQUENTIAL MATCH SLOTS (7 cols) */}
-        <div className="lg:col-span-7 battle-panel rounded-2xl p-3.5 flex flex-col justify-between border border-[#303030] overflow-hidden space-y-3">
+        <div className="lg:col-span-7 battle-panel rounded-2xl p-3.5 flex flex-col justify-between border border-[#39465A] overflow-hidden space-y-3">
           <div>
-            <div className="flex items-center justify-between text-xs font-heading font-bold text-[#A3A3A3] mb-2">
+            <div className="flex items-center justify-between text-xs font-heading font-bold text-[#AEB9CC] mb-2">
               <span className="uppercase tracking-wider">TACTICAL MATCH LINEUP ({assignedFighterIds.length} / {totalSlots})</span>
-              <span className="text-[11px] font-mono text-[#A3A3A3]">
+              <span className="text-[11px] font-mono text-[#AEB9CC]">
                 {isLineupComplete ? '✓ Ready to Lock' : `${totalSlots - assignedFighterIds.length} slots empty`}
               </span>
             </div>
@@ -462,21 +462,21 @@ export const TacticalDraftBoard = () => {
                     key={slotIdx}
                     className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-3 ${
                       fighter
-                        ? 'bg-[#111111] border-[#303030] hover:border-[#666666]'
-                        : 'bg-[#111111]/50 border-dashed border-[#303030]'
+                        ? 'bg-[#2C394C] border-[#39465A] hover:border-[#666666]'
+                        : 'bg-[#2C394C]/50 border-dashed border-[#39465A]'
                     }`}
                   >
                     {/* Slot Badge & Opponent Context */}
                     <div className="flex items-center gap-2.5 shrink-0">
-                      <span className="w-7 h-7 rounded-lg bg-[#191919] border border-[#303030] font-mono text-xs font-black flex items-center justify-center text-[#F2F2F0]">
+                      <span className="w-7 h-7 rounded-lg bg-[#222F43] border border-[#39465A] font-mono text-xs font-black flex items-center justify-center text-[#F5F3EE]">
                         {slotIdx + 1}
                       </span>
                       <div>
-                        <span className="text-[10px] font-mono font-bold uppercase text-[#A3A3A3] block leading-none">
+                        <span className="text-[10px] font-mono font-bold uppercase text-[#AEB9CC] block leading-none">
                           SLOT {slotIdx + 1}
                         </span>
                         {opponent && (
-                          <span className="text-[10px] text-[#A3A3A3] font-medium">
+                          <span className="text-[10px] text-[#AEB9CC] font-medium">
                             vs <span style={{ color: opponent.color }} className="font-bold">{opponent.name}</span>
                           </span>
                         )}
@@ -487,7 +487,7 @@ export const TacticalDraftBoard = () => {
                     <div className="flex-1 min-w-0">
                       {fighter ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-9 h-9 rounded-lg bg-[#191919] border border-[#303030] overflow-hidden shrink-0">
+                          <div className="w-9 h-9 rounded-lg bg-[#222F43] border border-[#39465A] overflow-hidden shrink-0">
                             {fighter.imageUrl ? (
                               <img src={fighter.imageUrl} alt={fighter.name} className="w-full h-full object-cover" />
                             ) : (
@@ -495,17 +495,17 @@ export const TacticalDraftBoard = () => {
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <span className="font-heading font-bold text-xs sm:text-sm text-[#F2F2F0] block truncate">
+                            <span className="font-heading font-bold text-xs sm:text-sm text-[#F5F3EE] block truncate">
                               {fighter.name}
                             </span>
-                            <span className="text-[10px] text-[#A3A3A3] truncate block">
-                              {fighter.category || 'Fighter'} • <span className="font-mono text-[#F2F2F0]">Hidden Rating</span>
+                            <span className="text-[10px] text-[#AEB9CC] truncate block">
+                              {fighter.category || 'Fighter'} • <span className="font-mono text-[#F5F3EE]">Hidden Rating</span>
                             </span>
                           </div>
                         </div>
                       ) : (
-                        <div className="text-[#737373] text-xs italic font-mono flex items-center gap-1.5 py-1">
-                          <AlertTriangle className="w-3.5 h-3.5 text-[#A3A3A3]" />
+                        <div className="text-[#AEB9CC] text-xs italic font-mono flex items-center gap-1.5 py-1">
+                          <AlertTriangle className="w-3.5 h-3.5 text-[#AEB9CC]" />
                           <span>Empty slot — select a fighter from available squad</span>
                         </div>
                       )}
@@ -518,7 +518,7 @@ export const TacticalDraftBoard = () => {
                           type="button"
                           onClick={() => handleSwapSlots(slotIdx, slotIdx - 1)}
                           disabled={slotIdx === 0}
-                          className="p-1 rounded-md bg-[#191919] border border-[#303030] text-[#A3A3A3] hover:text-[#F2F2F0] disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="p-1 rounded-md bg-[#222F43] border border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE] disabled:opacity-30 disabled:cursor-not-allowed"
                           title="Move up"
                         >
                           <ArrowUp className="w-3.5 h-3.5" />
@@ -527,7 +527,7 @@ export const TacticalDraftBoard = () => {
                           type="button"
                           onClick={() => handleSwapSlots(slotIdx, slotIdx + 1)}
                           disabled={slotIdx === totalSlots - 1}
-                          className="p-1 rounded-md bg-[#191919] border border-[#303030] text-[#A3A3A3] hover:text-[#F2F2F0] disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="p-1 rounded-md bg-[#222F43] border border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE] disabled:opacity-30 disabled:cursor-not-allowed"
                           title="Move down"
                         >
                           <ArrowDown className="w-3.5 h-3.5" />
@@ -535,7 +535,7 @@ export const TacticalDraftBoard = () => {
                         <button
                           type="button"
                           onClick={() => handleRemoveFromSlot(slotIdx)}
-                          className="p-1 rounded-md bg-[#191919] border border-[#303030] text-[#A3A3A3] hover:text-red-400"
+                          className="p-1 rounded-md bg-[#222F43] border border-[#39465A] text-[#AEB9CC] hover:text-red-400"
                           title="Unassign"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -549,7 +549,7 @@ export const TacticalDraftBoard = () => {
           </div>
 
           {/* Confirm Button */}
-          <div className="pt-2 border-t border-[#303030]">
+          <div className="pt-2 border-t border-[#39465A]">
             <Button
               variant="primary"
               size="lg"
@@ -557,11 +557,11 @@ export const TacticalDraftBoard = () => {
               onClick={handleConfirmLineup}
               className={`w-full font-heading font-bold tracking-wider py-3.5 flex items-center justify-center gap-2 ${
                 isLineupComplete
-                  ? 'bg-[#F2F2F0] text-[#090909] hover:bg-white shadow-lg'
+                  ? 'bg-[#D97858] text-[#F5F3EE] hover:bg-white shadow-lg'
                   : 'opacity-50 cursor-not-allowed'
               }`}
             >
-              <CheckCircle2 className="w-4 h-4 text-[#090909]" />
+              <CheckCircle2 className="w-4 h-4 text-[#111827]" />
               <span>CONFIRM TACTICAL LINEUP ({currentTeam?.name})</span>
               <ArrowRight className="w-4 h-4" />
             </Button>

@@ -21,7 +21,8 @@ import {
   Sparkles,
   ChevronDown,
   Layers,
-  Settings
+  Settings,
+  BookOpen
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 
@@ -93,7 +94,7 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-[#303030] bg-[#090909]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-[#39465A] bg-[#111827]/95 backdrop-blur-md">
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
         
         {/* Brand Logo & Tag */}
@@ -103,63 +104,69 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
               returnToArenaHome();
             } else if (platformMode === 'battle') {
               // Stay on battle
+            } else if (platformMode === 'rules') {
+              setPlatformMode('auction');
             } else {
               setActivePage('home');
             }
           }}
           className="flex items-center gap-3 cursor-pointer group flex-shrink-0"
         >
-          <div className="w-9 h-9 rounded-lg bg-[#191919] border border-[#303030] p-[1px] shadow-sm group-hover:border-[#555555] transition-all">
-            <div className="w-full h-full bg-[#090909] rounded-[7px] flex items-center justify-center">
+          <div className="w-9 h-9 rounded-lg bg-[#222F43] border border-[#39465A] p-[1px] shadow-sm group-hover:border-[#D97858] transition-all">
+            <div className="w-full h-full bg-[#111827] rounded-[7px] flex items-center justify-center">
               {platformMode === 'party' ? (
-                <Gamepad2 className="w-4 h-4 text-[#F2F2F0] group-hover:scale-105 transition-transform" />
+                <Gamepad2 className="w-4 h-4 text-[#D97858] group-hover:scale-105 transition-transform" />
               ) : platformMode === 'battle' ? (
-                <Swords className="w-4 h-4 text-[#F2F2F0] group-hover:scale-105 transition-transform" />
+                <Swords className="w-4 h-4 text-[#D97858] group-hover:scale-105 transition-transform" />
+              ) : platformMode === 'rules' ? (
+                <BookOpen className="w-4 h-4 text-[#D4B879] group-hover:scale-105 transition-transform" />
               ) : (
-                <Gavel className="w-4 h-4 text-[#F2F2F0] group-hover:rotate-6 transition-transform" />
+                <Gavel className="w-4 h-4 text-[#D97858] group-hover:rotate-6 transition-transform" />
               )}
             </div>
           </div>
           <div>
-            <span className="font-heading text-lg sm:text-xl font-bold tracking-tight text-[#F2F2F0] block leading-tight">
+            <span className="font-heading text-lg sm:text-xl font-bold tracking-tight text-[#F5F3EE] block leading-tight">
               BIDBATTLE
             </span>
-            <p className="text-[11px] text-[#A3A3A3] font-medium tracking-tight -mt-0.5 hidden sm:block">
+            <p className="text-[11px] text-[#AEB9CC] font-medium tracking-tight -mt-0.5 hidden sm:block">
               {platformMode === 'party'
                 ? 'Party Arena • Local Pass & Play'
                 : platformMode === 'battle'
                 ? 'Battle Arena • Tactical Clash'
+                : platformMode === 'rules'
+                ? 'Official Rulebooks & Guides'
                 : 'Auction Arena • Franchise Bidding'}
             </p>
           </div>
         </div>
 
-        {/* Global Platform Mode Switcher: Auction vs Party vs Battle Arena */}
-        <div className="flex items-center p-1 rounded-lg bg-[#191919] border border-[#303030] font-heading text-xs font-semibold">
+        {/* Global Platform Mode Switcher: Auction vs Party vs Battle Arena vs Rules */}
+        <div className="flex items-center p-1 rounded-xl bg-[#222F43] border border-[#39465A] font-heading text-xs font-semibold">
           <button
             type="button"
             onClick={() => setPlatformMode('auction')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
               platformMode === 'auction'
-                ? 'bg-[#F2F2F0] text-[#090909] font-bold shadow-sm'
-                : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
+                ? 'bg-[#D97858] text-[#F5F3EE] font-bold shadow-sm'
+                : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
             }`}
           >
             <Gavel className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">AUCTION</span>
             <span className="sm:hidden">AUCT</span>
             {hasLiveAuction && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#090909] animate-ping" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F5F3EE] animate-ping" />
             )}
           </button>
 
           <button
             type="button"
             onClick={() => setPlatformMode('party')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
               platformMode === 'party'
-                ? 'bg-[#F2F2F0] text-[#090909] font-bold shadow-sm'
-                : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
+                ? 'bg-[#D97858] text-[#F5F3EE] font-bold shadow-sm'
+                : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
             }`}
           >
             <Gamepad2 className="w-3.5 h-3.5" />
@@ -170,63 +177,79 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
           <button
             type="button"
             onClick={() => setPlatformMode('battle')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
               platformMode === 'battle'
-                ? 'bg-[#F2F2F0] text-[#090909] font-bold shadow-sm'
-                : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
+                ? 'bg-[#D97858] text-[#F5F3EE] font-bold shadow-sm'
+                : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
             }`}
           >
             <Swords className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">BATTLE ARENA</span>
             <span className="sm:hidden">BATTLE</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setPlatformMode('rules')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              platformMode === 'rules'
+                ? 'bg-[#D4B879] text-[#111827] font-bold shadow-sm'
+                : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">RULES</span>
+            <span className="sm:hidden">RULES</span>
+          </button>
         </div>
 
-        {/* Navigation Tabs */}
-        <nav className="hidden lg:flex items-center gap-1 p-1 rounded-lg bg-[#191919] border border-[#303030] text-xs font-medium relative font-heading">
-          {platformMode === 'party' ? (
-            partyNavItems.map((item) => {
-              const isActive = partyView === item.id;
-              const Icon = item.icon;
+        {/* Navigation Tabs (if inside party or auction mode) */}
+        {platformMode !== 'rules' && (
+          <nav className="hidden lg:flex items-center gap-1 p-1 rounded-xl bg-[#222F43] border border-[#39465A] text-xs font-medium relative font-heading">
+            {platformMode === 'party' ? (
+              partyNavItems.map((item) => {
+                const isActive = partyView === item.id;
+                const Icon = item.icon;
 
-              return (
-                <button
-                  key={item.id}
-                  onClick={item.onClick || (() => {})}
-                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all z-10 ${
-                    isActive ? 'bg-[#222222] text-[#F2F2F0] font-semibold border border-[#3A3A3A]' : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })
-          ) : (
-            auctionNavItems.map((item) => {
-              const isActive = activePage === item.id;
-              const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={item.onClick || (() => {})}
+                    className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all z-10 ${
+                      isActive ? 'bg-[#2C394C] text-[#F5F3EE] font-semibold border border-[#39465A]' : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })
+            ) : platformMode === 'auction' ? (
+              auctionNavItems.map((item) => {
+                const isActive = activePage === item.id;
+                const Icon = item.icon;
 
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActivePage(item.id)}
-                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all z-10 ${
-                    isActive ? 'bg-[#222222] text-[#F2F2F0] font-semibold border border-[#3A3A3A]' : 'text-[#A3A3A3] hover:text-[#F2F2F0]'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
-                  {item.badge > 0 && (
-                    <span className="px-1.5 py-0.2 rounded text-[10px] bg-[#303030] text-[#F2F2F0] border border-[#444444] font-mono">
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })
-          )}
-        </nav>
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActivePage(item.id)}
+                    className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all z-10 ${
+                      isActive ? 'bg-[#2C394C] text-[#F5F3EE] font-semibold border border-[#39465A]' : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{item.label}</span>
+                    {item.badge > 0 && (
+                      <span className="px-1.5 py-0.2 rounded text-[10px] bg-[#111827] text-[#D4B879] border border-[#39465A] font-mono">
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })
+            ) : null}
+          </nav>
+        )}
 
         {/* Right Controls: Sound, Fullscreen */}
         <div className="flex items-center gap-2">
@@ -234,22 +257,22 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
           <button
             onClick={handleToggleSound}
             title={isMuted ? 'Unmute Sound FX' : 'Mute Sound FX'}
-            className={`p-2 rounded-lg border transition-all ${
+            className={`p-2 rounded-xl border transition-all ${
               isMuted
-                ? 'bg-[#191919] border-rose-900/60 text-rose-300'
-                : 'bg-[#191919] border-[#303030] text-[#A3A3A3] hover:text-[#F2F2F0] hover:border-[#505050]'
+                ? 'bg-[#222F43] border-rose-900/60 text-rose-300'
+                : 'bg-[#222F43] border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE] hover:border-[#D97858]'
             }`}
           >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-[#F2F2F0]" />}
+            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-[#F5F3EE]" />}
           </button>
 
           {/* Fullscreen Toggle */}
           <button
             onClick={toggleFullscreen}
             title={isFullscreen ? 'Exit Fullscreen' : 'Enter Broadcast Fullscreen'}
-            className="p-2 rounded-lg bg-[#191919] border border-[#303030] text-[#A3A3A3] hover:text-[#F2F2F0] hover:border-[#505050] transition-all hidden sm:flex"
+            className="p-2 rounded-xl bg-[#222F43] border border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE] hover:border-[#D97858] transition-all hidden sm:flex"
           >
-            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4 text-[#F2F2F0]" />}
+            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4 text-[#F5F3EE]" />}
           </button>
 
           {/* Host Menu for live tournament in Auction Mode */}
@@ -257,16 +280,16 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
             <div className="relative">
               <button
                 onClick={() => setShowExitConfirm(!showExitConfirm)}
-                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-[#191919] hover:bg-[#222222] border border-[#303030] text-[#F2F2F0] transition-all font-heading"
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl bg-[#222F43] hover:bg-[#2C394C] border border-[#39465A] text-[#F5F3EE] transition-all font-heading"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-[#A3A3A3]" />
+                <RotateCcw className="w-3.5 h-3.5 text-[#AEB9CC]" />
                 <span className="hidden sm:inline">Host Controls</span>
-                <ChevronDown className="w-3.5 h-3.5 text-[#737373]" />
+                <ChevronDown className="w-3.5 h-3.5 text-[#AEB9CC]" />
               </button>
 
               {showExitConfirm && (
-                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-[#191919] border border-[#303030] shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2">
-                  <div className="px-3 py-1.5 border-b border-[#303030] text-[10px] font-bold text-[#737373] uppercase tracking-wider font-heading">
+                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-[#222F43] border border-[#39465A] shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-top-2">
+                  <div className="px-3 py-1.5 border-b border-[#39465A] text-[10px] font-bold text-[#AEB9CC] uppercase tracking-wider font-heading">
                     Tournament Admin
                   </div>
                   <button
@@ -274,9 +297,9 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                       finishAuction();
                       setShowExitConfirm(false);
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-medium text-[#F2F2F0] hover:bg-[#222222] rounded-md flex items-center gap-2 mt-1"
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-[#F5F3EE] hover:bg-[#2C394C] rounded-lg flex items-center gap-2 mt-1"
                   >
-                    <Trophy className="w-3.5 h-3.5 text-[#F2F2F0]" />
+                    <Trophy className="w-3.5 h-3.5 text-[#D4B879]" />
                     <span>Conclude Tournament</span>
                   </button>
                   <button
@@ -284,7 +307,7 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                       resetAuction();
                       setShowExitConfirm(false);
                     }}
-                    className="w-full text-left px-3 py-2 text-xs font-medium text-rose-300 hover:bg-rose-950/30 rounded-md flex items-center gap-2"
+                    className="w-full text-left px-3 py-2 text-xs font-medium text-rose-300 hover:bg-rose-950/30 rounded-lg flex items-center gap-2"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Reset & Exit to Home</span>
