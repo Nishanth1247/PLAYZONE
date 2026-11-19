@@ -384,6 +384,25 @@ export const AuctionProvider = ({ children }) => {
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         }
       ],
+      activityTimeline: [
+        {
+          id: `act_${Date.now()}_start`,
+          type: 'tournament_started',
+          title: 'Tournament Arena Initialized',
+          description: `Custom Tournament "${tournamentPreset.name || 'Hero Auction Showdown'}" initialized with ${configuredTeams.length} franchises.`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        },
+        {
+          id: `act_${Date.now()}_lot1`,
+          type: 'lot_introduced',
+          title: `Lot #1 Introduced: ${randomizedItems[0]?.name}`,
+          description: `Base Price: ${tournamentPreset.currency?.symbol || '₹'}${randomizedItems[0]?.basePrice} ${tournamentPreset.currency?.unit || 'Cr'} • Category: ${randomizedItems[0]?.category || 'Lot'}`,
+          lotName: randomizedItems[0]?.name,
+          lotNumber: 1,
+          basePrice: randomizedItems[0]?.basePrice,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        }
+      ],
       status: 'in_progress',
       timer: Number(tournamentPreset.rules?.countdownDuration) || 20,
       isTimerRunning: true,

@@ -147,12 +147,17 @@ export function validateBattleTournamentJSON(rawInput, { teamCount = 4, squadSiz
       }
     });
 
-    // 9. Sufficient entries check for the selected team count and squad size
+    // 9. Sufficient entries check: Battle Arena requires at least 4 entries (min 2 teams * 2 squad size)
     const requiredPoolSize = teamCount * squadSize;
-    if (rawEntries.length < requiredPoolSize) {
+    if (rawEntries.length < 4) {
       errors.push({
         field: 'entries.count',
-        message: `Insufficient entries: Imported file has ${rawEntries.length} entries, but the current Battle Arena setup (${teamCount} teams × ${squadSize} squad size) requires at least ${requiredPoolSize} entries.`,
+        message: `Insufficient entries: Battle Arena requires at least 4 entries (minimum 2 teams × 2 squad size), but imported file only has ${rawEntries.length}.`,
+      });
+    } else if (rawEntries.length < requiredPoolSize) {
+      warnings.push({
+        field: 'entries.count',
+        message: `Note: File has ${rawEntries.length} entries. Target requires ${requiredPoolSize} lots (${teamCount} teams × ${squadSize}). You can configure team count and squad size in the configuration step.`,
       });
     }
   }

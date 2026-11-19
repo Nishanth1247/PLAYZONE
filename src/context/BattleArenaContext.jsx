@@ -165,6 +165,7 @@ export const BattleArenaProvider = ({ children }) => {
     }
 
     const nextItem = updatedItems[nextIdx];
+    const duration = prevState.auction.countdownDuration || prevState.countdownDuration || 20;
     return {
       ...prevState,
       teams: updatedTeams,
@@ -175,7 +176,7 @@ export const BattleArenaProvider = ({ children }) => {
         currentBid: Number(nextItem?.basePrice) || 1.0,
         highestBidder: null,
         bidHistory: [],
-        timer: 20,
+        timer: duration,
         isTimerRunning: true,
       },
     };
@@ -212,6 +213,7 @@ export const BattleArenaProvider = ({ children }) => {
     }
 
     const nextItem = updatedItems[nextIdx];
+    const duration = prevState.auction.countdownDuration || prevState.countdownDuration || 20;
     return {
       ...prevState,
       unsoldPool: updatedUnsold,
@@ -222,7 +224,7 @@ export const BattleArenaProvider = ({ children }) => {
         currentBid: Number(nextItem?.basePrice) || 1.0,
         highestBidder: null,
         bidHistory: [],
-        timer: 20,
+        timer: duration,
         isTimerRunning: true,
       },
     };
@@ -235,6 +237,7 @@ export const BattleArenaProvider = ({ children }) => {
     selectedTeams = null,
     squadSize = 3,
     startingPurse = 100,
+    countdownDuration = 20,
     customItems = null,
     customTournament = null,
   }) => {
@@ -253,12 +256,17 @@ export const BattleArenaProvider = ({ children }) => {
       ? selectedTeams
       : FIXED_TEAMS.slice(0, teamCount);
 
-    const activeTeams = teamsToUse.map((t) => ({
-      ...t,
-      initialPurse: startingPurse,
-      purse: startingPurse,
-      squad: [],
-    }));
+    const activeTeams = teamsToUse.map((t) => {
+      const p = Number(t.initialPurse != null ? t.initialPurse : (t.purse != null ? t.purse : startingPurse));
+      return {
+        ...t,
+        initialPurse: p,
+        purse: p,
+        squad: [],
+      };
+    });
+
+    const finalCountdown = Number(countdownDuration) || Number(customTournament?.rules?.countdownSeconds) || Number(customTournament?.rules?.countdownDuration) || 20;
 
     // Randomize pool order, preserving all metadata, unique IDs, base prices, and ratings
     const randomizedPool = [...pool].sort(() => Math.random() - 0.5).map((item, idx) => ({
@@ -293,6 +301,7 @@ export const BattleArenaProvider = ({ children }) => {
       teamCount,
       squadSize,
       startingPurse,
+      countdownDuration: finalCountdown,
       tournamentName: customTournament?.name || selectedPreset.name || 'Battle Arena Clash',
       themeColor: customTournament?.theme?.primary || selectedPreset.theme?.primary || '#FF8A35',
       tournamentMetadata: customTournament || null,
@@ -303,7 +312,8 @@ export const BattleArenaProvider = ({ children }) => {
         currentBid: Number(randomizedPool[0]?.basePrice) || 1.0,
         highestBidder: null,
         bidHistory: [],
-        timer: 20,
+        timer: finalCountdown,
+        countdownDuration: finalCountdown,
         isTimerRunning: true,
         status: 'in_progress',
       },
@@ -360,7 +370,7 @@ export const BattleArenaProvider = ({ children }) => {
         ...prev.auction,
         currentBid: calculatedTarget,
         highestBidder: teamId,
-        timer: 20, // Reset timer on new bid
+        timer: prev.auction.countdownDuration || prev.countdownDuration || 20, // Reset timer on new bid
         isTimerRunning: true,
         bidHistory: [
           { teamId, amount: calculatedTarget, timestamp: new Date().toLocaleTimeString() },
@@ -403,7 +413,7 @@ export const BattleArenaProvider = ({ children }) => {
         currentBid: Number(reItems[0]?.basePrice) || 1.0,
         highestBidder: null,
         bidHistory: [],
-        timer: 20,
+        timer: prev.auction.countdownDuration || prev.countdownDuration || 20,
         isTimerRunning: true,
         status: 'in_progress',
       },
@@ -645,7 +655,7 @@ export const BattleArenaProvider = ({ children }) => {
       ...prev,
       auction: {
         ...prev.auction,
-        timer: 20,
+        timer: prev.auction.countdownDuration || prev.countdownDuration || 20,
         isTimerRunning: true,
       },
     }));

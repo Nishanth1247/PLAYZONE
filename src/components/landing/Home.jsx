@@ -1048,6 +1048,9 @@ export const Home = ({ onSwitchToParty }) => {
         onImportSuccess={() => {
           refreshCustomTournaments();
         }}
+        onLaunchTournament={(runtimeConfig) => {
+          saveAndLaunchCustomTournament(runtimeConfig);
+        }}
       />
 
       {/* Tournament Editor Modal */}

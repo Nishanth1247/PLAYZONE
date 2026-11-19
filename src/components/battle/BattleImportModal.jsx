@@ -17,6 +17,11 @@ import {
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { validateBattleTournamentJSON } from '../../services/battleImportService';
+import { CreateWithChatGPTCard } from '../common/CreateWithChatGPTCard';
+import { BATTLE_ARENA_CHATGPT_PROMPT } from '../../services/chatGptPrompts';
+import { ImportConfigForm } from '../custom/ImportConfigForm';
+import { extractImportTournamentDefaults } from '../../services/importConfigService';
+import { useBattleArena } from '../../context/BattleArenaContext';
 import { toast } from 'sonner';
 
 export const BattleImportModal = ({
@@ -28,6 +33,9 @@ export const BattleImportModal = ({
 }) => {
   if (!isOpen) return null;
 
+  const { initializeBattleTournament } = useBattleArena();
+
+  const [modalStage, setModalStage] = useState('input'); // 'input' | 'config'
   const [activeTab, setActiveTab] = useState('upload'); // 'upload' | 'paste'
   const [jsonText, setJsonText] = useState('');
   const [fileName, setFileName] = useState('');
@@ -95,6 +103,52 @@ export const BattleImportModal = ({
   const isValid = Boolean(validationResult && validationResult.isValid);
   const hasErrors = Boolean(validationResult && !validationResult.isValid);
 
+  const extractedDefaults = React.useMemo(() => {
+    if (!validationResult || !validationResult.isValid) return null;
+    const raw = validationResult.rawParsed || validationResult.tournament;
+    return extractImportTournamentDefaults(raw, 'battle');
+  }, [validationResult]);
+
+  const handleLaunchBattle = (runtimeConfig) => {
+    try {
+      const success = initializeBattleTournament({
+        teamCount: runtimeConfig.teams.length,
+        selectedTeams: runtimeConfig.teams,
+        squadSize: runtimeConfig.squadSize || squadSize,
+        startingPurse: runtimeConfig.teamBudgets?.defaultPurse || 100,
+        countdownDuration: runtimeConfig.rules?.countdownSeconds || 20,
+        customItems: runtimeConfig.items,
+        customTournament: runtimeConfig,
+      });
+
+      if (success) {
+        toast.success(`Launched Battle Arena with "${runtimeConfig.name}"!`);
+        if (onImportSuccess) {
+          onImportSuccess({
+            tournament: runtimeConfig,
+            items: runtimeConfig.items,
+            runtimeConfig,
+          });
+        }
+        onClose();
+      }
+    } catch (e) {
+      toast.error(`Failed to launch battle tournament: ${e.message}`);
+    }
+  };
+
+  const handleSaveToSetup = (runtimeConfig) => {
+    if (onImportSuccess) {
+      onImportSuccess({
+        tournament: runtimeConfig,
+        items: runtimeConfig.items,
+        runtimeConfig,
+      });
+    }
+    toast.success(`Loaded "${runtimeConfig.name}" into Battle Arena setup!`);
+    onClose();
+  };
+
   const handleConfirmImport = () => {
     if (!isValid || !validationResult?.tournament) {
       toast.error('Cannot import invalid tournament file.');
@@ -142,13 +196,17 @@ export const BattleImportModal = ({
               <Badge variant="orange" pulse>
                 BATTLE ARENA SETUP
               </Badge>
-              <Badge variant="cyan">JSON COMPATIBLE</Badge>
+              <Badge variant="cyan" className="font-mono text-[10px]">
+                {modalStage === 'config' ? 'Universal Configuration' : 'JSON COMPATIBLE'}
+              </Badge>
             </div>
             <h2 className="text-xl sm:text-2xl font-broadcast font-black text-white tracking-wider uppercase">
-              Import Tournament Roster
+              {modalStage === 'config' ? 'Configure Battle Tournament' : 'Import Tournament Roster'}
             </h2>
             <p className="text-xs text-battle-muted mt-0.5">
-              Load a custom tournament JSON for Battle Arena. Entries will enter the Round 1 auction block.
+              {modalStage === 'config'
+                ? 'Customize franchises, squad quotas, purses, and battle rules before entering the arena.'
+                : 'Load a custom tournament JSON for Battle Arena. Entries will enter the Round 1 auction block.'}
             </p>
           </div>
 
@@ -160,19 +218,44 @@ export const BattleImportModal = ({
           </button>
         </div>
 
-        {/* Target Requirement Notice */}
-        <div className="mb-5 p-3 rounded-2xl bg-battle-surface/70 border border-battle-border flex items-center justify-between text-xs font-mono relative z-10">
-          <div className="flex items-center gap-2 text-battle-text">
-            <Layers className="w-4 h-4 text-brand-orange flex-shrink-0" />
-            <span>
-              Target Requirement: <strong className="text-white">{teamCount} Teams</strong> ×{' '}
-              <strong className="text-white">{squadSize} Squad Size</strong>
-            </span>
+        {modalStage === 'config' && extractedDefaults ? (
+          <div className="relative z-10">
+            <ImportConfigForm
+              importedData={validationResult.rawParsed || validationResult.tournament}
+              defaults={extractedDefaults}
+              arenaType="battle"
+              onBackToUpload={() => setModalStage('input')}
+              onLaunch={handleLaunchBattle}
+              onSaveOnly={handleSaveToSetup}
+            />
           </div>
-          <span className="font-bold text-brand-orange px-2 py-0.5 rounded-lg bg-brand-orange/10 border border-brand-orange/30">
-            Min {requiredLots} Entries Required
-          </span>
-        </div>
+        ) : (
+          <>
+            {/* Section: CREATE YOUR OWN BATTLE TOURNAMENT — Create with ChatGPT */}
+            <div className="mb-5 relative z-10">
+              <CreateWithChatGPTCard
+                title="CREATE YOUR OWN BATTLE TOURNAMENT"
+                description="Generate a custom Battle Arena tournament with ChatGPT. Copy our prompt, create characters with power ratings, and import them here."
+                promptText={BATTLE_ARENA_CHATGPT_PROMPT}
+                targetPlatform="Battle Arena"
+                badgeText="BATTLE AI GENERATOR"
+                accentColor="#FF8A35"
+              />
+            </div>
+
+            {/* Target Requirement Notice */}
+            <div className="mb-5 p-3 rounded-2xl bg-battle-surface/70 border border-battle-border flex items-center justify-between text-xs font-mono relative z-10">
+              <div className="flex items-center gap-2 text-battle-text">
+                <Layers className="w-4 h-4 text-brand-orange flex-shrink-0" />
+                <span>
+                  Target Requirement: <strong className="text-white">{teamCount} Teams</strong> ×{' '}
+                  <strong className="text-white">{squadSize} Squad Size</strong>
+                </span>
+              </div>
+              <span className="font-bold text-brand-orange px-2 py-0.5 rounded-lg bg-brand-orange/10 border border-brand-orange/30">
+                Min {requiredLots} Entries Required
+              </span>
+            </div>
 
         {/* Mode Selector Tabs */}
         <div className="flex gap-2 p-1 rounded-2xl bg-battle-bg border border-battle-border mb-5 relative z-10">
@@ -366,21 +449,44 @@ export const BattleImportModal = ({
         )}
 
         {/* Modal Actions */}
-        <div className="flex items-center justify-end gap-3 pt-5 mt-5 border-t border-battle-border relative z-10">
+        <div className="flex items-center justify-between gap-3 pt-5 mt-5 border-t border-battle-border relative z-10">
           <Button variant="ghost" size="sm" onClick={onClose} className="text-xs">
             Cancel
           </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            disabled={!isValid}
-            onClick={handleConfirmImport}
-            className="text-xs bg-brand-orange hover:bg-orange-600 text-dark-950 font-broadcast font-black shadow-glow-orange flex items-center gap-1.5"
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>CONFIRM & IMPORT TO BATTLE ARENA</span>
-          </Button>
+
+          <div className="flex items-center gap-3">
+            {isValid && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleConfirmImport}
+                className="text-xs border-battle-border hover:border-brand-orange/40 font-bold"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-brand-neon" />
+                <span>Import with Defaults</span>
+              </Button>
+            )}
+
+            <Button
+              variant="primary"
+              size="sm"
+              disabled={!isValid}
+              onClick={() => {
+                if (isValid && extractedDefaults) {
+                  setModalStage('config');
+                } else {
+                  handleConfirmImport();
+                }
+              }}
+              className="text-xs bg-brand-orange hover:bg-orange-600 text-dark-950 font-broadcast font-black shadow-glow-orange flex items-center gap-1.5"
+            >
+              <span>CONFIGURE TOURNAMENT</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
+          </div>
         </div>
+          </>
+        )}
       </motion.div>
     </div>
   );

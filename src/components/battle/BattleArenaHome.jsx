@@ -394,10 +394,22 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
         onClose={() => setIsImportModalOpen(false)}
         teamCount={teamCount}
         squadSize={squadSize}
-        onImportSuccess={({ tournament, items }) => {
+        onImportSuccess={({ tournament, items, runtimeConfig }) => {
           setImportedTournament(tournament);
           setCustomFileItems(items);
           setCustomTournamentName(tournament.name);
+          if (runtimeConfig) {
+            if (runtimeConfig.teams && runtimeConfig.teams.length >= 2 && runtimeConfig.teams.length <= 4) {
+              setTeamCount(runtimeConfig.teams.length);
+              setSelectedTeamIds(runtimeConfig.teams.map((t) => t.id));
+            }
+            if (runtimeConfig.squadSize) {
+              setSquadSize(runtimeConfig.squadSize);
+            }
+            if (runtimeConfig.teamBudgets?.defaultPurse) {
+              setStartingPurse(runtimeConfig.teamBudgets.defaultPurse);
+            }
+          }
         }}
       />
     </div>

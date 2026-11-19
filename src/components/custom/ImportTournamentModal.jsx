@@ -23,11 +23,18 @@ import { validateTournamentJSON, normalizeTournamentData, generateUniqueId } fro
 import { storageService } from '../../services/storageService';
 import { CreateWithChatGPTCard } from '../common/CreateWithChatGPTCard';
 import { AUCTION_ARENA_CHATGPT_PROMPT } from '../../services/chatGptPrompts';
+import { ImportConfigForm } from './ImportConfigForm';
+import { extractImportTournamentDefaults } from '../../services/importConfigService';
+import { useAuction } from '../../context/AuctionContext';
 import { toast } from 'sonner';
 
-export const ImportTournamentModal = ({ isOpen, onClose, onImportSuccess }) => {
+export const ImportTournamentModal = ({ isOpen, onClose, onImportSuccess, onLaunchTournament }) => {
   if (!isOpen) return null;
 
+  const auctionCtx = useAuction();
+  const saveAndLaunchCustomTournament = onLaunchTournament || auctionCtx?.saveAndLaunchCustomTournament;
+
+  const [modalStage, setModalStage] = useState('input'); // 'input' | 'config'
   const [activeTab, setActiveTab] = useState('upload'); // 'upload' | 'paste'
   const [jsonText, setJsonText] = useState('');
   const [fileName, setFileName] = useState('');
@@ -129,6 +136,37 @@ export const ImportTournamentModal = ({ isOpen, onClose, onImportSuccess }) => {
   const parsedTournament = parsedData?.tournament || parsedData;
   const parsedEntries = parsedData?.entries || parsedData?.items || [];
 
+  const extractedDefaults = React.useMemo(() => {
+    if (!parsedData) return null;
+    return extractImportTournamentDefaults(parsedData, 'auction');
+  }, [parsedData]);
+
+  const handleLaunchRuntimeConfig = (runtimeConfig) => {
+    try {
+      if (saveAndLaunchCustomTournament) {
+        saveAndLaunchCustomTournament(runtimeConfig);
+      } else {
+        storageService.saveCustomTournament(runtimeConfig);
+      }
+      toast.success(`Launching "${runtimeConfig.name}" in Auction Arena!`);
+      if (onImportSuccess) onImportSuccess(runtimeConfig);
+      onClose();
+    } catch (err) {
+      toast.error(`Failed to launch tournament: ${err.message}`);
+    }
+  };
+
+  const handleSaveOnlyRuntimeConfig = (runtimeConfig) => {
+    try {
+      const saved = storageService.saveCustomTournament(runtimeConfig);
+      toast.success(`Tournament "${saved.name}" saved to My Custom Tournaments!`);
+      if (onImportSuccess) onImportSuccess(saved);
+      onClose();
+    } catch (err) {
+      toast.error(`Failed to save tournament: ${err.message}`);
+    }
+  };
+
   const handleSaveTournament = () => {
     if (!isValid || !parsedData) {
       toast.error('Please fix validation errors before creating tournament');
@@ -185,27 +223,31 @@ export const ImportTournamentModal = ({ isOpen, onClose, onImportSuccess }) => {
                 <span>Custom Tournament</span>
               </Badge>
               <Badge variant="outline" className="border-battle-border text-battle-muted text-[10px] font-mono">
-                schemaVersion: 1
+                {modalStage === 'config' ? 'Universal Configuration' : 'schemaVersion: 1'}
               </Badge>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-white font-broadcast uppercase tracking-wide">
-              Import Tournament JSON
+              {modalStage === 'config' ? 'Configure Tournament' : 'Import Tournament JSON'}
             </h2>
             <p className="text-xs text-battle-muted mt-1 max-w-xl">
-              Import any custom tournament into your saved presets. The tournament will be saved safely for you to launch whenever you're ready.
+              {modalStage === 'config'
+                ? 'Customize franchises, team budgets, squad limits, and auction rules before launch.'
+                : 'Import any custom tournament into your saved presets. The tournament will be saved safely for you to launch whenever you\'re ready.'}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownloadSample}
-              className="text-xs border-brand-cyan/40 text-brand-cyan hover:bg-brand-cyan/10"
-            >
-              <Download className="w-3.5 h-3.5 mr-1" />
-              <span>Sample Template</span>
-            </Button>
+            {modalStage === 'input' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadSample}
+                className="text-xs border-brand-cyan/40 text-brand-cyan hover:bg-brand-cyan/10"
+              >
+                <Download className="w-3.5 h-3.5 mr-1" />
+                <span>Sample Template</span>
+              </Button>
+            )}
             <button
               onClick={onClose}
               className="p-2 rounded-xl bg-battle-surface hover:bg-battle-card border border-battle-border text-battle-muted hover:text-white transition-colors"
@@ -215,7 +257,20 @@ export const ImportTournamentModal = ({ isOpen, onClose, onImportSuccess }) => {
           </div>
         </div>
 
-        {/* Section: CREATE YOUR OWN TOURNAMENT — Create with ChatGPT */}
+        {modalStage === 'config' && extractedDefaults ? (
+          <div className="relative z-10">
+            <ImportConfigForm
+              importedData={parsedData}
+              defaults={extractedDefaults}
+              arenaType="auction"
+              onBackToUpload={() => setModalStage('input')}
+              onLaunch={handleLaunchRuntimeConfig}
+              onSaveOnly={handleSaveOnlyRuntimeConfig}
+            />
+          </div>
+        ) : (
+          <>
+            {/* Section: CREATE YOUR OWN TOURNAMENT — Create with ChatGPT */}
         <div className="mb-6 relative z-10">
           <CreateWithChatGPTCard
             title="CREATE YOUR OWN TOURNAMENT"
@@ -457,17 +512,40 @@ export const ImportTournamentModal = ({ isOpen, onClose, onImportSuccess }) => {
             Cancel
           </Button>
 
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={handleSaveTournament}
-            disabled={!isValid || isProcessing}
-            className="shadow-glow-purple group"
-          >
-            <CheckCircle2 className="w-4 h-4 mr-2 text-brand-neon group-hover:scale-110 transition-transform" />
-            <span>CREATE TOURNAMENT</span>
-          </Button>
+          <div className="flex items-center gap-3">
+            {isValid && (
+              <Button
+                variant="outline"
+                size="md"
+                onClick={handleSaveTournament}
+                disabled={!isValid || isProcessing}
+                className="text-xs font-bold border-battle-border hover:border-brand-purple/40"
+              >
+                <CheckCircle2 className="w-4 h-4 mr-1.5 text-brand-neon" />
+                <span>Save with JSON Defaults</span>
+              </Button>
+            )}
+
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => {
+                if (isValid && extractedDefaults) {
+                  setModalStage('config');
+                } else {
+                  handleSaveTournament();
+                }
+              }}
+              disabled={!isValid || isProcessing}
+              className="shadow-glow-purple group font-broadcast tracking-wider"
+            >
+              <span>CONFIGURE TOURNAMENT</span>
+              <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
         </div>
+          </>
+        )}
       </motion.div>
     </div>
   );
