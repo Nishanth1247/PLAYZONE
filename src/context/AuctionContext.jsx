@@ -288,13 +288,17 @@ export const AuctionProvider = ({ children }) => {
     }
 
     const defaultPurse = Number(tournamentPreset.teamBudgets?.defaultPurse || 100);
-    const configuredTeams = FIXED_TEAMS.map((t, idx) => {
+    const baseTeamsToUse = (tournamentPreset.teams && Array.isArray(tournamentPreset.teams) && tournamentPreset.teams.length >= 2 && tournamentPreset.teams.length <= 4)
+      ? tournamentPreset.teams
+      : FIXED_TEAMS;
+
+    const configuredTeams = baseTeamsToUse.map((t, idx) => {
       const customT = tournamentPreset.teamBudgets?.teams?.find(
         (ct) => ct.id === t.id || ct.name?.toLowerCase() === t.name.toLowerCase()
       ) || tournamentPreset.teams?.find(
         (ct) => ct.id === t.id || ct.name?.toLowerCase() === t.name.toLowerCase()
       );
-      const purse = Number(customT?.purse || customT?.initialPurse || defaultPurse);
+      const purse = Number(customT?.purse || customT?.initialPurse || t.purse || t.initialPurse || defaultPurse);
       return {
         ...t,
         initialPurse: purse,

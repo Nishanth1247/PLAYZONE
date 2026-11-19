@@ -17,7 +17,7 @@ export const TeamBudgetConfig = ({
 
   // Stable base teams definition
   const baseTeams = useMemo(() => {
-    return initialTeams && initialTeams.length === 4 ? initialTeams : FIXED_TEAMS;
+    return initialTeams && initialTeams.length >= 2 ? initialTeams : FIXED_TEAMS;
   }, [initialTeams ? initialTeams.map(t => `${t.id}:${t.name}`).join(',') : '']);
 
   // Individual budgets state keyed by team id
@@ -29,6 +29,21 @@ export const TeamBudgetConfig = ({
     return defaultObj;
   });
 
+  // Sync team budgets when baseTeams changes (e.g. dynamic team selection)
+  useEffect(() => {
+    setTeamBudgets((prev) => {
+      const updated = { ...prev };
+      let changed = false;
+      baseTeams.forEach((t) => {
+        if (updated[t.id] === undefined) {
+          updated[t.id] = String(t.initialPurse || t.purse || commonPurseInput || '100');
+          changed = true;
+        }
+      });
+      return changed ? updated : prev;
+    });
+  }, [baseTeams, commonPurseInput]);
+
   const [fieldErrors, setFieldErrors] = useState({});
 
   // Validate budgets and report to parent
@@ -38,7 +53,7 @@ export const TeamBudgetConfig = ({
     let totalPurse = 0;
 
     const configuredTeams = baseTeams.map((t) => {
-      const rawVal = teamBudgets[t.id];
+      const rawVal = teamBudgets[t.id] !== undefined ? teamBudgets[t.id] : String(t.initialPurse || t.purse || '100');
       if (rawVal === undefined || rawVal === null || String(rawVal).trim() === '') {
         errors[t.id] = 'Budget is required';
         hasError = true;
@@ -120,7 +135,7 @@ export const TeamBudgetConfig = ({
           <div className="flex items-center gap-2">
             <Coins className="w-5 h-5 text-amber-400" />
             <h3 className="font-broadcast font-black text-lg text-white uppercase tracking-wider">
-              Franchise Starting Purse Configuration
+              Franchise Starting Purse Configuration ({baseTeams.length} Teams)
             </h3>
           </div>
           <p className="text-xs text-battle-muted">
@@ -196,7 +211,7 @@ export const TeamBudgetConfig = ({
       </div>
 
       {/* Individual Contender Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${baseTeams.length === 2 ? 'lg:grid-cols-2 max-w-2xl mx-auto' : baseTeams.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-3.5`}>
         {baseTeams.map((team) => {
           const hasError = Boolean(fieldErrors[team.id]);
           const currentVal = teamBudgets[team.id] ?? '100';
@@ -295,7 +310,7 @@ export const TeamBudgetConfig = ({
 
         <div className="flex items-center gap-4 text-battle-muted font-bold">
           <span>
-            Average: <strong className="text-white font-mono">{currency.symbol}{(currentTotal / 4).toFixed(2)} {currency.unit}</strong>
+            Average: <strong className="text-white font-mono">{currency.symbol}{(currentTotal / (baseTeams.length || 1)).toFixed(2)} {currency.unit}</strong>
           </span>
           <span className="text-battle-border">|</span>
           <span>

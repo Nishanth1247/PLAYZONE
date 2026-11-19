@@ -30,6 +30,7 @@ import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { formatCurrency } from '../common/CurrencyDisplay';
 import { TeamBudgetConfig } from './TeamBudgetConfig';
+import { FranchiseSelector } from '../common/FranchiseSelector';
 
 const CATEGORIES = ['Cricket', 'Football', 'Movies', 'Celebrities', 'Gaming', 'Friends / Custom'];
 
@@ -84,7 +85,15 @@ export const SetupWizard = () => {
   const [bulkText, setBulkText] = useState('');
   const [showBulkInput, setShowBulkInput] = useState(false);
 
-  // Step 3 State: Teams (Fixed Four Contenders)
+  // Step 3 State: Dynamic Franchise Selection & Purses
+  const [teamCount, setTeamCount] = useState(4);
+  const [selectedTeamIds, setSelectedTeamIds] = useState(FIXED_TEAMS.map((t) => t.id));
+  const selectedTeams = React.useMemo(() => {
+    return selectedTeamIds
+      .map((id) => FIXED_TEAMS.find((t) => t.id === id))
+      .filter(Boolean);
+  }, [selectedTeamIds]);
+
   const [defaultPurse, setDefaultPurse] = useState(100);
   const [teams, setTeams] = useState(
     FIXED_TEAMS.map((t) => ({ ...t, initialPurse: 100, purse: 100 }))
@@ -308,8 +317,12 @@ export const SetupWizard = () => {
       }
     }
     if (step === 3) {
+      if (selectedTeamIds.length !== teamCount) {
+        setErrorMsg(`Please select exactly ${teamCount} franchises (${selectedTeamIds.length}/${teamCount} selected).`);
+        return false;
+      }
       if (teams.length < 2) {
-        setErrorMsg('Create at least 2 teams for competitive bidding.');
+        setErrorMsg('Select at least 2 teams for competitive bidding.');
         return false;
       }
     }
@@ -719,15 +732,25 @@ export const SetupWizard = () => {
           >
             <div>
               <h2 className="text-2xl font-black text-white font-broadcast uppercase tracking-wide">
-                Step 3: Contending Franchises & Starting Purse ({teams.length})
+                Step 3: Contending Franchises & Starting Purse ({selectedTeams.length})
               </h2>
               <p className="text-xs text-battle-muted">
-                Configure starting capital for the 4 official contenders or assign individual purses.
+                Select participating franchises (2, 3, or 4 teams) and configure their starting auction purse.
               </p>
             </div>
 
+            {/* Dynamic Team Selector */}
+            <FranchiseSelector
+              teamCount={teamCount}
+              onTeamCountChange={setTeamCount}
+              selectedTeamIds={selectedTeamIds}
+              onSelectedTeamsChange={setSelectedTeamIds}
+              arenaType="auction"
+              showCountSelector={true}
+            />
+
             <TeamBudgetConfig
-              initialTeams={teams}
+              initialTeams={selectedTeams}
               currency={currency}
               onChange={(cfg) => {
                 if (cfg.isValid) {

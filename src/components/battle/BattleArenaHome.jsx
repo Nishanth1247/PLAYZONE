@@ -17,15 +17,55 @@ import {
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { FIXED_TEAMS, AUCTION_PRESETS } from '../../services/presets';
+import { FranchiseSelector } from '../common/FranchiseSelector';
 import { useBattleArena } from '../../context/BattleArenaContext';
 import { storageService } from '../../services/storageService';
 import { BattleImportModal } from './BattleImportModal';
 import { toast } from 'sonner';
 
+const BATTLE_TEAMS_STORAGE_KEY = 'bidbattle_battle_teams_selection';
+
 export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   const { initializeBattleTournament } = useBattleArena();
 
-  const [teamCount, setTeamCount] = useState(4);
+  // Restore team count & selected team IDs independently from Battle LocalStorage
+  const [teamCount, setTeamCount] = useState(() => {
+    try {
+      const saved = localStorage.getItem(BATTLE_TEAMS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if ([2, 3, 4].includes(parsed.teamCount)) return parsed.teamCount;
+      }
+    } catch (e) {}
+    return 4;
+  });
+
+  const [selectedTeamIds, setSelectedTeamIds] = useState(() => {
+    try {
+      const saved = localStorage.getItem(BATTLE_TEAMS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed.selectedTeamIds) && parsed.selectedTeamIds.length > 0) {
+          const valid = parsed.selectedTeamIds.filter((id) =>
+            FIXED_TEAMS.some((ft) => ft.id === id)
+          );
+          if (valid.length > 0) return valid;
+        }
+      }
+    } catch (e) {}
+    return FIXED_TEAMS.map((t) => t.id);
+  });
+
+  // Save battle selection to independent LocalStorage key
+  React.useEffect(() => {
+    try {
+      localStorage.setItem(
+        BATTLE_TEAMS_STORAGE_KEY,
+        JSON.stringify({ teamCount, selectedTeamIds })
+      );
+    } catch (e) {}
+  }, [teamCount, selectedTeamIds]);
+
   const [squadSize, setSquadSize] = useState(3);
   const [startingPurse, setStartingPurse] = useState(100);
   const [selectedPresetId, setSelectedPresetId] = useState(AUCTION_PRESETS[0].id);
@@ -34,8 +74,14 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   const [customTournamentName, setCustomTournamentName] = useState('');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
-  // Selected teams based on team count
-  const activeTeams = FIXED_TEAMS.slice(0, teamCount);
+  // Selected teams based on user choice
+  const activeTeams = React.useMemo(() => {
+    return selectedTeamIds
+      .map((id) => FIXED_TEAMS.find((t) => t.id === id))
+      .filter(Boolean);
+  }, [selectedTeamIds]);
+
+  const isSelectionValid = selectedTeamIds.length === teamCount;
 
   // Selected preset
   const selectedPreset = AUCTION_PRESETS.find((p) => p.id === selectedPresetId) || AUCTION_PRESETS[0];
@@ -45,6 +91,10 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   const isPoolSufficient = activePool.length >= requiredPoolLots;
 
   const handleStartTournament = () => {
+    if (!isSelectionValid) {
+      toast.error(`Please select exactly ${teamCount} franchises before starting (${selectedTeamIds.length}/${teamCount} selected).`);
+      return;
+    }
     if (!isPoolSufficient) {
       toast.error(`Not enough lots in pool! Need at least ${requiredPoolLots} items for ${teamCount} teams of ${squadSize}.`);
       return;
@@ -53,6 +103,7 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
     const success = initializeBattleTournament({
       preset: selectedPreset,
       teamCount,
+      selectedTeams: activeTeams,
       squadSize,
       startingPurse: Number(startingPurse) || 100,
       customItems: importedTournament?.items || customFileItems,
@@ -91,64 +142,28 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
           </p>
         </div>
 
+        {/* DYNAMIC FRANCHISE SELECTION (STEP 1 & 2) */}
+        <div className="max-w-5xl mx-auto">
+          <FranchiseSelector
+            teamCount={teamCount}
+            onTeamCountChange={setTeamCount}
+            selectedTeamIds={selectedTeamIds}
+            onSelectedTeamsChange={setSelectedTeamIds}
+            arenaType="battle"
+            showCountSelector={true}
+          />
+        </div>
+
         {/* SETUP CONFIGURATION GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-5xl mx-auto">
           
-          {/* LEFT: TEAM & SQUAD SETTINGS (7 COLS) */}
-          <div className="lg:col-span-7 battle-panel rounded-3xl p-6 sm:p-8 border border-brand-orange/40 shadow-xl space-y-6">
+          {/* LEFT: SQUAD & PURSE SETTINGS (6 COLS) */}
+          <div className="lg:col-span-6 battle-panel rounded-3xl p-6 sm:p-8 border border-brand-orange/40 shadow-xl space-y-6">
             
-            {/* 1. Team Count Selector */}
+            {/* Squad Size Selector */}
             <div>
               <label className="text-xs font-bold font-broadcast uppercase text-battle-muted tracking-wider block mb-3 flex items-center justify-between">
-                <span>1. Select Participating Teams</span>
-                <span className="text-brand-cyan font-mono font-black">{teamCount} Teams</span>
-              </label>
-
-              <div className="grid grid-cols-3 gap-3">
-                {[2, 3, 4].map((cnt) => (
-                  <button
-                    key={cnt}
-                    type="button"
-                    onClick={() => setTeamCount(cnt)}
-                    className={`py-3 px-2 rounded-2xl border font-broadcast text-sm transition-all text-center ${
-                      teamCount === cnt
-                        ? 'bg-brand-orange text-dark-950 font-black border-brand-orange shadow-glow-orange'
-                        : 'bg-battle-surface text-battle-muted hover:text-white border-battle-border'
-                    }`}
-                  >
-                    <span className="block font-black text-base">{cnt} TEAMS</span>
-                    <span className="text-[10px] opacity-80 block font-mono">
-                      {cnt === 2 ? '1-vs-1 Duel' : cnt === 3 ? 'Triple Threat' : '4-Way Showdown'}
-                    </span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Participating Franchises Preview */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 pt-3 border-t border-battle-border/60">
-                {activeTeams.map((t) => (
-                  <div
-                    key={t.id}
-                    className="p-2 rounded-xl bg-battle-bg border border-battle-border flex items-center gap-2"
-                  >
-                    <span
-                      className="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-                      style={{ backgroundColor: t.color }}
-                    >
-                      {t.logo}
-                    </span>
-                    <span className="text-xs font-broadcast font-bold text-white truncate">
-                      {t.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 2. Squad Size Selector */}
-            <div className="pt-2">
-              <label className="text-xs font-bold font-broadcast uppercase text-battle-muted tracking-wider block mb-3 flex items-center justify-between">
-                <span>2. Required Squad Size Per Team</span>
+                <span>Required Squad Size Per Team</span>
                 <span className="text-brand-neon font-mono font-black">{squadSize} Players</span>
               </label>
 
@@ -191,10 +206,10 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
               </p>
             </div>
 
-            {/* 3. Starting Purse Configuration */}
+            {/* Starting Purse Configuration */}
             <div className="pt-2">
               <label className="text-xs font-bold font-broadcast uppercase text-battle-muted tracking-wider block mb-2 flex items-center justify-between">
-                <span>3. Equal Starting Purse</span>
+                <span>Equal Starting Purse</span>
                 <span className="text-amber-400 font-mono font-bold">₹{startingPurse} Cr / Team</span>
               </label>
 
@@ -218,8 +233,8 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
 
           </div>
 
-          {/* RIGHT: TOURNAMENT ROSTER SELECTION (5 COLS) */}
-          <div className="lg:col-span-5 battle-panel rounded-3xl p-6 sm:p-8 border border-brand-purple/40 shadow-xl space-y-6 flex flex-col justify-between">
+          {/* RIGHT: TOURNAMENT ROSTER SELECTION (6 COLS) */}
+          <div className="lg:col-span-6 battle-panel rounded-3xl p-6 sm:p-8 border border-brand-purple/40 shadow-xl space-y-6 flex flex-col justify-between">
             <div className="space-y-4">
               <label className="text-xs font-bold font-broadcast uppercase text-battle-muted tracking-wider block">
                 4. Select Tournament Roster
@@ -348,11 +363,17 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
             </div>
 
             {/* Launch Round 1 Auction Button */}
-            <div className="pt-4">
+            <div className="pt-4 space-y-2">
+              {!isSelectionValid && (
+                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-broadcast font-bold flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>Select exactly {teamCount} franchises to start ({selectedTeamIds.length}/{teamCount} selected).</span>
+                </div>
+              )}
               <Button
                 variant="primary"
                 size="xl"
-                disabled={!isPoolSufficient}
+                disabled={!isPoolSufficient || !isSelectionValid}
                 onClick={handleStartTournament}
                 className="w-full font-broadcast text-base shadow-glow-orange bg-brand-orange hover:bg-orange-600 text-dark-950 font-black flex items-center justify-center gap-2"
               >

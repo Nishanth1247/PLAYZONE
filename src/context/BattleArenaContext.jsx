@@ -231,6 +231,7 @@ export const BattleArenaProvider = ({ children }) => {
   const initializeBattleTournament = ({
     preset,
     teamCount = 4,
+    selectedTeams = null,
     squadSize = 3,
     startingPurse = 100,
     customItems = null,
@@ -246,8 +247,12 @@ export const BattleArenaProvider = ({ children }) => {
       return false;
     }
 
-    // Configure teams for 2, 3, or 4 teams
-    const activeTeams = FIXED_TEAMS.slice(0, teamCount).map((t) => ({
+    // Configure teams for 2, 3, or 4 teams using selected franchises
+    const teamsToUse = (selectedTeams && Array.isArray(selectedTeams) && selectedTeams.length === teamCount)
+      ? selectedTeams
+      : FIXED_TEAMS.slice(0, teamCount);
+
+    const activeTeams = teamsToUse.map((t) => ({
       ...t,
       initialPurse: startingPurse,
       purse: startingPurse,

@@ -344,10 +344,10 @@ export function normalizeTournamentData(rawInput, options = {}) {
 
   // Four Fixed Teams with configured budgets
   const FIXED_TEAMS_META = [
-    { id: 'team-nishanth', name: 'Nishanth', shortName: 'NIS', color: '#9147FF', logo: '👑' },
-    { id: 'team-ajmal', name: 'Ajmal', shortName: 'AJM', color: '#00D9FF', logo: '⚡' },
-    { id: 'team-praneeth', name: 'Praneeth', shortName: 'PRA', color: '#FF8A35', logo: '🔥' },
-    { id: 'team-nagulan', name: 'Nagulan', shortName: 'NAG', color: '#B7F34A', logo: '🛡️' },
+    { id: 'team-nishanth', name: 'Nishanth', owner: 'Nishanth', shortName: 'NIS', color: '#9147FF', logo: '👑' },
+    { id: 'team-ajmal', name: 'Ajmal', owner: 'Ajmal', shortName: 'AJM', color: '#00D9FF', logo: '⚡' },
+    { id: 'team-praneeth', name: 'Praneeth', owner: 'Praneeth', shortName: 'PRA', color: '#FF8A35', logo: '🔥' },
+    { id: 'team-nagulan', name: 'Nagulan', owner: 'Nagulan', shortName: 'NAG', color: '#B7F34A', logo: '🛡️' },
   ];
 
   const individualBudgets = tInfo.teamBudgets?.individual || {};

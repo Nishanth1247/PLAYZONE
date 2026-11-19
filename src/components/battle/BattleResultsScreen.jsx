@@ -289,7 +289,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
 
         {/* Tab 2: Full Team Rosters (Revealing ratings now that tournament has ended) */}
         {activeTab === 'rosters' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className={`grid grid-cols-1 sm:grid-cols-2 ${teams.length === 3 ? 'lg:grid-cols-3' : teams.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-2'} gap-4`}>
             {teams.map((t) => (
               <div key={t.id} className="p-4 rounded-2xl bg-battle-bg border border-battle-border space-y-3">
                 <div className="flex items-center justify-between pb-2 border-b border-battle-border">

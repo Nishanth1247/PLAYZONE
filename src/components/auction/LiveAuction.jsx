@@ -634,7 +634,7 @@ export const LiveAuction = () => {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className={`grid grid-cols-1 ${teams.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-2`}>
               {teams.map((t) => {
                 const isLeading = highestBidder === t.id;
                 const squadCount = auction.items.filter((i) => i.soldTo === t.id).length;

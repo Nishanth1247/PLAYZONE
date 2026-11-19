@@ -3,7 +3,7 @@
  * Handles Matchmaking schedules, Battle combat evaluation, and Leaderboard standings
  */
 
-import { FIXED_TEAMS } from './presets';
+import { FIXED_TEAMS } from './presets.js';
 
 export const BATTLE_STORAGE_KEY = 'bidbattle_battle_arena_v1';
 
