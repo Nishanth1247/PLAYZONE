@@ -57,6 +57,7 @@ export const BattleArenaProvider = ({ children }) => {
       completedMatches: [],
       privateFighterSelection: {}, // { [teamId]: playerId }
       currentMatchEvaluation: null,
+      matchStage: 'faceoff', // 'faceoff' | 'teamA_select' | 'teamA_locked' | 'teamB_select' | 'evaluated' | 'confirmed'
       leaderboard: [],
     };
   });
@@ -434,67 +435,161 @@ export const BattleArenaProvider = ({ children }) => {
       currentMatchIndex: 0,
       privateFighterSelection: {},
       currentMatchEvaluation: null,
+      matchStage: 'faceoff',
     }));
     soundService.playBid();
   };
 
-  // 8. Private Fighter Selection for Match
-  const selectPrivateFighter = (teamId, playerId) => {
+  // 8. Start Fighter Selection from Pre-Match Face-Off Screen (BIDBATTLE 7.7)
+  const startFighterSelection = () => {
+    setBattleState((prev) => ({
+      ...prev,
+      matchStage: 'teamA_select',
+    }));
+  };
+
+  // 8a. Team A Selects Fighter (Saved privately, then transitions to privacy lock screen)
+  const selectTeamAFighter = (playerId) => {
     setBattleState((prev) => {
+      const currentMatch = prev.schedule[prev.currentMatchIndex];
+      return {
+        ...prev,
+        privateFighterSelection: {
+          ...prev.privateFighterSelection,
+          [currentMatch.teamAId]: playerId,
+        },
+        matchStage: 'teamA_locked',
+      };
+    });
+  };
+
+  // 8b. Proceed from Team A Locked to Team B Selection
+  const proceedToTeamB = () => {
+    setBattleState((prev) => ({
+      ...prev,
+      matchStage: 'teamB_select',
+    }));
+  };
+
+  // 8c. Team B Selects Fighter (Simultaneous Reveal & Immediate Evaluation)
+  const selectTeamBFighter = (playerId) => {
+    setBattleState((prev) => {
+      const currentMatch = prev.schedule[prev.currentMatchIndex];
       const updatedPicks = {
         ...prev.privateFighterSelection,
-        [teamId]: playerId,
+        [currentMatch.teamBId]: playerId,
       };
 
-      const currentMatch = prev.schedule[prev.currentMatchIndex];
-      const hasTeamAPick = Boolean(updatedPicks[currentMatch.teamAId]);
-      const hasTeamBPick = Boolean(updatedPicks[currentMatch.teamBId]);
+      const teamA = prev.teams.find((t) => t.id === currentMatch.teamAId);
+      const teamB = prev.teams.find((t) => t.id === currentMatch.teamBId);
 
-      // If both teams have picked privately, evaluate match!
-      if (hasTeamAPick && hasTeamBPick) {
+      const playerA = teamA.squad.find((p) => p.id === updatedPicks[currentMatch.teamAId]);
+      const playerB = teamB.squad.find((p) => p.id === playerId);
+
+      const evaluation = evaluateBattleMatch(playerA, playerB);
+
+      let winnerId = null;
+      let isDraw = false;
+      if (evaluation.winner === 'A') {
+        winnerId = teamA.id;
+      } else if (evaluation.winner === 'B') {
+        winnerId = teamB.id;
+      } else {
+        isDraw = true;
+      }
+
+      // Dramatic sound effect on simultaneous reveal
+      if (isDraw) {
+        soundService.playGavel();
+      } else {
+        soundService.playSold();
+      }
+
+      return {
+        ...prev,
+        privateFighterSelection: updatedPicks,
+        currentMatchEvaluation: {
+          ...evaluation,
+          playerA,
+          playerB,
+          winnerId,
+          isDraw,
+        },
+        matchStage: 'evaluated',
+      };
+    });
+  };
+
+  // 8d. Explicit Match Result Confirmation (BIDBATTLE 7.7)
+  const confirmMatchResult = () => {
+    setBattleState((prev) => {
+      if (!prev.currentMatchEvaluation || prev.matchStage !== 'evaluated') return prev;
+
+      const currentMatch = prev.schedule[prev.currentMatchIndex];
+      const { playerA, playerB, winnerId, isDraw, diff, scoreA, scoreB } = prev.currentMatchEvaluation;
+
+      const evaluatedMatch = {
+        ...currentMatch,
+        teamAPlayer: playerA,
+        teamBPlayer: playerB,
+        winnerId,
+        isDraw,
+        scoreDiff: diff,
+        teamAScore: scoreA,
+        teamBScore: scoreB,
+        status: 'completed',
+      };
+
+      const updatedSchedule = prev.schedule.map((m, idx) =>
+        idx === prev.currentMatchIndex ? evaluatedMatch : m
+      );
+
+      const updatedCompleted = [...prev.completedMatches, evaluatedMatch];
+      const updatedLeaderboard = calculateLeaderboard(prev.teams, updatedCompleted);
+
+      toast.success('Match result confirmed! Tournament standings updated.');
+
+      return {
+        ...prev,
+        schedule: updatedSchedule,
+        completedMatches: updatedCompleted,
+        usedPlayerIds: [...prev.usedPlayerIds, playerA.id, playerB.id],
+        leaderboard: updatedLeaderboard,
+        matchStage: 'confirmed',
+      };
+    });
+  };
+
+  // Fallback for direct private fighter selection
+  const selectPrivateFighter = (teamId, playerId) => {
+    setBattleState((prev) => {
+      const currentMatch = prev.schedule[prev.currentMatchIndex];
+      if (teamId === currentMatch.teamAId) {
+        return {
+          ...prev,
+          privateFighterSelection: {
+            ...prev.privateFighterSelection,
+            [teamId]: playerId,
+          },
+          matchStage: 'teamA_locked',
+        };
+      } else {
+        // Team B
+        const updatedPicks = {
+          ...prev.privateFighterSelection,
+          [teamId]: playerId,
+        };
         const teamA = prev.teams.find((t) => t.id === currentMatch.teamAId);
         const teamB = prev.teams.find((t) => t.id === currentMatch.teamBId);
-
         const playerA = teamA.squad.find((p) => p.id === updatedPicks[currentMatch.teamAId]);
-        const playerB = teamB.squad.find((p) => p.id === updatedPicks[currentMatch.teamBId]);
-
+        const playerB = teamB.squad.find((p) => p.id === playerId);
         const evaluation = evaluateBattleMatch(playerA, playerB);
 
         let winnerId = null;
         let isDraw = false;
-        if (evaluation.winner === 'A') {
-          winnerId = teamA.id;
-        } else if (evaluation.winner === 'B') {
-          winnerId = teamB.id;
-        } else {
-          isDraw = true;
-        }
-
-        const evaluatedMatch = {
-          ...currentMatch,
-          teamAPlayer: playerA,
-          teamBPlayer: playerB,
-          winnerId,
-          isDraw,
-          scoreDiff: evaluation.diff,
-          teamAScore: evaluation.scoreA,
-          teamBScore: evaluation.scoreB,
-          status: 'evaluated',
-        };
-
-        const updatedSchedule = prev.schedule.map((m, idx) =>
-          idx === prev.currentMatchIndex ? evaluatedMatch : m
-        );
-
-        const updatedCompleted = [...prev.completedMatches, evaluatedMatch];
-        const updatedLeaderboard = calculateLeaderboard(prev.teams, updatedCompleted);
-
-        // Play victory or draw sound
-        if (isDraw) {
-          soundService.playGavel();
-        } else {
-          soundService.playSold();
-        }
+        if (evaluation.winner === 'A') winnerId = teamA.id;
+        else if (evaluation.winner === 'B') winnerId = teamB.id;
+        else isDraw = true;
 
         return {
           ...prev,
@@ -506,17 +601,9 @@ export const BattleArenaProvider = ({ children }) => {
             winnerId,
             isDraw,
           },
-          schedule: updatedSchedule,
-          completedMatches: updatedCompleted,
-          usedPlayerIds: [...prev.usedPlayerIds, playerA.id, playerB.id],
-          leaderboard: updatedLeaderboard,
+          matchStage: 'evaluated',
         };
       }
-
-      return {
-        ...prev,
-        privateFighterSelection: updatedPicks,
-      };
     });
   };
 
@@ -537,6 +624,7 @@ export const BattleArenaProvider = ({ children }) => {
         currentMatchIndex: nextIndex,
         privateFighterSelection: {},
         currentMatchEvaluation: null,
+        matchStage: 'faceoff',
       };
     });
   };
@@ -596,6 +684,7 @@ export const BattleArenaProvider = ({ children }) => {
       completedMatches: [],
       privateFighterSelection: {},
       currentMatchEvaluation: null,
+      matchStage: 'faceoff',
       leaderboard: [],
     });
     toast.info('Battle Arena reset to setup.');
@@ -613,6 +702,11 @@ export const BattleArenaProvider = ({ children }) => {
         reAuctionUnsoldLots,
         startRound2Battles,
         enterBattleArenaStage,
+        startFighterSelection,
+        selectTeamAFighter,
+        proceedToTeamB,
+        selectTeamBFighter,
+        confirmMatchResult,
         selectPrivateFighter,
         advanceToNextBattle,
         toggleBattleTimer,

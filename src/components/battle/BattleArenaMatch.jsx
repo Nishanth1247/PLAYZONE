@@ -11,7 +11,11 @@ import {
   Sparkles, 
   Flame, 
   AlertTriangle,
-  RotateCcw
+  RotateCcw,
+  Lock,
+  Shield,
+  Zap,
+  Users
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -21,7 +25,11 @@ import { PassTheLaptopScreen } from '../party/common/PassTheLaptopScreen';
 export const BattleArenaMatch = () => {
   const {
     battleState,
-    selectPrivateFighter,
+    startFighterSelection,
+    selectTeamAFighter,
+    proceedToTeamB,
+    selectTeamBFighter,
+    confirmMatchResult,
     advanceToNextBattle,
   } = useBattleArena();
 
@@ -33,35 +41,42 @@ export const BattleArenaMatch = () => {
     privateFighterSelection,
     currentMatchEvaluation,
     leaderboard,
+    completedMatches,
   } = battleState;
 
   const currentMatch = schedule[currentMatchIndex];
+  if (!currentMatch) return null;
 
-  // Which team is currently picking privately:
-  // If Team A hasn't picked: 'teamA'
-  // If Team A picked but Team B hasn't: 'teamB'
-  // If both picked: 'faceoff'
   const teamA = teams.find((t) => t.id === currentMatch.teamAId);
   const teamB = teams.find((t) => t.id === currentMatch.teamBId);
+  if (!teamA || !teamB) return null;
 
-  const teamAPickId = privateFighterSelection[teamA.id];
-  const teamBPickId = privateFighterSelection[teamB.id];
+  const teamAPickId = privateFighterSelection?.[teamA.id];
+  const teamBPickId = privateFighterSelection?.[teamB.id];
 
-  // Unused squad members for each team
+  // Head-to-Head history between Team A and Team B in earlier rounds of this tournament
+  const h2hMatches = (completedMatches || []).filter(
+    (m) =>
+      (m.teamAId === teamA.id && m.teamBId === teamB.id) ||
+      (m.teamAId === teamB.id && m.teamBId === teamA.id)
+  );
+
+  // Tournament Points for each team
+  const pointsTeamA = leaderboard.find((l) => l.team.id === teamA.id)?.points || 0;
+  const pointsTeamB = leaderboard.find((l) => l.team.id === teamB.id)?.points || 0;
+
+  // Available (undeployed) squad members
   const availableSquadA = teamA.squad.filter((p) => !usedPlayerIds.includes(p.id));
   const availableSquadB = teamB.squad.filter((p) => !usedPlayerIds.includes(p.id));
 
-  // Handle Team A selection
-  const handleSelectTeamA = (playerId) => {
-    selectPrivateFighter(teamA.id, playerId);
-  };
-
-  // Handle Team B selection
-  const handleSelectTeamB = (playerId) => {
-    selectPrivateFighter(teamB.id, playerId);
-  };
-
-  const isEvaluated = Boolean(currentMatchEvaluation);
+  // Determine stage safely with reload resilience
+  const stage = battleState.matchStage || (
+    currentMatchEvaluation?.status === 'completed' ? 'confirmed' :
+    currentMatchEvaluation ? 'evaluated' :
+    teamBPickId ? 'evaluated' :
+    teamAPickId ? 'teamA_locked' :
+    'faceoff'
+  );
 
   return (
     <div className="max-w-[1500px] mx-auto px-4 py-6 space-y-6">
@@ -90,8 +105,148 @@ export const BattleArenaMatch = () => {
         {/* MAIN BATTLE STAGE (8 COLS) */}
         <div className="lg:col-span-8 space-y-6">
           
-          {/* STEP 1: TEAM A PRIVATE FIGHTER SELECTION */}
-          {!teamAPickId && (
+          {/* STAGE 1: BROADCAST PRE-MATCH FACE-OFF SCREEN (BIDBATTLE 7.7) */}
+          {stage === 'faceoff' && (
+            <motion.div
+              key="faceoff_screen"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              className="battle-panel rounded-3xl p-6 sm:p-8 border-2 border-brand-purple/50 shadow-2xl relative overflow-hidden"
+            >
+              {/* Ambient lighting halo */}
+              <div 
+                className="absolute -top-24 left-1/4 w-72 h-72 rounded-full blur-3xl opacity-25 pointer-events-none"
+                style={{ backgroundColor: teamA.color }}
+              />
+              <div 
+                className="absolute -top-24 right-1/4 w-72 h-72 rounded-full blur-3xl opacity-25 pointer-events-none"
+                style={{ backgroundColor: teamB.color }}
+              />
+
+              <div className="text-center mb-8 relative z-10">
+                <Badge variant="orange" pulse className="mb-2 uppercase tracking-wider font-broadcast">
+                  Round 2 Broadcast Face-Off
+                </Badge>
+                <h2 className="text-3xl sm:text-5xl font-black text-white font-broadcast uppercase tracking-wide">
+                  Match #{currentMatchIndex + 1} Head-to-Head
+                </h2>
+                <p className="text-xs text-battle-muted mt-1">
+                  Private fighter deployment required. Review matchup intelligence before selection.
+                </p>
+              </div>
+
+              {/* Face-off Duel Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-11 gap-4 items-center mb-8 relative z-10">
+                {/* Team A Card */}
+                <div 
+                  className="md:col-span-5 p-6 rounded-3xl bg-battle-bg border-2 text-center space-y-3 relative overflow-hidden shadow-lg"
+                  style={{ borderColor: teamA.color }}
+                >
+                  <div className="absolute top-0 left-0 right-0 h-1.5" style={{ backgroundColor: teamA.color }} />
+                  <span className="text-5xl p-3 rounded-2xl bg-battle-surface border border-battle-border inline-block shadow-md">
+                    {teamA.logo}
+                  </span>
+                  <div>
+                    <h3 className="font-broadcast text-2xl font-black text-white" style={{ color: teamA.color }}>
+                      {teamA.name}
+                    </h3>
+                    <span className="text-xs text-battle-muted font-mono font-bold block">
+                      @{teamA.owner}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-battle-border text-left">
+                    <div className="p-2 rounded-xl bg-battle-surface border border-battle-border">
+                      <span className="text-[10px] text-battle-muted uppercase font-broadcast font-bold block">Points</span>
+                      <span className="font-mono font-black text-lg text-brand-neon">{pointsTeamA} pts</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-battle-surface border border-battle-border">
+                      <span className="text-[10px] text-battle-muted uppercase font-broadcast font-bold block">Fighters Ready</span>
+                      <span className="font-mono font-black text-lg text-amber-300">{availableSquadA.length} / {teamA.squad.length}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Center VS Clash Emblem */}
+                <div className="md:col-span-1 flex flex-col items-center justify-center my-2 md:my-0">
+                  <div className="w-14 h-14 rounded-full bg-battle-surface border-2 border-brand-orange text-brand-orange flex items-center justify-center shadow-glow-orange font-broadcast font-black text-lg">
+                    VS
+                  </div>
+                  <Swords className="w-5 h-5 text-battle-muted mt-1" />
+                </div>
+
+                {/* Team B Card */}
+                <div 
+                  className="md:col-span-5 p-6 rounded-3xl bg-battle-bg border-2 text-center space-y-3 relative overflow-hidden shadow-lg"
+                  style={{ borderColor: teamB.color }}
+                >
+                  <div className="absolute top-0 left-0 right-0 h-1.5" style={{ backgroundColor: teamB.color }} />
+                  <span className="text-5xl p-3 rounded-2xl bg-battle-surface border border-battle-border inline-block shadow-md">
+                    {teamB.logo}
+                  </span>
+                  <div>
+                    <h3 className="font-broadcast text-2xl font-black text-white" style={{ color: teamB.color }}>
+                      {teamB.name}
+                    </h3>
+                    <span className="text-xs text-battle-muted font-mono font-bold block">
+                      @{teamB.owner}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-battle-border text-left">
+                    <div className="p-2 rounded-xl bg-battle-surface border border-battle-border">
+                      <span className="text-[10px] text-battle-muted uppercase font-broadcast font-bold block">Points</span>
+                      <span className="font-mono font-black text-lg text-brand-neon">{pointsTeamB} pts</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-battle-surface border border-battle-border">
+                      <span className="text-[10px] text-battle-muted uppercase font-broadcast font-bold block">Fighters Ready</span>
+                      <span className="font-mono font-black text-lg text-amber-300">{availableSquadB.length} / {teamB.squad.length}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Head-to-Head History Box */}
+              <div className="mb-8 p-4 rounded-2xl bg-battle-bg border border-battle-border relative z-10">
+                <div className="flex items-center justify-between mb-2 pb-1 border-b border-battle-border text-xs font-broadcast font-bold uppercase text-battle-muted">
+                  <span>Head-to-Head Record:</span>
+                  <span className="text-brand-cyan">{h2hMatches.length === 0 ? 'First Meeting' : `${h2hMatches.length} Previous Clash`}</span>
+                </div>
+                {h2hMatches.length === 0 ? (
+                  <p className="text-xs text-battle-muted italic">
+                    These two franchises have not clashed yet in this tournament. A critical battle for points!
+                  </p>
+                ) : (
+                  <div className="space-y-1.5">
+                    {h2hMatches.map((m, idx) => (
+                      <div key={m.id || idx} className="flex items-center justify-between text-xs font-mono">
+                        <span className="text-battle-muted">Clash #{idx + 1}:</span>
+                        <span className="text-white">
+                          {m.isDraw ? 'Tied Battle (+1 pt each)' : `${teams.find((t) => t.id === m.winnerId)?.name || 'Winner'} won (+3 pts)`}
+                        </span>
+                        <span className="text-brand-cyan">Diff: {m.scoreDiff || 0} pts</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* CTA Action Button */}
+              <Button
+                variant="accent"
+                size="xl"
+                onClick={startFighterSelection}
+                className="w-full font-broadcast text-lg shadow-glow-orange flex items-center justify-center gap-3 py-4"
+              >
+                <span>PROCEED TO FIGHTER SELECTION</span>
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            </motion.div>
+          )}
+
+          {/* STAGE 2: TEAM A PRIVATE FIGHTER SELECTION */}
+          {stage === 'teamA_select' && (
             <motion.div
               key={`pick_${teamA.id}`}
               initial={{ opacity: 0, scale: 0.96 }}
@@ -105,48 +260,105 @@ export const BattleArenaMatch = () => {
                 revealButtonText="Open Available Squad"
               >
                 <div className="space-y-4">
-                  <span className="text-xs font-mono font-bold text-battle-muted uppercase block">
-                    Choose 1 Fighter from Your Acquired Squad:
-                  </span>
+                  <div className="flex items-center justify-between text-xs font-mono font-bold text-battle-muted uppercase">
+                    <span>Choose 1 Fighter from Your Acquired Squad:</span>
+                    <span className="text-brand-cyan">{availableSquadA.length} available</span>
+                  </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {availableSquadA.map((fighter) => (
-                      <button
-                        key={fighter.id}
-                        type="button"
-                        onClick={() => handleSelectTeamA(fighter.id)}
-                        className="p-4 rounded-2xl border border-battle-border hover:border-brand-purple bg-battle-surface hover:bg-battle-surface/80 text-left transition-all group flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xl">🎬</span>
-                            <Badge variant="purple" className="text-[10px]">
-                              {fighter.role || 'Contender'}
-                            </Badge>
-                          </div>
-                          <h4 className="font-broadcast font-bold text-sm text-white group-hover:text-brand-purple">
-                            {fighter.name}
-                          </h4>
-                          {fighter.movie && (
-                            <span className="text-[11px] text-battle-muted block">
-                              {fighter.movie}
-                            </span>
-                          )}
-                        </div>
+                    {teamA.squad.map((fighter) => {
+                      const isDeployed = usedPlayerIds.includes(fighter.id);
 
-                        <span className="mt-3 text-xs font-mono font-bold text-brand-purple">
-                          DEPLOY FIGHTER →
-                        </span>
-                      </button>
-                    ))}
+                      return (
+                        <button
+                          key={fighter.id}
+                          type="button"
+                          disabled={isDeployed}
+                          onClick={() => selectTeamAFighter(fighter.id)}
+                          className={`p-4 rounded-2xl border text-left transition-all group flex flex-col justify-between ${
+                            isDeployed
+                              ? 'bg-battle-surface/30 border-battle-border opacity-40 cursor-not-allowed'
+                              : 'border-battle-border hover:border-brand-purple bg-battle-surface hover:bg-battle-surface/80 cursor-pointer shadow-md'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xl">🎬</span>
+                              {isDeployed ? (
+                                <Badge variant="secondary" className="text-[9px] uppercase">
+                                  Already Deployed
+                                </Badge>
+                              ) : (
+                                <Badge variant="purple" className="text-[10px]">
+                                  {fighter.role || 'Contender'}
+                                </Badge>
+                              )}
+                            </div>
+                            <h4 className="font-broadcast font-bold text-sm text-white group-hover:text-brand-purple">
+                              {fighter.name}
+                            </h4>
+                            {fighter.movie && (
+                              <span className="text-[11px] text-battle-muted block">
+                                {fighter.movie}
+                              </span>
+                            )}
+                          </div>
+
+                          <span className={`mt-3 text-xs font-mono font-bold ${isDeployed ? 'text-battle-muted' : 'text-brand-purple'}`}>
+                            {isDeployed ? 'UNAVAILABLE' : 'DEPLOY FIGHTER →'}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </PassTheLaptopScreen>
             </motion.div>
           )}
 
-          {/* STEP 2: TEAM B PRIVATE FIGHTER SELECTION */}
-          {teamAPickId && !teamBPickId && (
+          {/* STAGE 3: PRIVACY SHIELD SCREEN (SELECTION LOCKED) (BIDBATTLE 7.7) */}
+          {stage === 'teamA_locked' && (
+            <motion.div
+              key="teamA_locked_screen"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="battle-panel rounded-3xl p-8 border-2 border-brand-purple/60 shadow-2xl text-center space-y-6"
+            >
+              <div className="w-20 h-20 mx-auto rounded-3xl bg-brand-purple/20 border border-brand-purple/40 text-brand-purple flex items-center justify-center shadow-glow-purple">
+                <Lock className="w-10 h-10" />
+              </div>
+
+              <div>
+                <Badge variant="purple" className="mb-2 uppercase tracking-wider font-broadcast">
+                  Secret Selection Confirmed
+                </Badge>
+                <h3 className="text-3xl font-black text-white font-broadcast uppercase tracking-wide">
+                  {teamA.name}'s Fighter Locked!
+                </h3>
+                <p className="text-sm text-battle-muted max-w-md mx-auto mt-2">
+                  The selection has been encrypted. Hand the laptop over to <strong>{teamB.name}</strong> to make their pick.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-battle-bg border border-battle-border max-w-sm mx-auto text-xs text-battle-muted">
+                🛡️ Screen Privacy Active: {teamA.name}'s fighter remains hidden until simultaneous reveal.
+              </div>
+
+              <Button
+                variant="primary"
+                size="xl"
+                onClick={proceedToTeamB}
+                className="font-broadcast text-base shadow-glow-cyan bg-brand-cyan hover:bg-cyan-400 text-black font-black px-8"
+              >
+                <span>I AM {teamB.name} — SELECT FIGHTER</span>
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </motion.div>
+          )}
+
+          {/* STAGE 4: TEAM B PRIVATE FIGHTER SELECTION */}
+          {stage === 'teamB_select' && (
             <motion.div
               key={`pick_${teamB.id}`}
               initial={{ opacity: 0, scale: 0.96 }}
@@ -160,48 +372,64 @@ export const BattleArenaMatch = () => {
                 revealButtonText="Open Available Squad"
               >
                 <div className="space-y-4">
-                  <span className="text-xs font-mono font-bold text-battle-muted uppercase block">
-                    Choose 1 Fighter from Your Acquired Squad:
-                  </span>
+                  <div className="flex items-center justify-between text-xs font-mono font-bold text-battle-muted uppercase">
+                    <span>Choose 1 Fighter from Your Acquired Squad:</span>
+                    <span className="text-brand-cyan">{availableSquadB.length} available</span>
+                  </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {availableSquadB.map((fighter) => (
-                      <button
-                        key={fighter.id}
-                        type="button"
-                        onClick={() => handleSelectTeamB(fighter.id)}
-                        className="p-4 rounded-2xl border border-battle-border hover:border-brand-cyan bg-battle-surface hover:bg-battle-surface/80 text-left transition-all group flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xl">⚡</span>
-                            <Badge variant="cyan" className="text-[10px]">
-                              {fighter.role || 'Contender'}
-                            </Badge>
-                          </div>
-                          <h4 className="font-broadcast font-bold text-sm text-white group-hover:text-brand-cyan">
-                            {fighter.name}
-                          </h4>
-                          {fighter.movie && (
-                            <span className="text-[11px] text-battle-muted block">
-                              {fighter.movie}
-                            </span>
-                          )}
-                        </div>
+                    {teamB.squad.map((fighter) => {
+                      const isDeployed = usedPlayerIds.includes(fighter.id);
 
-                        <span className="mt-3 text-xs font-mono font-bold text-brand-cyan">
-                          DEPLOY FIGHTER →
-                        </span>
-                      </button>
-                    ))}
+                      return (
+                        <button
+                          key={fighter.id}
+                          type="button"
+                          disabled={isDeployed}
+                          onClick={() => selectTeamBFighter(fighter.id)}
+                          className={`p-4 rounded-2xl border text-left transition-all group flex flex-col justify-between ${
+                            isDeployed
+                              ? 'bg-battle-surface/30 border-battle-border opacity-40 cursor-not-allowed'
+                              : 'border-battle-border hover:border-brand-cyan bg-battle-surface hover:bg-battle-surface/80 cursor-pointer shadow-md'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xl">⚡</span>
+                              {isDeployed ? (
+                                <Badge variant="secondary" className="text-[9px] uppercase">
+                                  Already Deployed
+                                </Badge>
+                              ) : (
+                                <Badge variant="cyan" className="text-[10px]">
+                                  {fighter.role || 'Contender'}
+                                </Badge>
+                              )}
+                            </div>
+                            <h4 className="font-broadcast font-bold text-sm text-white group-hover:text-brand-cyan">
+                              {fighter.name}
+                            </h4>
+                            {fighter.movie && (
+                              <span className="text-[11px] text-battle-muted block">
+                                {fighter.movie}
+                              </span>
+                            )}
+                          </div>
+
+                          <span className={`mt-3 text-xs font-mono font-bold ${isDeployed ? 'text-battle-muted' : 'text-brand-cyan'}`}>
+                            {isDeployed ? 'UNAVAILABLE' : 'DEPLOY FIGHTER →'}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </PassTheLaptopScreen>
             </motion.div>
           )}
 
-          {/* STEP 3: BOTH FIGHTERS REVEALED & EVALUATED */}
-          {isEvaluated && (
+          {/* STAGE 5 & 6: SIMULTANEOUS REVEAL, EVALUATION & RESULT CONFIRMATION (BIDBATTLE 7.7) */}
+          {(stage === 'evaluated' || stage === 'confirmed') && currentMatchEvaluation && (
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -211,7 +439,7 @@ export const BattleArenaMatch = () => {
               <div className="flex items-center justify-center gap-3">
                 <Swords className="w-8 h-8 text-brand-orange animate-pulse" />
                 <h3 className="font-broadcast text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">
-                  ARENA CLASH SETTLED!
+                  {stage === 'confirmed' ? 'ARENA CLASH SETTLED!' : 'SIMULTANEOUS FIGHTER REVEAL!'}
                 </h3>
               </div>
 
@@ -341,16 +569,33 @@ export const BattleArenaMatch = () => {
                 )}
               </div>
 
-              {/* Advance Button */}
-              <Button
-                variant="primary"
-                size="xl"
-                onClick={advanceToNextBattle}
-                className="w-full font-broadcast text-base shadow-glow-orange bg-brand-orange hover:bg-orange-600 text-black font-black flex items-center justify-center gap-2"
-              >
-                <span>{currentMatchIndex + 1 < schedule.length ? 'NEXT MATCH' : 'VIEW TOURNAMENT CHAMPION PODIUM'}</span>
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+              {/* STEP 8: EXPLICIT CONFIRMATION BUTTON vs ADVANCE BUTTON */}
+              {stage === 'evaluated' ? (
+                <div className="space-y-2">
+                  <Button
+                    variant="accent"
+                    size="xl"
+                    onClick={confirmMatchResult}
+                    className="w-full font-broadcast text-base shadow-glow-orange bg-emerald-500 hover:bg-emerald-600 text-black font-black flex items-center justify-center gap-2 py-4"
+                  >
+                    <CheckCircle2 className="w-5 h-5" />
+                    <span>CONFIRM MATCH RESULT & UPDATE STANDINGS</span>
+                  </Button>
+                  <p className="text-[11px] text-battle-muted">
+                    Click to permanently record battle outcome, award points, and mark fighters as deployed.
+                  </p>
+                </div>
+              ) : (
+                <Button
+                  variant="primary"
+                  size="xl"
+                  onClick={advanceToNextBattle}
+                  className="w-full font-broadcast text-base shadow-glow-orange bg-brand-orange hover:bg-orange-600 text-black font-black flex items-center justify-center gap-2 py-4"
+                >
+                  <span>{currentMatchIndex + 1 < schedule.length ? 'NEXT MATCH' : 'VIEW TOURNAMENT CHAMPION PODIUM'}</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              )}
             </motion.div>
           )}
 
@@ -431,6 +676,11 @@ export const BattleArenaMatch = () => {
                   </span>
                 </div>
               ))}
+              {battleState.completedMatches.length === 0 && (
+                <div className="py-4 text-center text-battle-muted text-[11px] italic">
+                  No matches completed yet.
+                </div>
+              )}
             </div>
           </div>
         </div>

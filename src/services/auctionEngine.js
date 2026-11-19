@@ -220,3 +220,153 @@ export const getPurseHealth = (currentPurse, initialPurse) => {
   }
   return { status: 'critical', color: 'red', textClass: 'text-rose-400', bgClass: 'bg-rose-500', percentage };
 };
+
+/**
+ * BIDBATTLE 7.7: Smart Franchise Budget Health Calculator
+ * Evaluates:
+ * - Remaining squad slots needed
+ * - Minimum required reserve based on lowest valid base price
+ * - Average available budget per remaining slot
+ * - Health classification: Healthy | Caution | Critical
+ */
+export const calculateFranchiseBudgetHealth = ({
+  team,
+  items = [],
+  pendingLots: passedPendingLots,
+  rules,
+  minSquadSize: passedMin,
+  maxSquadSize: passedMax,
+  currentSquadCount: passedSquadCount,
+}) => {
+  const minSquadSize = rules?.minSquadSize || passedMin || 4;
+  const maxSquadSize = rules?.maxSquadSize || passedMax || 8;
+  const currentSquadCount = typeof passedSquadCount === 'number'
+    ? passedSquadCount
+    : (items || []).filter((i) => i.soldTo === team.id).length;
+  const remainingSquadSlots = Math.max(0, minSquadSize - currentSquadCount);
+  const remainingSlotsToMax = Math.max(0, maxSquadSize - currentSquadCount);
+
+  // Find lowest valid base price among remaining pending lots, or min base price in tournament
+  const pendingLots = passedPendingLots || (items || []).filter((i) => i.status === 'pending');
+  const allLots = items || [];
+
+  let minValidAcquisitionPrice = 0.50; // fallback
+  if (pendingLots.length > 0) {
+    const validPrices = pendingLots.map((i) => Number(i.basePrice)).filter((n) => !isNaN(n) && n > 0);
+    if (validPrices.length > 0) {
+      minValidAcquisitionPrice = Math.min(...validPrices);
+    }
+  } else if (allLots.length > 0) {
+    const validPrices = allLots.map((i) => Number(i.basePrice)).filter((n) => !isNaN(n) && n > 0);
+    if (validPrices.length > 0) {
+      minValidAcquisitionPrice = Math.min(...validPrices);
+    }
+  }
+  minValidAcquisitionPrice = Math.max(0.1, minValidAcquisitionPrice);
+
+  const minRequiredReserve = remainingSquadSlots * minValidAcquisitionPrice;
+  const currentPurse = Number(team.purse) || 0;
+  const initialPurse = Number(team.initialPurse) || currentPurse || 100;
+  const totalSpent = Number(Math.max(0, initialPurse - currentPurse).toFixed(2));
+  const purseConsumedPct = Math.min(100, Math.max(0, Math.round((totalSpent / (initialPurse || 1)) * 100)));
+
+  const avgAvailablePerSlot = remainingSquadSlots > 0
+    ? Number((currentPurse / remainingSquadSlots).toFixed(2))
+    : remainingSlotsToMax > 0
+    ? Number((currentPurse / remainingSlotsToMax).toFixed(2))
+    : 0;
+
+  // Determine budget health
+  let status = 'healthy';
+  let label = 'Healthy';
+  let badgeColor = 'emerald';
+  let reason = 'Sufficient funds for remaining squad slots';
+
+  if (remainingSquadSlots === 0) {
+    status = 'healthy';
+    label = 'Squad Complete';
+    badgeColor = 'cyan';
+    reason = 'Minimum squad requirement achieved';
+  } else if (currentPurse < minRequiredReserve) {
+    status = 'critical';
+    label = 'Critical Deficit';
+    badgeColor = 'rose';
+    reason = `Insufficient funds: Needs ₹${minRequiredReserve.toFixed(2)} Cr reserve for ${remainingSquadSlots} slots`;
+  } else if (currentPurse <= minRequiredReserve * 1.3 || (currentPurse - minRequiredReserve) < minValidAcquisitionPrice * 2) {
+    status = 'caution';
+    label = 'Caution';
+    badgeColor = 'amber';
+    reason = `Limited flexibility: Only ₹${(currentPurse - minRequiredReserve).toFixed(2)} Cr above reserve`;
+  } else {
+    status = 'healthy';
+    label = 'Healthy';
+    badgeColor = 'emerald';
+    reason = `Strong flexibility: ₹${(currentPurse - minRequiredReserve).toFixed(2)} Cr discretionary budget`;
+  }
+
+  return {
+    status,
+    label,
+    badgeColor,
+    reason,
+    currentPurse,
+    initialPurse,
+    totalSpent,
+    purseConsumedPct,
+    playersAcquired: currentSquadCount,
+    remainingSquadSlots,
+    remainingSlotsToMax,
+    minValidAcquisitionPrice,
+    minRequiredReserve: Number(minRequiredReserve.toFixed(2)),
+    avgAvailablePerSlot,
+  };
+};
+
+/**
+ * BIDBATTLE 7.7: Real-Time Auction Strategy Indicators
+ * Calculates market intelligence without exposing hidden ratings.
+ */
+export const calculateAuctionStrategyIndicators = ({ teams = [], items = [], currentItemIndex = 0 }) => {
+  const soldItems = (items || []).filter((i) => i.status === 'sold');
+  const unsoldItems = (items || []).filter((i) => i.status === 'unsold');
+  const pendingItems = (items || []).filter((i) => i.status === 'pending');
+
+  // 1. Most expensive acquisition
+  let mostExpensiveAcquisition = null;
+  if (soldItems.length > 0) {
+    const sorted = [...soldItems].sort((a, b) => Number(b.soldPrice || 0) - Number(a.soldPrice || 0));
+    const top = sorted[0];
+    const buyer = teams.find((t) => t.id === top.soldTo);
+    mostExpensiveAcquisition = {
+      name: top.name,
+      role: top.role || 'Hero',
+      category: top.category || 'Standard',
+      price: Number(top.soldPrice || 0),
+      buyerName: buyer?.name || 'Unknown',
+      buyerColor: buyer?.color || '#00D9FF',
+      buyerLogo: buyer?.logo || '👑',
+    };
+  }
+
+  // 2. Highest-spending franchise
+  const teamSpends = teams.map((t) => {
+    const spent = Number(((t.initialPurse || 100) - (t.purse || 0)).toFixed(2));
+    return { ...t, totalSpent: Math.max(0, spent) };
+  });
+  const highestSpender = [...teamSpends].sort((a, b) => b.totalSpent - a.totalSpent)[0] || null;
+
+  // 3. Franchise with highest remaining purse
+  const highestPurseTeam = [...teams].sort((a, b) => (b.purse || 0) - (a.purse || 0))[0] || null;
+
+  return {
+    mostExpensiveAcquisition,
+    highestSpender: highestSpender && highestSpender.totalSpent > 0 ? highestSpender : null,
+    highestPurseTeam,
+    totalLots: items.length,
+    soldCount: soldItems.length,
+    unsoldCount: unsoldItems.length,
+    pendingCount: pendingItems.length,
+    currentLotNumber: Math.min(items.length, currentItemIndex + 1),
+    remainingLotsCount: pendingItems.length,
+  };
+};

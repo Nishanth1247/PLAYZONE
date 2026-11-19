@@ -277,6 +277,189 @@ export const calculateLeaderboard = (teams, completedMatches) => {
 };
 
 /**
+ * BIDBATTLE 7.7: Deterministic Tournament MVP & Statistics Calculator
+ * Evaluates individual fighter performances from completed matches:
+ * Criteria:
+ * - Match Victory Bonus: +10 pts
+ * - Match Draw Bonus: +3 pts
+ * - Victory Margin Diff: +1 pt per score difference
+ * - Combat Rating Factor: +(Battle Score / 10)
+ * Tie-breakers:
+ * 1. Total Battle Score
+ * 2. Highest Single Match Score
+ * 3. Character Base Rating
+ */
+export const calculateTournamentMVP = (completedMatches = [], teams = []) => {
+  if (!completedMatches || completedMatches.length === 0) return null;
+
+  const fighterPerformances = {};
+
+  completedMatches.forEach((m) => {
+    // Process Fighter A
+    if (m.teamAPlayer) {
+      const fId = m.teamAPlayer.id;
+      if (!fighterPerformances[fId]) {
+        fighterPerformances[fId] = {
+          fighter: m.teamAPlayer,
+          team: teams.find((t) => t.id === m.teamAId) || { name: m.teamAName, color: m.teamAColor, logo: m.teamALogo },
+          matchesPlayed: 0,
+          matchesWon: 0,
+          matchesDrawn: 0,
+          matchesLost: 0,
+          totalBattleScore: 0,
+          totalMarginDiff: 0,
+          mvpPoints: 0,
+          highestScore: 0,
+        };
+      }
+      const perf = fighterPerformances[fId];
+      perf.matchesPlayed += 1;
+      const score = Number(m.teamAScore) || Number(m.teamAPlayer.rating) || 80;
+      perf.totalBattleScore += score;
+      perf.highestScore = Math.max(perf.highestScore, score);
+
+      const won = m.winnerId === m.teamAId;
+      const drawn = m.isDraw;
+      if (won) {
+        perf.matchesWon += 1;
+        perf.totalMarginDiff += (m.scoreDiff || 0);
+        perf.mvpPoints += 10 + (m.scoreDiff || 0);
+      } else if (drawn) {
+        perf.matchesDrawn += 1;
+        perf.mvpPoints += 3;
+      } else {
+        perf.matchesLost += 1;
+        perf.totalMarginDiff -= (m.scoreDiff || 0);
+      }
+      perf.mvpPoints += Math.round(score / 10);
+    }
+
+    // Process Fighter B
+    if (m.teamBPlayer) {
+      const fId = m.teamBPlayer.id;
+      if (!fighterPerformances[fId]) {
+        fighterPerformances[fId] = {
+          fighter: m.teamBPlayer,
+          team: teams.find((t) => t.id === m.teamBId) || { name: m.teamBName, color: m.teamBColor, logo: m.teamBLogo },
+          matchesPlayed: 0,
+          matchesWon: 0,
+          matchesDrawn: 0,
+          matchesLost: 0,
+          totalBattleScore: 0,
+          totalMarginDiff: 0,
+          mvpPoints: 0,
+          highestScore: 0,
+        };
+      }
+      const perf = fighterPerformances[fId];
+      perf.matchesPlayed += 1;
+      const score = Number(m.teamBScore) || Number(m.teamBPlayer.rating) || 80;
+      perf.totalBattleScore += score;
+      perf.highestScore = Math.max(perf.highestScore, score);
+
+      const won = m.winnerId === m.teamBId;
+      const drawn = m.isDraw;
+      if (won) {
+        perf.matchesWon += 1;
+        perf.totalMarginDiff += (m.scoreDiff || 0);
+        perf.mvpPoints += 10 + (m.scoreDiff || 0);
+      } else if (drawn) {
+        perf.matchesDrawn += 1;
+        perf.mvpPoints += 3;
+      } else {
+        perf.matchesLost += 1;
+        perf.totalMarginDiff -= (m.scoreDiff || 0);
+      }
+      perf.mvpPoints += Math.round(score / 10);
+    }
+  });
+
+  const list = Object.values(fighterPerformances);
+  if (list.length === 0) return null;
+
+  // Sort deterministically:
+  list.sort((a, b) => {
+    if (b.mvpPoints !== a.mvpPoints) return b.mvpPoints - a.mvpPoints;
+    if (b.totalBattleScore !== a.totalBattleScore) return b.totalBattleScore - a.totalBattleScore;
+    if (b.highestScore !== a.highestScore) return b.highestScore - a.highestScore;
+    return (Number(b.fighter.rating) || 0) - (Number(a.fighter.rating) || 0);
+  });
+
+  const mvp = list[0];
+  const bestIndividual = [...list].sort((a, b) => b.highestScore - a.highestScore)[0];
+
+  return {
+    mvp,
+    bestIndividual,
+    allPerformances: list,
+    criteriaExplanation: 'Deterministic MVP Criteria: +10 pts per match victory, +3 pts per draw, +1 pt per score margin difference, and +(Battle Score ÷ 10) rating contribution. Tie-breaker: Highest total combat score.',
+  };
+};
+
+/**
+ * Calculates comprehensive tournament statistics for every franchise
+ */
+export const calculateBattleTournamentStats = (teams = [], completedMatches = [], usedPlayerIds = []) => {
+  return teams.map((team) => {
+    let matchesPlayed = 0;
+    let wins = 0;
+    let draws = 0;
+    let losses = 0;
+    let points = 0;
+    let totalScore = 0;
+    let marginTotal = 0;
+
+    completedMatches.forEach((m) => {
+      const isTeamA = m.teamAId === team.id;
+      const isTeamB = m.teamBId === team.id;
+
+      if (!isTeamA && !isTeamB) return;
+
+      matchesPlayed += 1;
+      const myScore = isTeamA ? m.teamAScore : m.teamBScore;
+      const opponentScore = isTeamA ? m.teamBScore : m.teamAScore;
+      totalScore += (myScore || 0);
+
+      if (m.winnerId === team.id) {
+        wins += 1;
+        points += 3;
+        marginTotal += (m.scoreDiff || 0);
+      } else if (m.isDraw) {
+        draws += 1;
+        points += 1;
+      } else {
+        losses += 1;
+        marginTotal -= (m.scoreDiff || 0);
+      }
+    });
+
+    const squad = team.squad || [];
+    const usedCount = squad.filter((p) => usedPlayerIds.includes(p.id)).length;
+    const remainingUnusedCount = Math.max(0, squad.length - usedCount);
+
+    return {
+      team,
+      matchesPlayed,
+      wins,
+      draws,
+      losses,
+      points,
+      totalScore,
+      scoreDiff: marginTotal,
+      marginTotal,
+      remainingFighters: remainingUnusedCount,
+      totalFighters: squad.length,
+      remainingUnusedFighters: remainingUnusedCount,
+      squadSize: squad.length,
+    };
+  });
+
+  return list
+    .sort((a, b) => b.points - a.points || b.wins - a.wins || b.marginTotal - a.marginTotal)
+    .map((item, idx) => ({ ...item, rank: idx + 1 }));
+};
+
+/**
  * Storage Helpers
  */
 export const getSavedBattleState = () => {

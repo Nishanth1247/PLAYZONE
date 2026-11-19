@@ -89,6 +89,64 @@ export const ResultsScreen = () => {
     color: t.color,
   }));
 
+  // BIDBATTLE 7.7: Auction Completion Report JSON exporter
+  const handleDownloadCompletionReportJSON = () => {
+    const reportData = {
+      title: 'BIDBATTLE 7.7 Official Auction Completion Report',
+      tournamentId: auction.id,
+      tournamentName: auction.name,
+      category: auction.category,
+      generatedAt: new Date().toISOString(),
+      marketSummary: {
+        totalLots: items.length,
+        soldLots: soldItems.length,
+        unsoldLots: unsoldItems.length,
+        clearanceRatePct: Number(((soldItems.length / (items.length || 1)) * 100).toFixed(1)),
+        totalLeagueSpent: Number(totalLeagueSpent.toFixed(2)),
+        averagePurchasePrice: soldItems.length ? Number((totalLeagueSpent / soldItems.length).toFixed(2)) : 0,
+        highestSale: highestValueBuy ? {
+          name: highestValueBuy.name,
+          soldPrice: highestValueBuy.soldPrice,
+          buyer: teams.find((t) => t.id === highestValueBuy.soldTo)?.name,
+        } : null,
+        cheapestSale: cheapestBuy ? {
+          name: cheapestBuy.name,
+          soldPrice: cheapestBuy.soldPrice,
+          buyer: teams.find((t) => t.id === cheapestBuy.soldTo)?.name,
+        } : null,
+      },
+      franchises: rankedTeams.map((t) => ({
+        rank: t.rank,
+        name: t.name,
+        totalScore: t.totalScore,
+        averageRating: t.averageRating,
+        squadCount: t.heroesCount,
+        maxSquadSize,
+        remainingPurse: t.remainingPurse,
+        totalSpent: t.totalSpent,
+        purseUtilizationPct: Math.round(((t.totalSpent / ((t.remainingPurse + t.totalSpent) || 100)) * 100)),
+        squad: (t.squad || []).map((s) => ({
+          name: s.name,
+          rating: s.rating,
+          soldPrice: s.soldPrice,
+          role: s.role,
+        })),
+      })),
+      activityTimeline: auction.activityTimeline || [],
+    };
+
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${auction.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}_completion_report.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Downloaded Auction Completion Report (JSON)!');
+  };
+
   const rankBadges = [
     { label: '1ST PLACE — CHAMPION', color: 'gold', glow: 'shadow-glow-orange border-amber-500/80 text-amber-400' },
     { label: '2ND PLACE — RUNNER UP', color: 'cyan', glow: 'shadow-glow-cyan border-brand-cyan/80 text-brand-cyan' },
@@ -221,6 +279,16 @@ export const ResultsScreen = () => {
           >
             <FileJson className="w-4 h-4 text-brand-purple" />
             <span>Download JSON</span>
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={handleDownloadCompletionReportJSON}
+            className="border-brand-cyan/40 text-brand-cyan hover:bg-brand-cyan/10"
+          >
+            <Download className="w-4 h-4 text-brand-cyan" />
+            <span>Completion Report (JSON)</span>
           </Button>
 
           <Button
@@ -398,6 +466,161 @@ export const ResultsScreen = () => {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* 4.5 AUCTION COMPLETION REPORT & MARKET ANALYSIS (BIDBATTLE 7.7) */}
+      <div className="mb-12 p-6 sm:p-8 rounded-3xl battle-panel border border-brand-cyan/40 shadow-xl relative overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-battle-border">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-brand-cyan/15 border border-brand-cyan/30 text-brand-cyan flex items-center justify-center">
+              <FileSpreadsheet className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <Badge variant="cyan" className="text-[10px] uppercase font-bold tracking-wider">
+                  Official Audit
+                </Badge>
+                <span className="text-xs text-battle-muted font-mono">{items.length} Lots Evaluated</span>
+              </div>
+              <h3 className="text-2xl font-black text-white font-broadcast uppercase tracking-wide">
+                Auction Completion Report
+              </h3>
+            </div>
+          </div>
+
+          <Button
+            variant="accent"
+            size="sm"
+            onClick={handleDownloadCompletionReportJSON}
+            className="font-broadcast text-xs gap-1.5"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download Report (JSON)</span>
+          </Button>
+        </div>
+
+        {/* Market Economics Stats Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+          <div className="p-4 rounded-2xl bg-battle-bg border border-battle-border text-center">
+            <span className="text-[10px] text-battle-muted uppercase font-broadcast font-bold block mb-1">
+              Market Clearance
+            </span>
+            <span className="text-2xl font-black text-brand-neon font-mono">
+              {((soldItems.length / (items.length || 1)) * 100).toFixed(1)}%
+            </span>
+            <span className="text-[10px] text-battle-muted block mt-0.5">
+              {soldItems.length} Sold / {unsoldItems.length} Unsold
+            </span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-battle-bg border border-battle-border text-center">
+            <span className="text-[10px] text-battle-muted uppercase font-broadcast font-bold block mb-1">
+              Total Capital Spent
+            </span>
+            <span className="text-2xl font-black text-amber-400 font-mono">
+              {formatCurrency(totalLeagueSpent, currency)}
+            </span>
+            <span className="text-[10px] text-battle-muted block mt-0.5">
+              Avg {formatCurrency(soldItems.length ? totalLeagueSpent / soldItems.length : 0, currency)} / hero
+            </span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-battle-bg border border-battle-border text-center">
+            <span className="text-[10px] text-battle-muted uppercase font-broadcast font-bold block mb-1">
+              Top Acquisition
+            </span>
+            <span className="text-lg font-black text-white font-broadcast truncate block">
+              {highestValueBuy ? highestValueBuy.name : 'None'}
+            </span>
+            <span className="text-[10px] text-amber-400 font-mono block mt-0.5">
+              {highestValueBuy ? `${formatCurrency(highestValueBuy.soldPrice, currency)} (${teams.find((t) => t.id === highestValueBuy.soldTo)?.name || 'Buyer'})` : '—'}
+            </span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-battle-bg border border-battle-border text-center">
+            <span className="text-[10px] text-battle-muted uppercase font-broadcast font-bold block mb-1">
+              Biggest Bargain
+            </span>
+            <span className="text-lg font-black text-white font-broadcast truncate block">
+              {cheapestBuy ? cheapestBuy.name : 'None'}
+            </span>
+            <span className="text-[10px] text-brand-cyan font-mono block mt-0.5">
+              {cheapestBuy ? `${formatCurrency(cheapestBuy.soldPrice, currency)} (${teams.find((t) => t.id === cheapestBuy.soldTo)?.name || 'Buyer'})` : '—'}
+            </span>
+          </div>
+        </div>
+
+        {/* Participating Franchise Balance & Audit Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs font-broadcast">
+            <thead>
+              <tr className="border-b border-battle-border text-battle-muted uppercase tracking-wider text-[10px]">
+                <th className="py-2.5 px-3">Franchise</th>
+                <th className="py-2.5 px-3 text-center">Rank</th>
+                <th className="py-2.5 px-3 text-center">Squad</th>
+                <th className="py-2.5 px-3 text-right">Purse Left</th>
+                <th className="py-2.5 px-3 text-right">Total Spent</th>
+                <th className="py-2.5 px-3 text-center">Purse Used</th>
+                <th className="py-2.5 px-3 text-right">Score</th>
+                <th className="py-2.5 px-3 text-right">Avg / Hero</th>
+                <th className="py-2.5 px-3 text-right">ROI (Pts / ₹ Cr)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-battle-border/50">
+              {rankedTeams.map((t) => {
+                const totalPurse = (t.remainingPurse || 0) + (t.totalSpent || 0);
+                const usedPct = Math.round(((t.totalSpent || 0) / (totalPurse || 100)) * 100);
+                const roi = t.totalSpent > 0 ? (t.totalScore / t.totalSpent).toFixed(1) : '∞';
+
+                return (
+                  <tr key={t.id} className="hover:bg-battle-surface/40 transition-colors">
+                    <td className="py-3 px-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{t.logo}</span>
+                        <div>
+                          <span className="font-bold text-white block text-sm" style={{ color: t.color }}>
+                            {t.name}
+                          </span>
+                          <span className="text-[10px] text-battle-muted font-mono">{t.owner}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 text-center font-bold">
+                      <span className={`px-2 py-0.5 rounded-lg border text-[10px] ${
+                        t.rank === 1 ? 'border-amber-500/60 bg-amber-500/10 text-amber-300' :
+                        t.rank === 2 ? 'border-cyan-500/60 bg-cyan-500/10 text-cyan-300' :
+                        'border-battle-border bg-battle-surface text-battle-muted'
+                      }`}>
+                        #{t.rank}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono">
+                      {t.heroesCount} / {maxSquadSize}
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono font-bold text-brand-neon">
+                      {formatCurrency(t.remainingPurse, currency)}
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono font-bold text-battle-text">
+                      {formatCurrency(t.totalSpent, currency)}
+                    </td>
+                    <td className="py-3 px-3 text-center font-mono text-battle-muted">
+                      {usedPct}%
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono font-black text-amber-400 text-sm">
+                      {t.totalScore}
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono text-white">
+                      {t.averageRating}
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono font-bold text-brand-cyan">
+                      {roi}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 

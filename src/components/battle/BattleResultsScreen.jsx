@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { 
@@ -12,11 +12,16 @@ import {
   CheckCircle2, 
   Award,
   Sparkles,
-  Users
+  Users,
+  Star,
+  Zap,
+  Shield,
+  FileSpreadsheet
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useBattleArena } from '../../context/BattleArenaContext';
+import { calculateTournamentMVP, calculateBattleTournamentStats } from '../../services/battleEngine';
 import { toast } from 'sonner';
 
 export const BattleResultsScreen = ({ onReturnHome }) => {
@@ -28,28 +33,22 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
   const champion = leaderboard[0]?.team || teams[0];
   const championStats = leaderboard[0];
 
-  // Calculate battle highlights:
-  // 1. Biggest battle win by margin
+  // BIDBATTLE 7.7: Tournament MVP and Performance Stats
+  const mvpData = useMemo(() => {
+    return calculateTournamentMVP(completedMatches, teams);
+  }, [completedMatches, teams]);
+
+  const tournamentStats = useMemo(() => {
+    return calculateBattleTournamentStats(teams, completedMatches, battleState.usedPlayerIds || []);
+  }, [teams, completedMatches, battleState.usedPlayerIds]);
+
+  // Calculate battle highlights
   let biggestWinMatch = null;
   let maxMargin = -1;
   completedMatches.forEach((m) => {
     if (!m.isDraw && m.scoreDiff > maxMargin) {
       maxMargin = m.scoreDiff;
       biggestWinMatch = m;
-    }
-  });
-
-  // 2. Best individual performer (highest combat score)
-  let bestPerformer = null;
-  let highestScore = -1;
-  completedMatches.forEach((m) => {
-    if (m.teamAScore > highestScore) {
-      highestScore = m.teamAScore;
-      bestPerformer = { player: m.teamAPlayer, score: m.teamAScore, team: teams.find((t) => t.id === m.teamAId) };
-    }
-    if (m.teamBScore > highestScore) {
-      highestScore = m.teamBScore;
-      bestPerformer = { player: m.teamBPlayer, score: m.teamBScore, team: teams.find((t) => t.id === m.teamBId) };
     }
   });
 
@@ -62,27 +61,69 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
     });
   }, []);
 
-  const handleExport = () => {
+  // Export Comprehensive Battle Report as JSON (BIDBATTLE 7.7)
+  const handleExportJSON = () => {
     const summary = {
-      tournament: tournamentName,
-      date: new Date().toLocaleDateString(),
-      champion: champion.name,
-      leaderboard: leaderboard.map((e) => ({
-        rank: e.rank,
-        team: e.team.name,
-        played: e.played,
-        won: e.won,
-        drawn: e.drawn,
-        lost: e.lost,
-        points: e.points,
-      })),
+      title: 'BIDBATTLE 7.7 Official Battle Arena Tournament Report',
+      tournamentName,
+      date: new Date().toISOString(),
+      podium: {
+        champion: {
+          rank: 1,
+          name: champion.name,
+          owner: champion.owner,
+          color: champion.color,
+          points: championStats?.points || 0,
+          wins: championStats?.won || 0,
+        },
+        runnerUp: leaderboard[1] ? {
+          rank: 2,
+          name: leaderboard[1].team.name,
+          owner: leaderboard[1].team.owner,
+          points: leaderboard[1].points,
+        } : null,
+        thirdPlace: leaderboard[2] ? {
+          rank: 3,
+          name: leaderboard[2].team.name,
+          points: leaderboard[2].points,
+        } : null,
+        fourthPlace: leaderboard[3] ? {
+          rank: 4,
+          name: leaderboard[3].team.name,
+          points: leaderboard[3].points,
+        } : null,
+      },
+      tournamentMVP: mvpData?.mvp ? {
+        name: mvpData.mvp.fighter.name,
+        role: mvpData.mvp.fighter.role,
+        movie: mvpData.mvp.fighter.movie,
+        team: mvpData.mvp.team.name,
+        mvpPoints: mvpData.mvp.mvpPoints,
+        matchesPlayed: mvpData.mvp.matchesPlayed,
+        matchesWon: mvpData.mvp.matchesWon,
+        highestScore: mvpData.mvp.highestScore,
+        criteria: mvpData.criteriaExplanation,
+      } : null,
+      teamStandings: tournamentStats,
       matches: completedMatches.map((m) => ({
-        match: m.matchNumber,
+        matchNumber: m.matchNumber,
         teamA: `${m.teamAName} (${m.teamAPlayer?.name})`,
         teamB: `${m.teamBName} (${m.teamBPlayer?.name})`,
         result: m.isDraw ? 'Draw' : `${teams.find((t) => t.id === m.winnerId)?.name} Won`,
         scoreA: m.teamAScore,
         scoreB: m.teamBScore,
+        scoreDiff: m.scoreDiff,
+      })),
+      rosters: teams.map((t) => ({
+        team: t.name,
+        owner: t.owner,
+        purseRemaining: t.purse,
+        fighters: t.squad.map((f) => ({
+          name: f.name,
+          role: f.role,
+          rating: f.rating,
+          soldPrice: f.soldPrice,
+        })),
       })),
     };
 
@@ -90,15 +131,22 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `battle_arena_results_${Date.now()}.json`;
+    a.download = `${tournamentName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_battle_report.json`;
     a.click();
-    toast.success('Tournament results exported to JSON!');
+    toast.success('Downloaded Official Battle Arena Report (JSON)!');
   };
+
+  const rankBadges = [
+    { label: '🥇 1ST — CHAMPION', border: 'border-amber-500', glow: 'shadow-glow-orange text-amber-400 bg-amber-500/10' },
+    { label: '🥈 2ND — RUNNER-UP', border: 'border-brand-cyan', glow: 'shadow-glow-cyan text-brand-cyan bg-cyan-500/10' },
+    { label: '🥉 3RD PLACE', border: 'border-brand-purple', glow: 'shadow-glow-purple text-brand-purple bg-purple-500/10' },
+    { label: '4TH PLACE', border: 'border-battle-border', glow: 'text-battle-muted bg-battle-surface' },
+  ];
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       
-      {/* 1. CINEMATIC CHAMPION PRESENTATION */}
+      {/* 1. CINEMATIC CHAMPION HEADER CARD */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -132,11 +180,11 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
           <Button
             variant="secondary"
             size="md"
-            onClick={handleExport}
-            className="font-broadcast text-xs border-battle-border hover:border-brand-cyan text-white flex items-center gap-2"
+            onClick={handleExportJSON}
+            className="font-broadcast text-xs border-brand-cyan/40 hover:border-brand-cyan text-brand-cyan flex items-center gap-2 bg-brand-cyan/10"
           >
             <Download className="w-4 h-4 text-brand-cyan" />
-            <span>EXPORT SUMMARY</span>
+            <span>DOWNLOAD BATTLE REPORT (JSON)</span>
           </Button>
 
           <Button
@@ -151,58 +199,156 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
         </div>
       </motion.div>
 
-      {/* 2. TOURNAMENT HIGHLIGHT STATS ROW */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Highlight 1: Best Individual Performer */}
-        <div className="battle-panel rounded-2xl p-5 border border-battle-border text-center space-y-1">
-          <span className="text-[10px] font-mono text-battle-muted uppercase font-bold block">
-            ⭐ Top Match Performer
-          </span>
-          <h4 className="font-broadcast font-black text-lg text-white">
-            {bestPerformer?.player?.name || '—'}
-          </h4>
-          <span className="text-xs font-mono text-brand-neon font-black block">
-            {bestPerformer ? `Combat Score: ${bestPerformer.score}` : ''}
-          </span>
-          <span className="text-[10px] font-mono text-battle-muted">
-            {bestPerformer?.team?.name}
-          </span>
+      {/* 2. DYNAMIC CHAMPIONSHIP PODIUM (2, 3 OR 4 TEAMS) (BIDBATTLE 7.7) */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Trophy className="w-5 h-5 text-amber-400" />
+          <h3 className="font-broadcast font-black text-xl text-white uppercase tracking-wide">
+            Championship Podium ({teams.length} Franchises)
+          </h3>
         </div>
 
-        {/* Highlight 2: Biggest Margin Victory */}
-        <div className="battle-panel rounded-2xl p-5 border border-battle-border text-center space-y-1">
-          <span className="text-[10px] font-mono text-battle-muted uppercase font-bold block">
-            🔥 Biggest Victory Margin
-          </span>
-          <h4 className="font-broadcast font-black text-lg text-amber-300">
-            {biggestWinMatch ? `+${biggestWinMatch.scoreDiff} Pts Margin` : '—'}
-          </h4>
-          <span className="text-xs font-mono text-white block">
-            {biggestWinMatch ? `${teams.find((t) => t.id === biggestWinMatch.winnerId)?.name} Win` : ''}
-          </span>
-          <span className="text-[10px] font-mono text-battle-muted">
-            {biggestWinMatch ? `Match #${biggestWinMatch.matchNumber}` : ''}
-          </span>
-        </div>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${teams.length === 3 ? 'lg:grid-cols-3' : teams.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-2 max-w-3xl mx-auto'} gap-4`}>
+          {leaderboard.map((entry, idx) => {
+            const badgeStyle = rankBadges[idx] || rankBadges[3];
+            const isWinner = idx === 0;
 
-        {/* Highlight 3: Purse Efficiency */}
-        <div className="battle-panel rounded-2xl p-5 border border-battle-border text-center space-y-1">
-          <span className="text-[10px] font-mono text-battle-muted uppercase font-bold block">
-            💰 Champion Purse Left
-          </span>
-          <h4 className="font-broadcast font-black text-lg text-brand-cyan">
-            ₹{champion.purse} Cr
-          </h4>
-          <span className="text-xs font-mono text-battle-muted block">
-            Spent: ₹{(champion.initialPurse - champion.purse).toFixed(2)} Cr
-          </span>
-          <span className="text-[10px] font-mono text-emerald-400 font-bold">
-            {champion.squad.length} Fighters Acquired
-          </span>
+            return (
+              <motion.div
+                key={entry.team.id}
+                whileHover={{ y: -3 }}
+                className={`p-5 rounded-3xl battle-panel border-2 ${badgeStyle.border} relative overflow-hidden flex flex-col justify-between shadow-lg ${
+                  isWinner ? 'shadow-glow-orange' : ''
+                }`}
+              >
+                <div className="absolute top-0 left-0 right-0 h-1.5" style={{ backgroundColor: entry.team.color }} />
+
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-3xl p-2 rounded-2xl bg-battle-bg border border-battle-border">
+                      {entry.team.logo}
+                    </span>
+                    <span className={`px-2.5 py-1 rounded-xl text-[10px] font-broadcast font-bold uppercase border ${badgeStyle.glow}`}>
+                      {badgeStyle.label}
+                    </span>
+                  </div>
+
+                  <h4 className="font-broadcast font-black text-xl text-white mb-0.5" style={{ color: entry.team.color }}>
+                    {entry.team.name}
+                  </h4>
+                  <span className="text-xs text-battle-muted font-mono block mb-3">
+                    @{entry.team.owner}
+                  </span>
+
+                  <div className="p-3 rounded-2xl bg-battle-bg border border-battle-border space-y-1 mb-3 text-center">
+                    <span className="text-[10px] text-battle-muted uppercase font-broadcast font-bold block">
+                      Tournament Score
+                    </span>
+                    <span className="text-2xl font-black text-brand-neon font-mono">
+                      {entry.points} pts
+                    </span>
+                    <span className="text-[11px] text-battle-muted block font-mono">
+                      {entry.won}W • {entry.drawn}D • {entry.lost}L
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-battle-border text-center text-xs font-mono text-battle-muted">
+                  Net Diff: {entry.marginTotal > 0 ? `+${entry.marginTotal}` : entry.marginTotal} pts
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
 
-      {/* 3. TABBED VIEW: STANDINGS / TEAM ROSTERS / BATTLE HISTORY */}
+      {/* 3. TOURNAMENT MVP SPOTLIGHT CARD (BIDBATTLE 7.7) */}
+      {mvpData?.mvp && (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-6 sm:p-8 rounded-3xl battle-panel border-2 border-amber-500/70 shadow-2xl relative overflow-hidden"
+        >
+          {/* Ambient Amber Halo */}
+          <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
+
+          <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
+            <div className="relative shrink-0">
+              <div className="w-28 h-28 rounded-3xl bg-battle-bg border-2 border-amber-500/60 shadow-xl flex items-center justify-center text-5xl overflow-hidden shadow-glow-orange">
+                {mvpData.mvp.fighter.imageUrl ? (
+                  <img
+                    src={mvpData.mvp.fighter.imageUrl}
+                    alt={mvpData.mvp.fighter.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>👑</span>
+                )}
+              </div>
+              <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-amber-500 text-black flex items-center justify-center font-black shadow-md">
+                ★
+              </div>
+            </div>
+
+            <div className="flex-1 text-center md:text-left space-y-2">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                <Badge variant="gold" className="text-xs uppercase font-bold tracking-wider">
+                  Tournament MVP Award
+                </Badge>
+                <span className="text-xs font-mono font-bold text-amber-400">
+                  {mvpData.mvp.mvpPoints} MVP Pts
+                </span>
+              </div>
+
+              <h3 className="font-broadcast text-3xl sm:text-4xl font-black text-white uppercase tracking-wide">
+                {mvpData.mvp.fighter.name}
+              </h3>
+
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs font-mono">
+                <span className="text-brand-purple font-bold">
+                  {mvpData.mvp.fighter.role || 'Superstar'}
+                </span>
+                {mvpData.mvp.fighter.movie && (
+                  <span className="text-battle-muted">• Film: {mvpData.mvp.fighter.movie}</span>
+                )}
+                <span className="text-brand-cyan">• Franchise: {mvpData.mvp.team.name}</span>
+              </div>
+
+              {/* Formula & Criteria explanation badge */}
+              <div className="p-3 rounded-2xl bg-battle-bg border border-battle-border text-xs text-battle-muted leading-relaxed">
+                <span className="text-amber-400 font-bold block mb-0.5 font-broadcast uppercase text-[11px]">
+                  Official MVP Formula & Criteria:
+                </span>
+                <span>
+                  {mvpData.criteriaExplanation} ({mvpData.mvp.matchesWon} Wins, Combat Score: {mvpData.mvp.highestScore}).
+                </span>
+              </div>
+            </div>
+
+            {/* Quick Stats Column */}
+            <div className="grid grid-cols-2 gap-2 text-center shrink-0 w-full md:w-48">
+              <div className="p-3 rounded-2xl bg-battle-bg border border-battle-border">
+                <span className="text-[10px] text-battle-muted uppercase font-bold block font-broadcast">Matches</span>
+                <span className="font-mono font-black text-xl text-white">{mvpData.mvp.matchesPlayed}</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-battle-bg border border-battle-border">
+                <span className="text-[10px] text-battle-muted uppercase font-bold block font-broadcast">Wins</span>
+                <span className="font-mono font-black text-xl text-emerald-400">{mvpData.mvp.matchesWon}</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-battle-bg border border-battle-border">
+                <span className="text-[10px] text-battle-muted uppercase font-bold block font-broadcast">Top Score</span>
+                <span className="font-mono font-black text-xl text-amber-300">{mvpData.mvp.highestScore}</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-battle-bg border border-battle-border">
+                <span className="text-[10px] text-battle-muted uppercase font-bold block font-broadcast">Base ★</span>
+                <span className="font-mono font-black text-xl text-brand-cyan">{mvpData.mvp.fighter.rating}</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* 4. TABBED PERFORMANCE BREAKDOWN */}
       <div className="battle-panel rounded-3xl border border-battle-border overflow-hidden shadow-xl space-y-4 p-6">
         <div className="flex items-center gap-2 border-b border-battle-border pb-3">
           <button
@@ -214,7 +360,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
                 : 'text-battle-muted hover:text-white'
             }`}
           >
-            FINAL POINTS TABLE
+            TEAM PERFORMANCE TABLE
           </button>
 
           <button
@@ -226,7 +372,7 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
                 : 'text-battle-muted hover:text-white'
             }`}
           >
-            TEAM ROSTERS & RATINGS
+            TEAM ROSTERS & REVEALED RATINGS
           </button>
 
           <button
@@ -242,42 +388,51 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
           </button>
         </div>
 
-        {/* Tab 1: Final Standings Table */}
+        {/* Tab 1: Comprehensive Team Performance Table (BIDBATTLE 7.7) */}
         {activeTab === 'standings' && (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="border-b border-battle-border text-battle-muted font-broadcast text-[11px] uppercase">
-                  <th className="pb-3">Pos</th>
-                  <th className="pb-3">Franchise</th>
-                  <th className="pb-3 text-center">Played</th>
-                  <th className="pb-3 text-center">Won</th>
-                  <th className="pb-3 text-center">Drawn</th>
-                  <th className="pb-3 text-center">Lost</th>
-                  <th className="pb-3 text-center">Diff</th>
-                  <th className="pb-3 text-right">Points</th>
+                  <th className="pb-3 px-2">Pos</th>
+                  <th className="pb-3 px-2">Franchise</th>
+                  <th className="pb-3 px-2 text-center">Played</th>
+                  <th className="pb-3 px-2 text-center">Won</th>
+                  <th className="pb-3 px-2 text-center">Drawn</th>
+                  <th className="pb-3 px-2 text-center">Lost</th>
+                  <th className="pb-3 px-2 text-center">Diff Margin</th>
+                  <th className="pb-3 px-2 text-center">Remaining Fighters</th>
+                  <th className="pb-3 px-2 text-right">Points</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-battle-border/50 font-mono">
-                {leaderboard.map((entry) => (
-                  <tr key={entry.team.id} className="hover:bg-battle-surface/40">
-                    <td className="py-3 font-bold text-battle-muted">
+                {tournamentStats.map((entry) => (
+                  <tr key={entry.team.id} className="hover:bg-battle-surface/40 transition-colors">
+                    <td className="py-3 px-2 font-bold text-battle-muted">
                       #{entry.rank} {entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : ''}
                     </td>
-                    <td className="py-3">
+                    <td className="py-3 px-2">
                       <div className="flex items-center gap-2">
                         <span className="text-lg">{entry.team.logo}</span>
-                        <span className="font-broadcast font-bold text-white text-sm" style={{ color: entry.team.color }}>
-                          {entry.team.name}
-                        </span>
+                        <div>
+                          <span className="font-broadcast font-bold text-white text-sm block" style={{ color: entry.team.color }}>
+                            {entry.team.name}
+                          </span>
+                          <span className="text-[10px] text-battle-muted">@{entry.team.owner}</span>
+                        </div>
                       </div>
                     </td>
-                    <td className="py-3 text-center text-battle-muted">{entry.played}</td>
-                    <td className="py-3 text-center text-emerald-400 font-bold">{entry.won}</td>
-                    <td className="py-3 text-center text-battle-muted">{entry.drawn}</td>
-                    <td className="py-3 text-center text-rose-400">{entry.lost}</td>
-                    <td className="py-3 text-center text-battle-muted">{entry.marginTotal > 0 ? `+${entry.marginTotal}` : entry.marginTotal}</td>
-                    <td className="py-3 text-right font-black text-brand-neon text-base">
+                    <td className="py-3 px-2 text-center text-battle-muted">{entry.matchesPlayed}</td>
+                    <td className="py-3 px-2 text-center text-emerald-400 font-bold">{entry.wins}</td>
+                    <td className="py-3 px-2 text-center text-battle-muted">{entry.draws}</td>
+                    <td className="py-3 px-2 text-center text-rose-400">{entry.losses}</td>
+                    <td className="py-3 px-2 text-center font-bold text-white">
+                      {entry.marginTotal > 0 ? `+${entry.marginTotal}` : entry.marginTotal}
+                    </td>
+                    <td className="py-3 px-2 text-center text-amber-300">
+                      {entry.remainingFighters} / {entry.totalFighters}
+                    </td>
+                    <td className="py-3 px-2 text-right font-black text-brand-neon text-base">
                       {entry.points}
                     </td>
                   </tr>

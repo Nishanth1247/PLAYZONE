@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { storageService } from '../services/storageService';
 import { soundService } from '../services/soundService';
 import { AUCTION_PRESETS, FIXED_TEAMS, shuffleArray, getScoreMetricLabel } from '../services/presets';
@@ -31,8 +32,9 @@ export const AuctionProvider = ({ children }) => {
   const [saleCelebration, setSaleCelebration] = useState(null);
   const [unsoldPrompt, setUnsoldPrompt] = useState(null);
 
-  // Undo stack
+  // Undo stack & transaction safety
   const [undoStack, setUndoStack] = useState([]);
+  const [undoConfirmDialog, setUndoConfirmDialog] = useState(null);
 
   // Guard against rapid duplicate clicks
   const isBiddingRef = useRef(false);
@@ -128,10 +130,11 @@ export const AuctionProvider = ({ children }) => {
     return auction.items[auction.currentItemIndex];
   };
 
-  // Helper: Take snapshot for Undo
-  const pushUndoSnapshot = (currentAuction) => {
+  // Helper: Take snapshot for Undo with rich action metadata
+  const pushUndoSnapshot = (currentAuction, actionMeta = {}) => {
+    if (!currentAuction) return;
     const snapshot = JSON.parse(JSON.stringify(currentAuction));
-    setUndoStack((prev) => [snapshot, ...prev].slice(0, 10));
+    setUndoStack((prev) => [{ snapshot, meta: actionMeta }, ...prev].slice(0, 15));
   };
 
   // 1. Start New Auction from Setup Wizard or Preset
@@ -214,6 +217,25 @@ export const AuctionProvider = ({ children }) => {
           id: `tick_start_${Date.now()}`,
           text: `🏟️ Tournament Arena initialized: ${setupData.name || 'Hero Auction Showdown'}. Mode: ${modeConfig.name}. Lot #1 is on the block!`,
           type: 'event',
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        }
+      ],
+      activityTimeline: [
+        {
+          id: `act_${Date.now()}_start`,
+          type: 'tournament_started',
+          title: 'Tournament Arena Initialized',
+          description: `Tournament "${setupData.name || 'Hero Auction Showdown'}" initialized with ${configuredTeams.length} franchises.`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        },
+        {
+          id: `act_${Date.now()}_lot1`,
+          type: 'lot_introduced',
+          title: `Lot #1 Introduced: ${randomizedItems[0]?.name}`,
+          description: `Base Price: ${setupData.currency?.symbol || '₹'}${randomizedItems[0]?.basePrice} ${setupData.currency?.unit || 'Cr'} • Category: ${randomizedItems[0]?.category}`,
+          lotName: randomizedItems[0]?.name,
+          lotNumber: 1,
+          basePrice: randomizedItems[0]?.basePrice,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         }
       ],
@@ -479,12 +501,24 @@ export const AuctionProvider = ({ children }) => {
       isBiddingRef.current = false;
     }, 200);
 
-    // Save undo state before modifying
-    pushUndoSnapshot(auction);
-
     const validAmount = validation.amount;
     const prevHighestBidderId = auction.highestBidder;
     const prevTeam = prevHighestBidderId ? auction.teams.find((t) => t.id === prevHighestBidderId) : null;
+
+    // Save undo state before modifying
+    const currentLotItem = auction.items?.[auction.currentItemIndex];
+    pushUndoSnapshot(auction, {
+      type: 'bid',
+      description: `Bid of ${auction.currency?.symbol || '₹'}${validAmount} Cr by ${team.name} on ${currentLotItem?.name || 'Lot'}`,
+      teamId: team.id,
+      teamName: team.name,
+      amount: validAmount,
+      lotName: currentLotItem?.name,
+      effects: [
+        `Restore lot bid to ${auction.currency?.symbol || '₹'}${auction.currentBid} Cr`,
+        prevTeam ? `Highest bidder will revert to ${prevTeam.name}` : 'Highest bidder will be cleared',
+      ],
+    });
 
     if (prevTeam && prevTeam.id !== team.id) {
       setOutbidAlert({
@@ -523,12 +557,45 @@ export const AuctionProvider = ({ children }) => {
       timestamp: timeStr,
     };
 
+    const bidTimelineEntry = {
+      id: `act_${Date.now()}_bid`,
+      type: 'bid_placed',
+      title: `Bid: ${auction.currency?.symbol || '₹'}${validAmount} Cr`,
+      description: `${team.name} placed a bid of ${auction.currency?.symbol || '₹'}${validAmount} Cr (+${auction.currency?.symbol || '₹'}${fromPaise(diffPaise)} Cr)`,
+      teamId: team.id,
+      teamName: team.name,
+      teamColor: team.color,
+      teamLogo: team.logo,
+      amount: validAmount,
+      lotName: currentLotItem?.name,
+      lotNumber: (auction.currentItemIndex || 0) + 1,
+      timestamp: timeStr,
+    };
+
+    const newTimelineEntries = [bidTimelineEntry];
+    if (prevTeam && prevTeam.id !== team.id) {
+      newTimelineEntries.unshift({
+        id: `act_${Date.now()}_lead`,
+        type: 'leader_changed',
+        title: `Lead Outbid by ${team.name}`,
+        description: `${team.name} took the lead over ${prevTeam.name} at ${auction.currency?.symbol || '₹'}${validAmount} Cr.`,
+        teamId: team.id,
+        teamName: team.name,
+        teamColor: team.color,
+        amount: validAmount,
+        lotName: currentLotItem?.name,
+        lotNumber: (auction.currentItemIndex || 0) + 1,
+        timestamp: timeStr,
+      });
+    }
+
     setAuction((prev) => ({
       ...prev,
       currentBid: validAmount,
       highestBidder: team.id,
       bidHistory: [newBidRecord, ...prev.bidHistory],
       tickerEvents: [newTickerMsg, ...(prev.tickerEvents || [])].slice(0, 20),
+      activityTimeline: [...newTimelineEntries, ...(prev.activityTimeline || [])].slice(0, 100),
       timer: prev.rules?.countdownDuration || 20,
       isTimerRunning: true,
     }));
@@ -549,26 +616,63 @@ export const AuctionProvider = ({ children }) => {
     return placeBid(teamId, target);
   };
 
-  // 5. Undo Last Bid
-  const undoLastBid = () => {
-    if (undoStack.length === 0) return false;
-    const previousState = undoStack[0];
+  // 5. Transaction Safety: Request Undo with Confirmation
+  const requestUndo = () => {
+    if (undoStack.length === 0) {
+      toast.error('No transactions available to undo');
+      return false;
+    }
+    const top = undoStack[0];
+    setUndoConfirmDialog(top);
+    return true;
+  };
+
+  const cancelUndo = () => {
+    setUndoConfirmDialog(null);
+  };
+
+  const executeConfirmedUndo = () => {
+    if (!undoConfirmDialog || undoStack.length === 0) return false;
+    const { snapshot, meta } = undoConfirmDialog;
     setUndoStack((prev) => prev.slice(1));
+    setUndoConfirmDialog(null);
 
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const undoTickerMsg = {
-      id: `tick_${Date.now()}`,
-      text: `↩️ Last bid undone. Bid restored to ${previousState.currency?.symbol || '₹'}${previousState.currentBid} Cr`,
-      type: 'undo',
+    const reversalMsg = meta?.description
+      ? `Reversed: ${meta.description}`
+      : `Reversed transaction at ${timeStr}`;
+
+    const undoTimelineEntry = {
+      id: `act_${Date.now()}_undo`,
+      type: 'undo_transaction',
+      title: 'Transaction Reversed (Undo)',
+      description: reversalMsg,
       timestamp: timeStr,
     };
 
     setAuction({
-      ...previousState,
-      tickerEvents: [undoTickerMsg, ...(previousState.tickerEvents || [])].slice(0, 20),
+      ...snapshot,
+      activityTimeline: [undoTimelineEntry, ...(snapshot.activityTimeline || [])].slice(0, 100),
+      tickerEvents: [
+        {
+          id: `tick_${Date.now()}`,
+          text: `↩️ ${reversalMsg}`,
+          type: 'undo',
+          timestamp: timeStr,
+        },
+        ...(snapshot.tickerEvents || [])
+      ].slice(0, 20),
     });
+    setSaleCelebration(null);
+    setUnsoldPrompt(null);
     setOutbidAlert(null);
+    toast.success('Transaction successfully reversed!');
     return true;
+  };
+
+  // Keep legacy direct undo as alias to requestUndo
+  const undoLastBid = () => {
+    return requestUndo();
   };
 
   // 6. Centralized Authoritative Settlement (Timeout, SOLD, or UNSOLD)
@@ -603,6 +707,21 @@ export const AuctionProvider = ({ children }) => {
   };
 
   const confirmSoldInternal = (currentItem, winningTeam, finalPrice, curAuction) => {
+    // Record undoable snapshot with clear metadata
+    pushUndoSnapshot(curAuction, {
+      type: 'settlement',
+      description: `Sale of Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) to ${winningTeam.name} for ${curAuction.currency?.symbol || '₹'}${finalPrice} Cr`,
+      teamId: winningTeam.id,
+      teamName: winningTeam.name,
+      amount: finalPrice,
+      lotName: currentItem.name,
+      effects: [
+        `Refund ${curAuction.currency?.symbol || '₹'}${finalPrice} Cr to ${winningTeam.name}'s purse`,
+        `Restore 1 squad slot to ${winningTeam.name}`,
+        `Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) returns to active pending block`,
+      ],
+    });
+
     if (curAuction.rules?.soundEffects && !isMuted) {
       soundService.playSold();
     }
@@ -618,6 +737,21 @@ export const AuctionProvider = ({ children }) => {
       id: `tick_${Date.now()}`,
       text: `🔨 Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) SOLD to ${winningTeam.name} for ${curAuction.currency?.symbol || '₹'}${finalPrice} Cr!`,
       type: 'sold',
+      timestamp: timeStr,
+    };
+
+    const soldTimelineEntry = {
+      id: `act_${Date.now()}_sold`,
+      type: 'item_sold',
+      title: `SOLD: ${currentItem.name}`,
+      description: `Hammer fell! Acquired by ${winningTeam.name} for ${curAuction.currency?.symbol || '₹'}${finalPrice} Cr`,
+      teamId: winningTeam.id,
+      teamName: winningTeam.name,
+      teamColor: winningTeam.color,
+      teamLogo: winningTeam.logo,
+      lotName: currentItem.name,
+      lotNumber: curAuction.currentItemIndex + 1,
+      price: finalPrice,
       timestamp: timeStr,
     };
 
@@ -664,6 +798,7 @@ export const AuctionProvider = ({ children }) => {
         teams: updatedTeams,
         items: updatedItems,
         tickerEvents: [soldTickerMsg, ...(prev.tickerEvents || [])].slice(0, 20),
+        activityTimeline: [soldTimelineEntry, ...(prev.activityTimeline || [])].slice(0, 100),
         timer: 0,
         isTimerRunning: false,
       };
@@ -671,6 +806,15 @@ export const AuctionProvider = ({ children }) => {
   };
 
   const markUnsoldInternal = (currentItem, curAuction) => {
+    pushUndoSnapshot(curAuction, {
+      type: 'unsold',
+      description: `Marking Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) as UNSOLD`,
+      lotName: currentItem.name,
+      effects: [
+        `Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) returns from unsold reserve to pending block`,
+      ],
+    });
+
     if (curAuction.rules?.soundEffects && !isMuted) {
       soundService.playUnsold();
     }
@@ -682,6 +826,17 @@ export const AuctionProvider = ({ children }) => {
       id: `tick_${Date.now()}`,
       text: `❌ Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) passed and marked UNSOLD`,
       type: 'unsold',
+      timestamp: timeStr,
+    };
+
+    const unsoldTimelineEntry = {
+      id: `act_${Date.now()}_unsold`,
+      type: 'item_unsold',
+      title: `UNSOLD: ${currentItem.name}`,
+      description: `No qualifying bids meeting reserve of ${curAuction.currency?.symbol || '₹'}${currentItem.basePrice} Cr. Lot passed to unsold reserve.`,
+      lotName: currentItem.name,
+      lotNumber: curAuction.currentItemIndex + 1,
+      basePrice: currentItem.basePrice,
       timestamp: timeStr,
     };
 
@@ -703,6 +858,7 @@ export const AuctionProvider = ({ children }) => {
         ...prev,
         items: updatedItems,
         tickerEvents: [unsoldTickerMsg, ...(prev.tickerEvents || [])].slice(0, 20),
+        activityTimeline: [unsoldTimelineEntry, ...(prev.activityTimeline || [])].slice(0, 100),
         timer: 0,
         isTimerRunning: false,
       };
@@ -735,7 +891,8 @@ export const AuctionProvider = ({ children }) => {
     setSaleCelebration(null);
     setUnsoldPrompt(null);
     setOutbidAlert(null);
-    setUndoStack([]);
+    // Keep most recent transaction in undo stack so accidental advance can still be reversed
+    setUndoStack((prev) => prev.slice(0, 1));
 
     if (!auction) return;
 
@@ -754,6 +911,18 @@ export const AuctionProvider = ({ children }) => {
 
     const nextItem = auction.items[nextIdx];
     const initialBid = nextItem ? Number(nextItem.basePrice) : 1.0;
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    const lotIntroTimeline = nextItem ? {
+      id: `act_${Date.now()}_lot_${nextIdx + 1}`,
+      type: 'lot_introduced',
+      title: `Lot #${nextIdx + 1} Introduced: ${nextItem.name}`,
+      description: `Base Price: ${auction.currency?.symbol || '₹'}${nextItem.basePrice} Cr • Category: ${nextItem.category || nextItem.role}`,
+      lotName: nextItem.name,
+      lotNumber: nextIdx + 1,
+      basePrice: nextItem.basePrice,
+      timestamp: timeStr,
+    } : null;
 
     setAuction((prev) => ({
       ...prev,
@@ -764,6 +933,9 @@ export const AuctionProvider = ({ children }) => {
       timer: prev.rules.countdownDuration || 20,
       isTimerRunning: true,
       status: 'in_progress',
+      activityTimeline: lotIntroTimeline
+        ? [lotIntroTimeline, ...(prev.activityTimeline || [])].slice(0, 100)
+        : prev.activityTimeline,
     }));
   };
 
@@ -789,6 +961,16 @@ export const AuctionProvider = ({ children }) => {
         return item;
       });
 
+      const reAuctionTimeline = {
+        id: `tl_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        timestamp: new Date().toLocaleTimeString(),
+        type: 're_auction',
+        icon: '🔄',
+        title: `Re-Auction: ${targetItem.name}`,
+        description: `Returned to bidding pool at base price ₹${targetItem.basePrice} Cr`,
+        badgeColor: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
+      };
+
       return {
         ...prev,
         items: updatedItems,
@@ -799,6 +981,7 @@ export const AuctionProvider = ({ children }) => {
         timer: prev.rules.countdownDuration || 20,
         isTimerRunning: true,
         status: 'in_progress',
+        activityTimeline: [reAuctionTimeline, ...(prev.activityTimeline || [])].slice(0, 100),
       };
     });
 
@@ -828,6 +1011,16 @@ export const AuctionProvider = ({ children }) => {
       const firstIdx = updatedItems.findIndex((i) => i.status === 'pending');
       const firstPending = updatedItems[firstIdx];
 
+      const reAllTimeline = {
+        id: `tl_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        timestamp: new Date().toLocaleTimeString(),
+        type: 're_auction_all',
+        icon: '🔁',
+        title: `Re-Auctioning ${unsoldItems.length} Unsold Lots`,
+        description: `Round ${(prev.round || 1) + 1} initiated for all passed lots`,
+        badgeColor: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10',
+      };
+
       return {
         ...prev,
         round: (prev.round || 1) + 1,
@@ -839,6 +1032,7 @@ export const AuctionProvider = ({ children }) => {
         timer: prev.rules.countdownDuration || 20,
         isTimerRunning: true,
         status: 'in_progress',
+        activityTimeline: [reAllTimeline, ...(prev.activityTimeline || [])].slice(0, 100),
       };
     });
 
@@ -849,7 +1043,22 @@ export const AuctionProvider = ({ children }) => {
   const toggleTimer = () => {
     setAuction((prev) => {
       if (!prev) return prev;
-      return { ...prev, isTimerRunning: !prev.isTimerRunning };
+      const nextRunning = !prev.isTimerRunning;
+      const timerTimeline = {
+        id: `tl_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        timestamp: new Date().toLocaleTimeString(),
+        type: nextRunning ? 'timer_resume' : 'timer_pause',
+        icon: nextRunning ? '▶️' : '⏸️',
+        title: nextRunning ? 'Auction Timer Resumed' : 'Auction Timer Paused',
+        description: `Timer ${nextRunning ? 'resumed at' : 'paused at'} ${prev.timer}s`,
+        badgeColor: 'text-slate-400 border-slate-500/30 bg-slate-500/10',
+      };
+
+      return {
+        ...prev,
+        isTimerRunning: nextRunning,
+        activityTimeline: [timerTimeline, ...(prev.activityTimeline || [])].slice(0, 100),
+      };
     });
   };
 
@@ -930,6 +1139,10 @@ export const AuctionProvider = ({ children }) => {
         placeIncrementBid,
         undoLastBid,
         canUndo: undoStack.length > 0,
+        requestUndo,
+        executeConfirmedUndo,
+        cancelUndo,
+        undoConfirmDialog,
         settleCurrentLot,
         confirmSold,
         markUnsold,
