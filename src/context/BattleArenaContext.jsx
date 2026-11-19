@@ -129,6 +129,9 @@ export const BattleArenaProvider = ({ children }) => {
       status: 'sold',
       soldTo: highestBidder,
       soldPrice: currentBid,
+      basePrice: currentItem.basePrice,
+      highestBid: currentBid,
+      settlementType: 'normal_sold',
     };
 
     const updatedTeams = prevState.teams.map((t) => {
@@ -184,13 +187,82 @@ export const BattleArenaProvider = ({ children }) => {
 
   // Helper: auto settle lot as UNSOLD when timer runs out
   const handleAutoUnsoldOnTimeout = (prevState) => {
-    const { items, currentItemIndex } = prevState.auction;
+    const { items, currentItemIndex, highestBidder, currentBid } = prevState.auction;
     const currentItem = items[currentItemIndex];
     if (!currentItem) return prevState;
+
+    // MANDATORY LAST-BIDDER SETTLEMENT RULE (Part 3):
+    // If at least one valid bid was placed, player cannot be unsold!
+    // Last accepted bidder acquires the player at base price.
+    if (highestBidder) {
+      const winningTeam = prevState.teams.find((t) => t.id === highestBidder);
+      const basePrice = Number(currentItem.basePrice) || 1.0;
+      const updatedPurse = Number((winningTeam.purse - basePrice).toFixed(2));
+
+      const soldItem = {
+        ...currentItem,
+        status: 'sold',
+        soldTo: highestBidder,
+        soldPrice: basePrice,
+        basePrice: basePrice,
+        highestBid: currentBid,
+        settlementType: 'last_bidder_base_price_settlement',
+      };
+
+      const updatedTeams = prevState.teams.map((t) => {
+        if (t.id === highestBidder) {
+          return {
+            ...t,
+            purse: Math.max(0, updatedPurse),
+            squad: [...t.squad, soldItem],
+          };
+        }
+        return t;
+      });
+
+      const updatedItems = items.map((it, idx) => (idx === currentItemIndex ? soldItem : it));
+      const allSquadsFull = updatedTeams.every((t) => t.squad.length >= prevState.squadSize);
+      const nextIdx = currentItemIndex + 1;
+
+      if (allSquadsFull || nextIdx >= items.length) {
+        soundService.playSold();
+        return {
+          ...prevState,
+          phase: 'roster_confirm',
+          teams: updatedTeams,
+          auction: {
+            ...prevState.auction,
+            items: updatedItems,
+            status: 'concluded',
+            isTimerRunning: false,
+            timer: 0,
+          },
+        };
+      }
+
+      const nextItem = updatedItems[nextIdx];
+      const duration = prevState.auction.countdownDuration || prevState.countdownDuration || 20;
+      return {
+        ...prevState,
+        teams: updatedTeams,
+        auction: {
+          ...prevState.auction,
+          items: updatedItems,
+          currentItemIndex: nextIdx,
+          currentBid: Number(nextItem?.basePrice) || 1.0,
+          highestBidder: null,
+          bidHistory: [],
+          timer: duration,
+          isTimerRunning: true,
+        },
+      };
+    }
 
     const unsoldItem = {
       ...currentItem,
       status: 'unsold',
+      basePrice: currentItem.basePrice,
+      settlementType: 'unsold_no_bids',
     };
 
     const updatedItems = items.map((it, idx) => (idx === currentItemIndex ? unsoldItem : it));

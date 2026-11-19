@@ -105,6 +105,8 @@ export const ResultsScreen = () => {
         totalLots: items.length,
         soldLots: soldItems.length,
         unsoldLots: unsoldItems.length,
+        normalSoldLots: soldItems.filter((i) => i.settlementType === 'normal_sold').length,
+        specialSettlementLots: soldItems.filter((i) => i.settlementType === 'last_bidder_base_price_settlement').length,
         clearanceRatePct: Number(((soldItems.length / (items.length || 1)) * 100).toFixed(1)),
         totalLeagueSpent: Number(totalLeagueSpent.toFixed(2)),
         averagePurchasePrice: soldItems.length ? Number((totalLeagueSpent / soldItems.length).toFixed(2)) : 0,
@@ -133,6 +135,9 @@ export const ResultsScreen = () => {
           name: s.name,
           rating: s.rating,
           soldPrice: s.soldPrice,
+          basePrice: s.basePrice,
+          highestBid: s.highestBid,
+          settlementType: s.settlementType || 'normal_sold',
           role: s.role,
         })),
       })),
@@ -789,6 +794,14 @@ export const ResultsScreen = () => {
                       </div>
 
                       <div className="text-right flex items-center gap-3">
+                        {item.settlementType === 'last_bidder_base_price_settlement' && (
+                          <span
+                            className="px-2 py-0.5 rounded-lg bg-brand-orange/20 border border-brand-orange/40 text-brand-orange font-mono text-[9px] uppercase font-bold"
+                            title="Acquired via mandatory last-bidder settlement at original base price"
+                          >
+                            ⚡ Base Price Settle
+                          </span>
+                        )}
                         <span className="px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono font-bold text-xs">
                           {item.imdbRating ? `★ IMDb ${item.imdbRating} (${item.rating} pts)` : `★ ${item.rating} pts`}
                         </span>

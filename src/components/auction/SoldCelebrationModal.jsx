@@ -83,9 +83,15 @@ export const SoldCelebrationModal = ({ saleData, currency, onNext }) => {
 
         {/* Winning Franchise Spotlight */}
         <div className="my-6 space-y-3 relative z-10">
-          <Badge variant="gold" icon={Trophy}>
-            Acquired by Franchise
-          </Badge>
+          {saleData.settlementType === 'last_bidder_base_price_settlement' ? (
+            <Badge variant="orange" icon={Sparkles} className="text-xs uppercase font-broadcast font-bold">
+              ⚡ Last-Bidder Settlement @ Base Price
+            </Badge>
+          ) : (
+            <Badge variant="gold" icon={Trophy}>
+              Acquired by Franchise
+            </Badge>
+          )}
 
           <div className="flex items-center justify-center gap-3">
             <span className="text-4xl p-2.5 rounded-2xl bg-battle-surface border border-battle-border shadow-xl">
@@ -95,7 +101,11 @@ export const SoldCelebrationModal = ({ saleData, currency, onNext }) => {
               <h3 className="text-3xl font-black text-white font-broadcast tracking-wide" style={{ color: team.color }}>
                 {team.name}
               </h3>
-              <p className="text-xs text-battle-muted">Added to official championship roster</p>
+              <p className="text-xs text-battle-muted">
+                {saleData.settlementType === 'last_bidder_base_price_settlement'
+                  ? 'Mandatory last-bidder acquisition at base price'
+                  : 'Added to official championship roster'}
+              </p>
             </div>
           </div>
         </div>
@@ -120,11 +130,16 @@ export const SoldCelebrationModal = ({ saleData, currency, onNext }) => {
 
           <div className="text-right">
             <span className="text-[10px] text-battle-muted uppercase font-bold tracking-wider block font-broadcast">
-              Final Hammer Price
+              {saleData.settlementType === 'last_bidder_base_price_settlement' ? 'Charged Base Price' : 'Final Hammer Price'}
             </span>
             <span className="text-2xl font-black text-amber-400 font-mono">
               {formatCurrency(price, currency)}
             </span>
+            {saleData.settlementType === 'last_bidder_base_price_settlement' && saleData.highestBid && (
+              <span className="text-[10px] font-mono text-battle-muted block line-through">
+                High bid: {formatCurrency(saleData.highestBid, currency)}
+              </span>
+            )}
           </div>
         </div>
 

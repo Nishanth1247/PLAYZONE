@@ -151,17 +151,29 @@ export const AuctionReplayViewer = ({ auction, onClose }) => {
               )}
             </div>
 
-            <Badge
-              variant={isSold ? 'neon' : 'danger'}
-              className="px-3 py-1 text-xs uppercase font-broadcast font-bold flex items-center gap-1"
-            >
-              {isSold ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
-              <span>{isSold ? 'SOLD' : 'UNSOLD'}</span>
-            </Badge>
+            <div className="flex items-center gap-2">
+              {currentLot.settlementType === 'last_bidder_base_price_settlement' ? (
+                <Badge
+                  variant="orange"
+                  className="px-3 py-1 text-xs uppercase font-broadcast font-bold flex items-center gap-1 shadow-glow-orange"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>SPECIAL BASE-PRICE SETTLEMENT</span>
+                </Badge>
+              ) : (
+                <Badge
+                  variant={isSold ? 'neon' : 'danger'}
+                  className="px-3 py-1 text-xs uppercase font-broadcast font-bold flex items-center gap-1"
+                >
+                  {isSold ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                  <span>{isSold ? 'NORMAL SOLD' : 'UNSOLD (NO BIDS)'}</span>
+                </Badge>
+              )}
+            </div>
           </div>
 
           {/* Pricing & Acquisition Economics */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
             <div className="p-3 rounded-2xl bg-battle-surface border border-battle-border">
               <span className="text-[10px] font-mono text-battle-muted uppercase block">Base Price</span>
               <span className="font-mono font-bold text-sm text-white">
@@ -170,25 +182,48 @@ export const AuctionReplayViewer = ({ auction, onClose }) => {
             </div>
 
             <div className="p-3 rounded-2xl bg-battle-surface border border-battle-border">
-              <span className="text-[10px] font-mono text-battle-muted uppercase block">Final Sale Price</span>
-              <span className="font-broadcast font-black text-lg text-brand-neon">
-                {isSold ? formatCurrency(currentLot.soldPrice, currency) : '₹0 Cr (Unsold)'}
+              <span className="text-[10px] font-mono text-battle-muted uppercase block">Highest Bid</span>
+              <span className="font-mono font-bold text-sm text-amber-300">
+                {currentLot.highestBid
+                  ? formatCurrency(currentLot.highestBid, currency)
+                  : bidHistory.length > 0
+                  ? formatCurrency(bidHistory[0].amount, currency)
+                  : 'None'}
               </span>
             </div>
 
-            <div className="p-3 rounded-2xl bg-battle-surface border border-battle-border col-span-2 sm:col-span-1">
+            <div className="p-3 rounded-2xl bg-battle-surface border border-battle-border">
+              <span className="text-[10px] font-mono text-battle-muted uppercase block">Actual Charged Price</span>
+              <span className="font-broadcast font-black text-base text-brand-neon">
+                {isSold ? formatCurrency(currentLot.soldPrice, currency) : '₹0 Cr'}
+              </span>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-battle-surface border border-battle-border">
               <span className="text-[10px] font-mono text-battle-muted uppercase block">Final Buyer</span>
               {buyerTeam ? (
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span>{buyerTeam.logo}</span>
-                  <span className="font-broadcast font-bold text-sm truncate" style={{ color: buyerTeam.color }}>
+                  <span className="font-broadcast font-bold text-xs truncate" style={{ color: buyerTeam.color }}>
                     {buyerTeam.name}
                   </span>
                 </div>
               ) : (
-                <span className="text-xs font-mono text-battle-muted italic">None (Unsold)</span>
+                <span className="text-xs font-mono text-battle-muted italic">None</span>
               )}
             </div>
+          </div>
+
+          {/* Settlement Type Note */}
+          <div className="p-2.5 rounded-xl bg-battle-surface/60 border border-battle-border text-xs flex items-center justify-between font-mono">
+            <span className="text-battle-muted">Settlement Rule Applied:</span>
+            <span className="font-bold text-white">
+              {currentLot.settlementType === 'last_bidder_base_price_settlement'
+                ? '⚡ Mandatory Last-Bidder Acquisition @ Base Price'
+                : isSold
+                ? '🔨 Standard Competitive Auction Hammer'
+                : '❌ Passed Without Bids (Unsold Reserve)'}
+            </span>
           </div>
 
           {/* Lore / Description */}

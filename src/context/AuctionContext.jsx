@@ -31,6 +31,7 @@ export const AuctionProvider = ({ children }) => {
   // Sold/Unsold overlay state
   const [saleCelebration, setSaleCelebration] = useState(null);
   const [unsoldPrompt, setUnsoldPrompt] = useState(null);
+  const [specialSettlementDialog, setSpecialSettlementDialog] = useState(null);
 
   // Undo stack & transaction safety
   const [undoStack, setUndoStack] = useState([]);
@@ -684,6 +685,7 @@ export const AuctionProvider = ({ children }) => {
     });
     setSaleCelebration(null);
     setUnsoldPrompt(null);
+    setSpecialSettlementDialog(null);
     setOutbidAlert(null);
     toast.success('Transaction successfully reversed!');
     return true;
@@ -726,13 +728,17 @@ export const AuctionProvider = ({ children }) => {
   };
 
   const confirmSoldInternal = (currentItem, winningTeam, finalPrice, curAuction) => {
+    const timeIso = new Date().toISOString();
     // Record undoable snapshot with clear metadata
     pushUndoSnapshot(curAuction, {
       type: 'settlement',
+      settlementType: 'normal_sold',
       description: `Sale of Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) to ${winningTeam.name} for ${curAuction.currency?.symbol || '₹'}${finalPrice} Cr`,
       teamId: winningTeam.id,
       teamName: winningTeam.name,
       amount: finalPrice,
+      basePrice: currentItem.basePrice,
+      highestBid: finalPrice,
       lotName: currentItem.name,
       effects: [
         `Refund ${curAuction.currency?.symbol || '₹'}${finalPrice} Cr to ${winningTeam.name}'s purse`,
@@ -749,6 +755,9 @@ export const AuctionProvider = ({ children }) => {
       item: { ...currentItem },
       team: { ...winningTeam },
       price: finalPrice,
+      basePrice: currentItem.basePrice,
+      highestBid: finalPrice,
+      settlementType: 'normal_sold',
     });
 
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -771,6 +780,9 @@ export const AuctionProvider = ({ children }) => {
       lotName: currentItem.name,
       lotNumber: curAuction.currentItemIndex + 1,
       price: finalPrice,
+      basePrice: currentItem.basePrice,
+      highestBid: finalPrice,
+      settlementType: 'normal_sold',
       timestamp: timeStr,
     };
 
@@ -790,6 +802,9 @@ export const AuctionProvider = ({ children }) => {
                 role: currentItem.role,
                 rating: currentItem.rating,
                 price: finalPrice,
+                basePrice: currentItem.basePrice,
+                highestBid: finalPrice,
+                settlementType: 'normal_sold',
                 category: currentItem.category,
               },
             ],
@@ -804,7 +819,127 @@ export const AuctionProvider = ({ children }) => {
             ...i,
             status: 'sold',
             soldPrice: finalPrice,
+            basePrice: currentItem.basePrice,
+            highestBid: finalPrice,
             soldTo: winningTeam.id,
+            settlementType: 'normal_sold',
+            settlementTimestamp: timeIso,
+            bidCount: prev.bidHistory?.length || 0,
+            bidHistory: prev.bidHistory || [],
+          };
+        }
+        return i;
+      });
+
+      return {
+        ...prev,
+        teams: updatedTeams,
+        items: updatedItems,
+        tickerEvents: [soldTickerMsg, ...(prev.tickerEvents || [])].slice(0, 20),
+        activityTimeline: [soldTimelineEntry, ...(prev.activityTimeline || [])].slice(0, 100),
+        timer: 0,
+        isTimerRunning: false,
+      };
+    });
+  };
+
+  const confirmSpecialSettlementInternal = (currentItem, winningTeam, basePrice, highestBid, curAuction) => {
+    const timeIso = new Date().toISOString();
+    // Record undoable snapshot with clear metadata
+    pushUndoSnapshot(curAuction, {
+      type: 'special_settlement',
+      settlementType: 'last_bidder_base_price_settlement',
+      description: `Special Last-Bidder Settlement: Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) to ${winningTeam.name} at Base Price ${curAuction.currency?.symbol || '₹'}${basePrice} Cr (Highest Bid: ${curAuction.currency?.symbol || '₹'}${highestBid} Cr)`,
+      teamId: winningTeam.id,
+      teamName: winningTeam.name,
+      amount: basePrice,
+      basePrice: basePrice,
+      highestBid: highestBid,
+      lotName: currentItem.name,
+      effects: [
+        `Refund ${curAuction.currency?.symbol || '₹'}${basePrice} Cr to ${winningTeam.name}'s purse`,
+        `Restore 1 squad slot to ${winningTeam.name}`,
+        `Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) returns to active pending block`,
+      ],
+    });
+
+    if (curAuction.rules?.soundEffects && !isMuted) {
+      soundService.playSold();
+    }
+
+    setSaleCelebration({
+      item: { ...currentItem },
+      team: { ...winningTeam },
+      price: basePrice,
+      basePrice: basePrice,
+      highestBid: highestBid,
+      settlementType: 'last_bidder_base_price_settlement',
+    });
+
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const soldTickerMsg = {
+      id: `tick_${Date.now()}`,
+      text: `⚡ Special Settlement: Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) awarded to ${winningTeam.name} at Base Price (${curAuction.currency?.symbol || '₹'}${basePrice} Cr)!`,
+      type: 'sold',
+      timestamp: timeStr,
+    };
+
+    const soldTimelineEntry = {
+      id: `act_${Date.now()}_special_sold`,
+      type: 'item_sold',
+      title: `SPECIAL SETTLEMENT: ${currentItem.name}`,
+      description: `Mandatory Last-Bidder Settlement! Awarded to ${winningTeam.name} at Base Price ${curAuction.currency?.symbol || '₹'}${basePrice} Cr (Highest Bid: ${curAuction.currency?.symbol || '₹'}${highestBid} Cr)`,
+      teamId: winningTeam.id,
+      teamName: winningTeam.name,
+      teamColor: winningTeam.color,
+      teamLogo: winningTeam.logo,
+      lotName: currentItem.name,
+      lotNumber: curAuction.currentItemIndex + 1,
+      price: basePrice,
+      basePrice: basePrice,
+      highestBid: highestBid,
+      settlementType: 'last_bidder_base_price_settlement',
+      timestamp: timeStr,
+    };
+
+    setAuction((prev) => {
+      if (!prev) return prev;
+      const updatedTeams = prev.teams.map((t) => {
+        if (t.id === winningTeam.id) {
+          const newPursePaise = toPaise(t.purse) - toPaise(basePrice);
+          return {
+            ...t,
+            purse: fromPaise(Math.max(0, newPursePaise)),
+            itemsPurchased: [
+              ...(t.itemsPurchased || []),
+              {
+                id: currentItem.id,
+                name: currentItem.name,
+                role: currentItem.role,
+                rating: currentItem.rating,
+                price: basePrice,
+                basePrice: basePrice,
+                highestBid: highestBid,
+                settlementType: 'last_bidder_base_price_settlement',
+                category: currentItem.category,
+              },
+            ],
+          };
+        }
+        return t;
+      });
+
+      const updatedItems = prev.items.map((i, idx) => {
+        if (idx === prev.currentItemIndex) {
+          return {
+            ...i,
+            status: 'sold',
+            soldPrice: basePrice,
+            basePrice: basePrice,
+            highestBid: highestBid,
+            soldTo: winningTeam.id,
+            settlementType: 'last_bidder_base_price_settlement',
+            settlementTimestamp: timeIso,
             bidCount: prev.bidHistory?.length || 0,
             bidHistory: prev.bidHistory || [],
           };
@@ -825,10 +960,13 @@ export const AuctionProvider = ({ children }) => {
   };
 
   const markUnsoldInternal = (currentItem, curAuction) => {
+    const timeIso = new Date().toISOString();
     pushUndoSnapshot(curAuction, {
       type: 'unsold',
+      settlementType: 'unsold_no_bids',
       description: `Marking Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) as UNSOLD`,
       lotName: currentItem.name,
+      basePrice: currentItem.basePrice,
       effects: [
         `Lot #${curAuction.currentItemIndex + 1} (${currentItem.name}) returns from unsold reserve to pending block`,
       ],
@@ -856,6 +994,7 @@ export const AuctionProvider = ({ children }) => {
       lotName: currentItem.name,
       lotNumber: curAuction.currentItemIndex + 1,
       basePrice: currentItem.basePrice,
+      settlementType: 'unsold_no_bids',
       timestamp: timeStr,
     };
 
@@ -866,6 +1005,12 @@ export const AuctionProvider = ({ children }) => {
           return {
             ...i,
             status: 'unsold',
+            soldPrice: null,
+            basePrice: currentItem.basePrice,
+            highestBid: null,
+            soldTo: null,
+            settlementType: 'unsold_no_bids',
+            settlementTimestamp: timeIso,
             bidCount: prev.bidHistory?.length || 0,
             bidHistory: prev.bidHistory || [],
           };
@@ -887,7 +1032,101 @@ export const AuctionProvider = ({ children }) => {
   settleCurrentLotRef.current = settleCurrentLot;
 
   const confirmSold = () => settleCurrentLot({ manual: true, forceSold: true });
-  const markUnsold = () => settleCurrentLot({ manual: true, forceUnsold: true });
+
+  // BIDBATTLE 8.3: Mandatory Last-Bidder Settlement Rule
+  const markUnsold = () => {
+    const curAuction = auctionRef.current;
+    if (!curAuction || curAuction.status !== 'in_progress') return;
+
+    const currentItem = curAuction.items?.[curAuction.currentItemIndex];
+    if (!currentItem || currentItem.status !== 'pending') return;
+
+    // Check if at least one valid bid has been placed on this lot
+    const hasBids = Boolean(curAuction.highestBidder) || (curAuction.bidHistory && curAuction.bidHistory.length > 0);
+
+    if (hasBids) {
+      // RULE: Once at least one valid bid has been accepted, player CANNOT become UNSOLD!
+      const lastBidderId = curAuction.highestBidder || curAuction.bidHistory?.[0]?.teamId;
+      const lastBidderTeam = curAuction.teams.find((t) => t.id === lastBidderId);
+
+      if (!lastBidderTeam) {
+        toast.error('Unable to locate last bidding franchise for settlement.');
+        return;
+      }
+
+      // Pause timer while prompt is active
+      if (timerRef.current) clearInterval(timerRef.current);
+      setAuction((prev) => (prev ? { ...prev, isTimerRunning: false } : prev));
+
+      // Trigger mandatory last-bidder confirmation dialog
+      setSpecialSettlementDialog({
+        item: { ...currentItem },
+        team: { ...lastBidderTeam },
+        basePrice: currentItem.basePrice,
+        highestBid: curAuction.currentBid,
+      });
+      return;
+    }
+
+    // No bids placed: genuinely unsold
+    settleCurrentLot({ manual: true, forceUnsold: true });
+  };
+
+  // Confirm Special Last-Bidder Settlement
+  const confirmSpecialSettlement = () => {
+    if (!specialSettlementDialog) return false;
+    const curAuction = auctionRef.current;
+    if (!curAuction || curAuction.status !== 'in_progress') return false;
+
+    const currentItem = curAuction.items?.[curAuction.currentItemIndex];
+    if (!currentItem || currentItem.status !== 'pending') {
+      toast.error('Current lot is already settled or not pending.');
+      setSpecialSettlementDialog(null);
+      return false;
+    }
+
+    const team = curAuction.teams.find((t) => t.id === specialSettlementDialog.team.id);
+    if (!team) {
+      toast.error('Franchise not found.');
+      setSpecialSettlementDialog(null);
+      return false;
+    }
+
+    const basePrice = Number(specialSettlementDialog.basePrice);
+    const maxSquadSize = Number(curAuction.rules?.maxSquadSize) || 8;
+    const squadCount = curAuction.items.filter((i) => i.soldTo === team.id).length;
+
+    // VALIDATION (Part 3)
+    // 1. Confirm last bidder has sufficient purse for base price
+    if (toPaise(team.purse) < toPaise(basePrice)) {
+      toast.error(`Special settlement failed: ${team.name} has insufficient purse (${formatCurrency(team.purse, curAuction.currency)}) for base price (${formatCurrency(basePrice, curAuction.currency)})!`);
+      return false;
+    }
+
+    // 2. Confirm squad limit is not exceeded
+    if (squadCount >= maxSquadSize) {
+      toast.error(`Special settlement failed: ${team.name} has reached maximum squad size (${maxSquadSize})!`);
+      return false;
+    }
+
+    // 3. Confirm player has not already been acquired
+    if (currentItem.status !== 'pending') {
+      toast.error('Special settlement failed: Player is already acquired!');
+      return false;
+    }
+
+    // Close dialog and pause timer
+    setSpecialSettlementDialog(null);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    // Execute special settlement
+    confirmSpecialSettlementInternal(currentItem, team, basePrice, specialSettlementDialog.highestBid, curAuction);
+    return true;
+  };
+
+  const cancelSpecialSettlement = () => {
+    setSpecialSettlementDialog(null);
+  };
 
   // In-auction settings update
   const updateAuctionSettings = (newRules) => {
@@ -909,6 +1148,7 @@ export const AuctionProvider = ({ children }) => {
   const advanceToNextItem = () => {
     setSaleCelebration(null);
     setUnsoldPrompt(null);
+    setSpecialSettlementDialog(null);
     setOutbidAlert(null);
     // Keep most recent transaction in undo stack so accidental advance can still be reversed
     setUndoStack((prev) => prev.slice(0, 1));
@@ -1131,6 +1371,7 @@ export const AuctionProvider = ({ children }) => {
     setAuction(null);
     setSaleCelebration(null);
     setUnsoldPrompt(null);
+    setSpecialSettlementDialog(null);
     setOutbidAlert(null);
     setActivePage('home');
   };
@@ -1165,6 +1406,9 @@ export const AuctionProvider = ({ children }) => {
         settleCurrentLot,
         confirmSold,
         markUnsold,
+        specialSettlementDialog,
+        confirmSpecialSettlement,
+        cancelSpecialSettlement,
         advanceToNextItem,
         reAuctionItem,
         reAuctionAllUnsold,
