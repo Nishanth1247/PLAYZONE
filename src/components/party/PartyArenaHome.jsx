@@ -3,15 +3,12 @@ import { motion } from 'framer-motion';
 import { 
   Gamepad2, 
   Sparkles, 
-  Shuffle, 
-  Settings, 
   Play, 
   Users, 
-  ShieldAlert,
-  ArrowRight,
-  Gavel,
-  CheckCircle2,
-  Cpu
+  ArrowRight, 
+  Gavel, 
+  CheckCircle2, 
+  Cpu 
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -19,17 +16,10 @@ import { usePartyGame } from '../../context/PartyGameContext';
 import { GAME_REGISTRY } from '../../services/party/gameRegistry';
 import { AISettingsModal } from './AISettingsModal';
 import { isAIConfigured } from '../../services/party/aiContentService';
-import { toast } from 'sonner';
 
 export const PartyArenaHome = ({ onSwitchToAuction }) => {
   const { openGameLobby } = usePartyGame();
   const [showAISettings, setShowAISettings] = useState(false);
-
-  const handleRandomGame = () => {
-    const randomGame = GAME_REGISTRY[Math.floor(Math.random() * GAME_REGISTRY.length)];
-    toast.success(`🎲 Selected: ${randomGame.title}!`);
-    openGameLobby(randomGame.id);
-  };
 
   const aiActive = isAIConfigured();
 
@@ -46,7 +36,7 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
         <div className="text-center max-w-3xl mx-auto pt-4 space-y-4">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-battle-surface/90 border border-brand-purple/40 text-xs font-bold text-brand-purple shadow-glow-purple">
             <Sparkles className="w-4 h-4 text-brand-cyan" />
-            <span className="text-battle-text">BIDBATTLE 7.2 • Party Arena Rebuild</span>
+            <span className="text-battle-text">BIDBATTLE 7.9 • Party Arena</span>
             <span className="w-1.5 h-1.5 rounded-full bg-brand-neon" />
             <span className="text-brand-neon font-black tracking-wider">2–4 LOCAL PLAYERS • 1 LAPTOP</span>
           </div>
@@ -56,21 +46,11 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
           </h1>
 
           <p className="text-sm sm:text-base text-battle-muted max-w-2xl mx-auto leading-relaxed">
-            The ultimate four-game party suite for game night. Pass the laptop, keep your secret prompt hidden, bluff your friends, and crown the party champion!
+            The ultimate silent acting party showdown for game night. Pass the laptop secretly to view your movie prompt, act silently without speaking or lip-syncing, and crown the party champion!
           </p>
 
           {/* Quick Action Bar */}
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={handleRandomGame}
-              className="font-broadcast text-xs border-battle-border hover:border-brand-cyan text-white shadow-sm flex items-center gap-2"
-            >
-              <Shuffle className="w-4 h-4 text-brand-cyan" />
-              <span>RANDOM GAME</span>
-            </Button>
-
             <Button
               variant="secondary"
               size="md"
@@ -96,100 +76,111 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
           </div>
         </div>
 
-        {/* 2. THE FOUR EXCLUSIVE GAME CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-          {GAME_REGISTRY.map((game, idx) => {
-            return (
-              <motion.div
-                key={game.id}
-                whileHover={{ y: -6, scale: 1.01 }}
-                transition={{ duration: 0.2 }}
-                className="battle-panel rounded-3xl p-6 sm:p-8 border transition-all duration-300 relative overflow-hidden flex flex-col justify-between group shadow-xl"
-                style={{
-                  borderColor: `${game.accentColor}40`,
-                }}
-              >
-                {/* Glow highlight */}
-                <div
-                  className="absolute -top-24 -right-24 w-60 h-60 rounded-full blur-[90px] opacity-25 group-hover:opacity-50 transition-opacity pointer-events-none"
-                  style={{ backgroundColor: game.accentColor }}
-                />
+        {/* 2. DUMB CHARADES OFFICIAL GAME CARD */}
+        <div className="max-w-4xl mx-auto pt-2">
+          {GAME_REGISTRY.map((game) => (
+            <motion.div
+              key={game.id}
+              whileHover={{ y: -4, scale: 1.005 }}
+              transition={{ duration: 0.2 }}
+              className="battle-panel rounded-3xl p-6 sm:p-10 border transition-all duration-300 relative overflow-hidden flex flex-col justify-between group shadow-2xl"
+              style={{
+                borderColor: `${game.accentColor}50`,
+              }}
+            >
+              {/* Glow highlight */}
+              <div
+                className="absolute -top-24 -right-24 w-80 h-80 rounded-full blur-[100px] opacity-25 group-hover:opacity-45 transition-opacity pointer-events-none"
+                style={{ backgroundColor: game.accentColor }}
+              />
 
-                <div className="space-y-4 relative z-10">
-                  {/* Card Top Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-4xl p-3 rounded-2xl bg-battle-bg border border-battle-border shadow-inner">
-                        {game.icon}
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span
-                            className="text-[11px] font-mono font-black tracking-wider uppercase"
-                            style={{ color: game.accentColor }}
-                          >
-                            Game 0{idx + 1}
-                          </span>
-                          <span className="text-battle-muted text-xs">•</span>
-                          <Badge variant="neon" className="text-[10px] px-2 py-0">
-                            {game.badge}
-                          </Badge>
-                        </div>
-                        <h2 className="font-broadcast text-2xl sm:text-3xl font-black text-white tracking-wide">
-                          {game.title}
-                        </h2>
+              <div className="space-y-5 relative z-10">
+                {/* Card Top Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <span className="text-5xl p-4 rounded-2xl bg-battle-bg border border-battle-border shadow-inner">
+                      {game.icon}
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span
+                          className="text-xs font-mono font-black tracking-wider uppercase"
+                          style={{ color: game.accentColor }}
+                        >
+                          Official Party Game
+                        </span>
+                        <span className="text-battle-muted text-xs">•</span>
+                        <Badge variant="purple" className="text-[10px] px-2 py-0">
+                          {game.badge}
+                        </Badge>
                       </div>
+                      <h2 className="font-broadcast text-3xl sm:text-4xl font-black text-white tracking-wide">
+                        {game.title}
+                      </h2>
                     </div>
+                  </div>
 
-                    <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-battle-bg border border-battle-border text-xs font-mono font-bold text-battle-muted">
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-battle-bg border border-battle-border text-xs font-mono font-bold text-battle-muted">
                       <Users className="w-3.5 h-3.5 text-brand-cyan" />
-                      <span>2–4 Players</span>
+                      <span>2–4 Franchises</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-battle-bg border border-battle-border text-xs font-mono font-bold text-brand-neon">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Importable Prompts</span>
                     </div>
                   </div>
-
-                  {/* Description */}
-                  <p className="text-xs sm:text-sm text-battle-muted leading-relaxed">
-                    {game.shortDesc}
-                  </p>
-
-                  {/* Feature Tags */}
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {game.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2.5 py-1 rounded-xl bg-battle-bg border border-battle-border text-[11px] font-mono text-battle-text"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
                 </div>
 
-                {/* Card Action Footer */}
-                <div className="pt-6 mt-6 border-t border-battle-border/80 flex items-center justify-between relative z-10">
-                  <span className="text-xs font-mono text-battle-muted flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-neon" />
-                    <span>Pass-the-Laptop Privacy Locked</span>
+                {/* Description */}
+                <p className="text-sm sm:text-base text-battle-muted leading-relaxed">
+                  {game.shortDesc}
+                </p>
+
+                {/* Feature Tags */}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {game.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 rounded-xl bg-battle-bg border border-battle-border text-xs font-mono text-battle-text"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  <span className="px-3 py-1 rounded-xl bg-brand-purple/10 border border-brand-purple/30 text-xs font-mono text-brand-purple font-bold">
+                    Custom JSON / CSV / TXT
                   </span>
-
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    onClick={() => openGameLobby(game.id)}
-                    className="font-broadcast text-xs font-black shadow-md flex items-center gap-2 group-hover:scale-105 transition-transform"
-                    style={{
-                      backgroundColor: game.accentColor,
-                      borderColor: game.accentColor,
-                      color: '#080A12',
-                    }}
-                  >
-                    <span>PLAY NOW</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
+                  <span className="px-3 py-1 rounded-xl bg-brand-cyan/10 border border-brand-cyan/30 text-xs font-mono text-brand-cyan font-bold">
+                    Create with ChatGPT
+                  </span>
                 </div>
-              </motion.div>
-            );
-          })}
+              </div>
+
+              {/* Card Action Footer */}
+              <div className="pt-6 mt-8 border-t border-battle-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+                <span className="text-xs font-mono text-battle-muted flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-brand-neon" />
+                  <span>Pass-the-Laptop Privacy Screen & Anti-Cheat Guards</span>
+                </span>
+
+                <Button
+                  variant="primary"
+                  size="xl"
+                  onClick={() => openGameLobby(game.id)}
+                  className="font-broadcast text-sm font-black shadow-glow-purple flex items-center justify-center gap-2 group-hover:scale-105 transition-transform"
+                  style={{
+                    backgroundColor: game.accentColor,
+                    borderColor: game.accentColor,
+                    color: '#080A12',
+                  }}
+                >
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>PLAY DUMB CHARADES</span>
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
         {/* 3. FOUR FIXED PLAYERS SHOWCASE FOOTER */}

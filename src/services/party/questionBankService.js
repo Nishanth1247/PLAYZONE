@@ -1,19 +1,12 @@
 /**
- * BIDBATTLE 7.2 - Question Bank & Freshness Service
- * Prevents repetition, manages randomized seeds, and ensures fresh gameplay for the 4 Party games:
- * 1. Dumb Charades
- * 2. Impostor
- * 3. Spyfall
- * 4. Find the Liar
+ * BIDBATTLE 7.9 - Question Bank & Freshness Service
+ * Prevents repetition, manages randomized seeds, and ensures fresh gameplay for Dumb Charades.
  */
 
 import {
   DUMB_CHARADES_TAMIL,
   DUMB_CHARADES_MCU,
   DUMB_CHARADES_MIXED,
-  IMPOSTOR_DATA,
-  SPYFALL_LOCATIONS,
-  FIND_THE_LIAR_DATA,
 } from './offlineDatabase';
 
 const RECENTLY_PLAYED_KEY = 'bidbattle_party_recently_played_v2';
@@ -49,38 +42,18 @@ export function recordPlayedIds(ids) {
 }
 
 /**
- * Retrieves content for a specific game, prioritizing fresh items not played recently.
+ * Retrieves content for Dumb Charades, prioritizing fresh items not played recently.
  */
-export function getOfflineContentForGame(gameId, requestedCount = 4, difficulty = 'mixed', category = 'mixed') {
+export function getOfflineContentForGame(gameId = 'party_dumb_charades', requestedCount = 4, difficulty = 'mixed', category = 'mixed') {
   const recentIds = new Set(getRecentlyPlayedIds());
   let sourceList = [];
 
-  switch (gameId) {
-    case 'party_dumb_charades':
-      if (category === 'tamil' || category === 'cinema_tamil' || category === 'Tamil Cinema') {
-        sourceList = DUMB_CHARADES_TAMIL;
-      } else if (category === 'mcu' || category === 'cinema_mcu' || category === 'Marvel Cinematic Universe') {
-        sourceList = DUMB_CHARADES_MCU;
-      } else {
-        sourceList = DUMB_CHARADES_MIXED;
-      }
-      break;
-
-    case 'party_impostor':
-      sourceList = IMPOSTOR_DATA;
-      break;
-
-    case 'party_spyfall':
-      sourceList = SPYFALL_LOCATIONS;
-      break;
-
-    case 'party_find_the_liar':
-      sourceList = FIND_THE_LIAR_DATA;
-      break;
-
-    default:
-      sourceList = DUMB_CHARADES_MIXED;
-      break;
+  if (category === 'tamil' || category === 'cinema_tamil' || category === 'Tamil Cinema') {
+    sourceList = DUMB_CHARADES_TAMIL;
+  } else if (category === 'mcu' || category === 'cinema_mcu' || category === 'Marvel Cinematic Universe') {
+    sourceList = DUMB_CHARADES_MCU;
+  } else {
+    sourceList = DUMB_CHARADES_MIXED;
   }
 
   if (!sourceList || sourceList.length === 0) {
@@ -104,7 +77,7 @@ export function getOfflineContentForGame(gameId, requestedCount = 4, difficulty 
 /**
  * Quick fallback item for individual turns
  */
-export function getSingleOfflineFallbackItem(gameId, category = 'mixed') {
+export function getSingleOfflineFallbackItem(gameId = 'party_dumb_charades', category = 'mixed') {
   const list = getOfflineContentForGame(gameId, 1, 'mixed', category);
   return list[0] || DUMB_CHARADES_TAMIL[0];
 }

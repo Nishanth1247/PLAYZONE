@@ -35,12 +35,19 @@ export const PartyGameProvider = ({ children }) => {
   // Privacy pass-the-laptop guard
   const [passLaptopState, setPassLaptopState] = useState(null);
 
+  // Safety: Ensure only Dumb Charades is active, intercepting any obsolete game states
+  useEffect(() => {
+    if (!selectedGame || selectedGame.id !== 'party_dumb_charades') {
+      setSelectedGame(GAME_REGISTRY[0]);
+    }
+  }, [selectedGame]);
+
   // Open Lobby for a selected game
-  const openGameLobby = (gameId) => {
-    const game = getGameById(gameId);
+  const openGameLobby = (gameId = 'party_dumb_charades') => {
+    const game = getGameById(gameId) || GAME_REGISTRY[0];
     setSelectedGame(game);
     setRoundsCount(game.defaultRounds || 5);
-    setTimerDuration(game.defaultTimer || 20);
+    setTimerDuration(game.defaultTimer || 45);
     setSelectedCategory('mixed');
     setPartyView('lobby');
   };

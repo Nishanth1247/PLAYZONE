@@ -1,6 +1,6 @@
 /**
- * BIDBATTLE 7.2 - Party Arena Game Registry
- * Dedicated 4-game local multiplayer suite: Dumb Charades, Impostor, Spyfall, Find the Liar.
+ * BIDBATTLE 7.9 - Party Arena Game Registry
+ * Dumb Charades is the official local multiplayer Party Arena game.
  * Designed for 2-4 players on one physical laptop and shared screen.
  */
 
@@ -15,7 +15,7 @@ export const UNIVERSES = {
   PARTY_ARENA: {
     id: 'party_arena',
     name: 'Party Arena',
-    tagline: 'Social Deduction, Secret Deception & Charades',
+    tagline: 'Silent Acting & Charades Showdown',
     icon: '🎉',
     color: '#9147FF',
     badgeVariant: 'purple',
@@ -38,63 +38,12 @@ export const GAME_REGISTRY = [
     defaultTimer: 45,
     hasCategories: true,
     tags: ['Silent Acting', 'Kollywood & MCU', 'Timer Blitz'],
-    badge: 'Party Hit',
+    badge: 'Official Party Game',
     accentColor: '#9147FF',
-    featured: true,
-  },
-  {
-    id: 'party_impostor',
-    universe: 'party_arena',
-    title: 'Impostor',
-    shortDesc: 'Everyone receives the exact same secret word except ONE player who gets an imposter clue or blank slate. Interrogate and find them!',
-    longDesc: 'Social deduction bluffing game. Non-impostors share a secret word; the chosen Impostor must bluff without getting caught. Secret pass-the-laptop voting reveals if the imposter was identified, followed by a dramatic last-gasp word guess.',
-    icon: '🕵️',
-    mechanic: 'impostor',
-    minPlayers: 2,
-    maxPlayers: 4,
-    defaultRounds: 4,
-    defaultTimer: 60,
-    tags: ['Social Deduction', 'Secret Bluffing', 'Deception'],
-    badge: 'Top Deduction',
-    accentColor: '#00D9FF',
-    featured: true,
-  },
-  {
-    id: 'party_spyfall',
-    universe: 'party_arena',
-    title: 'Spyfall',
-    shortDesc: 'All innocent players receive a secret location and suggested role. One player is the SPY! Ask clever questions to expose the spy.',
-    longDesc: 'High-stakes undercover interrogation. Everyone except the Spy knows the secret location (e.g., Space Station, Submarine, Cricket Stadium, Film Set). Non-spies ask subtle questions to detect who is clueless. Spies listen intently to deduce the location before being accused!',
-    icon: '🔍',
-    mechanic: 'spyfall',
-    minPlayers: 2,
-    maxPlayers: 4,
-    defaultRounds: 4,
-    defaultTimer: 90,
-    tags: ['Undercover', 'Secret Location', 'Interrogation'],
-    badge: 'Tactical',
-    accentColor: '#FF8A35',
-    featured: true,
-  },
-  {
-    id: 'party_find_the_liar',
-    universe: 'party_arena',
-    title: 'Find the Liar',
-    shortDesc: 'Most players answer Question A, but ONE liar secretly answered Question B! Compare all answers on screen and vote who is lying.',
-    longDesc: 'Humorous, psychological party game. During pass-the-laptop, players secretly type their genuine response. Regular players answer Question A (e.g., "Your favorite food"), but the Liar was shown Question B (e.g., "Food you hate"). All answers appear together: discuss, vote, and uncover the liar!',
-    icon: '🤥',
-    mechanic: 'find_the_liar',
-    minPlayers: 2,
-    maxPlayers: 4,
-    defaultRounds: 4,
-    defaultTimer: 60,
-    tags: ['Secret Answers', 'Psychological', 'Voting'],
-    badge: 'Hilarious',
-    accentColor: '#B7F34A',
     featured: true,
   },
 ];
 
-export const getGameById = (id) => GAME_REGISTRY.find((g) => g.id === id);
+export const getGameById = (id) => GAME_REGISTRY.find((g) => g.id === id) || GAME_REGISTRY[0];
 export const getGamesByUniverse = (universeId) => GAME_REGISTRY.filter((g) => g.universe === universeId || universeId === 'all');
-export const getFeaturedGames = () => GAME_REGISTRY.filter((g) => g.featured);
+export const getFeaturedGames = () => GAME_REGISTRY;
