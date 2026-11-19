@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuction } from '../../context/AuctionContext';
 import { exportService } from '../../services/exportService';
@@ -41,9 +41,12 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { formatCurrency } from '../common/CurrencyDisplay';
+import { AuctionReplayViewer } from '../auction/AuctionReplayViewer';
+import { History } from 'lucide-react';
 
 export const ResultsScreen = () => {
   const { auction, setActivePage, resetAuction, restartTournamentFresh } = useAuction();
+  const [showReplay, setShowReplay] = useState(false);
 
   if (!auction) {
     return (
@@ -294,6 +297,16 @@ export const ResultsScreen = () => {
           <Button
             variant="secondary"
             size="md"
+            onClick={() => setShowReplay(!showReplay)}
+            className="border-brand-purple/50 text-brand-purple hover:bg-brand-purple/10"
+          >
+            <History className="w-4 h-4 text-brand-purple" />
+            <span>{showReplay ? 'Hide Replay' : 'Auction Replay (Lot by Lot)'}</span>
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="md"
             onClick={() => exportService.printSummary()}
           >
             <Printer className="w-4 h-4 text-amber-400" />
@@ -329,6 +342,13 @@ export const ResultsScreen = () => {
           </Button>
         </div>
       </div>
+
+      {/* AUCTION REPLAY VIEWER (BIDBATTLE 8.1) */}
+      {showReplay && (
+        <div className="mb-10">
+          <AuctionReplayViewer auction={auction} onClose={() => setShowReplay(false)} />
+        </div>
+      )}
 
       {/* 2. EXPLANATION OF RANKING FORMULA */}
       <div className="mb-10 p-4 rounded-2xl bg-battle-surface border border-battle-border flex items-start gap-3">

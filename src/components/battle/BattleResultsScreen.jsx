@@ -22,6 +22,7 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useBattleArena } from '../../context/BattleArenaContext';
 import { calculateTournamentMVP, calculateBattleTournamentStats } from '../../services/battleEngine';
+import { BattleReplayViewer } from './BattleReplayViewer';
 import { toast } from 'sonner';
 
 export const BattleResultsScreen = ({ onReturnHome }) => {
@@ -365,6 +366,18 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
 
           <button
             type="button"
+            onClick={() => setActiveTab('replay')}
+            className={`px-4 py-2 rounded-xl font-broadcast text-xs font-bold transition-all ${
+              activeTab === 'replay'
+                ? 'bg-brand-orange text-black font-black shadow-glow-orange'
+                : 'text-battle-muted hover:text-white'
+            }`}
+          >
+            BATTLE REPLAY (PREV / NEXT)
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab('rosters')}
             className={`px-4 py-2 rounded-xl font-broadcast text-xs font-bold transition-all ${
               activeTab === 'rosters'
@@ -440,6 +453,11 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
               </tbody>
             </table>
           </div>
+        )}
+
+        {/* Tab: Battle Replay Viewer (BIDBATTLE 8.1) */}
+        {activeTab === 'replay' && (
+          <BattleReplayViewer completedMatches={completedMatches} teams={teams} />
         )}
 
         {/* Tab 2: Full Team Rosters (Revealing ratings now that tournament has ended) */}

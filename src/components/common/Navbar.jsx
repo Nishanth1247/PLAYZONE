@@ -126,14 +126,14 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                 BIDBATTLE
               </span>
               <span className="text-[10px] uppercase font-black tracking-widest px-1.5 py-0.5 rounded bg-brand-orange/20 text-brand-orange border border-brand-orange/40 font-mono">
-                7.3
+                8.1
               </span>
             </div>
             <p className="text-[11px] text-battle-muted font-medium tracking-tight -mt-1 hidden sm:block">
               {platformMode === 'party'
-                ? 'AI-Powered Party Arena'
+                ? 'Party Arena • Local Multiplayer'
                 : platformMode === 'battle'
-                ? 'Battle Arena • Auction & Clash'
+                ? 'Battle Arena • Tournament & Clash'
                 : 'IPL-Style Auction Arena'}
             </p>
           </div>

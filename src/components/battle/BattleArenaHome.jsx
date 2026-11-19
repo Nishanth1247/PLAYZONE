@@ -128,7 +128,7 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
         <div className="text-center max-w-3xl mx-auto pt-4 space-y-4">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-battle-surface/90 border border-brand-orange/40 text-xs font-bold text-brand-orange shadow-glow-orange">
             <Swords className="w-4 h-4 text-brand-orange" />
-            <span className="text-battle-text">BIDBATTLE 7.3 • Competitive Esports System</span>
+            <span className="text-battle-text">BIDBATTLE 8.1 • Competitive Esports System</span>
             <span className="w-1.5 h-1.5 rounded-full bg-brand-neon" />
             <span className="text-brand-neon font-black tracking-wider">ROUND 1: AUCTION → ROUND 2: BATTLES</span>
           </div>

@@ -20,7 +20,7 @@ import { Button } from '../../ui/Button';
 import { Badge } from '../../ui/Badge';
 import { FIXED_PARTY_PLAYERS } from '../../../services/party/gameRegistry';
 import { parseDumbCharadesInput } from '../../../services/party/dumbCharadesParser';
-import { DUMB_CHARADES_TAMIL } from '../../../services/party/offlineDatabase';
+import { DUMB_CHARADES_TAMIL, DUMB_CHARADES_MCU } from '../../../services/party/offlineDatabase';
 import { getSavedDumbCharadesState, clearDumbCharadesState, createDumbCharadesTournament } from '../../../services/party/dumbCharadesEngine';
 import { CopyContentPromptCard } from '../../common/CopyContentPromptCard';
 import { DUMB_CHARADES_CHATGPT_PROMPT } from '../../../services/chatGptPrompts';
@@ -42,7 +42,13 @@ export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
   // 3. Timer Duration: 30 | 45 | 60 | 90 (Default: 60)
   const [timerDuration, setTimerDuration] = useState(60);
 
-  // 4. Import / Source State
+  // 4. Scoring Configuration (BIDBATTLE 8.1)
+  const [basePoints, setBasePoints] = useState(1);
+  const [streakBonusEnabled, setStreakBonusEnabled] = useState(false);
+  const [skipPenalty, setSkipPenalty] = useState(0);
+  const [timeoutPenalty, setTimeoutPenalty] = useState(0);
+
+  // 5. Import / Source State
   const [importMode, setImportMode] = useState('preset'); // 'preset' | 'file' | 'manual'
   const [activePreset, setActivePreset] = useState('tamil'); // 'tamil' | 'mcu' | 'mixed'
   const [rawText, setRawText] = useState('');
@@ -163,20 +169,39 @@ export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
   };
 
   // Determine active prompt list
-  const activePromptList = importedData && importedData.isValid
-    ? importedData.prompts
-    : DUMB_CHARADES_TAMIL.map((it, idx) => ({
+  const getPresetList = () => {
+    let source = DUMB_CHARADES_TAMIL;
+    let title = 'Verified Tamil Cinema Hits';
+    if (activePreset === 'mcu') {
+      source = DUMB_CHARADES_MCU;
+      title = 'Marvel Cinematic Universe Hits';
+    } else if (activePreset === 'mixed') {
+      source = [...DUMB_CHARADES_TAMIL, ...DUMB_CHARADES_MCU];
+      title = 'Cinema Multiverse (Kollywood & MCU)';
+    }
+
+    return {
+      name: title,
+      prompts: source.map((it, idx) => ({
         id: it.id || `built_in_${idx + 1}`,
         name: it.title,
         title: it.title,
-        category: it.category || 'Tamil Cinema',
+        category: it.category || 'Cinema',
         hint: it.hint || it.stars || '',
         year: it.year || '',
-      }));
+      })),
+    };
+  };
+
+  const presetData = getPresetList();
+
+  const activePromptList = importedData && importedData.isValid
+    ? importedData.prompts
+    : presetData.prompts;
 
   const activeListName = importedData && importedData.isValid
     ? importedData.name
-    : 'Verified Tamil Cinema Hits (Built-in Roster)';
+    : presetData.name;
 
   // Validation status
   const isTeamCountValid = selectedTeamIds.length === teamCountTarget;
@@ -204,6 +229,12 @@ export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
       listName: activeListName,
       selectedTeams,
       timerDuration: Number(timerDuration) || 60,
+      scoringConfig: {
+        basePoints: Number(basePoints) || 1,
+        streakBonusEnabled: Boolean(streakBonusEnabled),
+        skipPenalty: Number(skipPenalty) || 0,
+        timeoutPenalty: Number(timeoutPenalty) || 0,
+      },
     });
   };
 
@@ -415,6 +446,89 @@ export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
               ))}
             </div>
           </div>
+
+          {/* SECTION D: CONFIGURABLE SCORING & RULES (BIDBATTLE 8.1) */}
+          <div className="rounded-3xl battle-panel p-6 border border-battle-border space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold font-broadcast uppercase text-battle-muted tracking-wider block">
+                3. Scoring & Streak Rules
+              </label>
+              <Badge variant={streakBonusEnabled ? 'neon' : 'secondary'} className="text-[10px]">
+                {streakBonusEnabled ? 'STREAKS ON' : 'STANDARD'}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+              {/* Base Points */}
+              <div className="p-3 rounded-2xl bg-battle-surface/60 border border-battle-border space-y-1.5">
+                <span className="text-battle-muted text-[11px] block">Base Points / Found</span>
+                <div className="flex gap-1">
+                  {[1, 2, 3].map((pts) => (
+                    <button
+                      key={pts}
+                      type="button"
+                      onClick={() => setBasePoints(pts)}
+                      className={`flex-1 py-1.5 rounded-xl font-bold transition-all ${
+                        basePoints === pts
+                          ? 'bg-brand-purple text-white border border-brand-purple'
+                          : 'bg-battle-bg text-battle-muted hover:text-white'
+                      }`}
+                    >
+                      +{pts}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Streak Bonus Toggle */}
+              <div className="p-3 rounded-2xl bg-battle-surface/60 border border-battle-border space-y-1.5">
+                <span className="text-battle-muted text-[11px] block">Streak Bonuses</span>
+                <button
+                  type="button"
+                  onClick={() => setStreakBonusEnabled(!streakBonusEnabled)}
+                  className={`w-full py-1.5 px-2 rounded-xl font-bold transition-all text-center ${
+                    streakBonusEnabled
+                      ? 'bg-amber-500 text-dark-950 font-black shadow-sm'
+                      : 'bg-battle-bg text-battle-muted hover:text-white'
+                  }`}
+                >
+                  {streakBonusEnabled ? '🔥 +2 (3x), +5 (5x)' : 'Disabled'}
+                </button>
+              </div>
+
+              {/* Skip Penalty */}
+              <div className="p-3 rounded-2xl bg-battle-surface/60 border border-battle-border space-y-1.5">
+                <span className="text-battle-muted text-[11px] block">Skip Penalty</span>
+                <button
+                  type="button"
+                  onClick={() => setSkipPenalty(skipPenalty === 0 ? 1 : 0)}
+                  className={`w-full py-1.5 px-2 rounded-xl font-bold transition-all text-center ${
+                    skipPenalty > 0
+                      ? 'bg-red-500 text-white font-black shadow-sm'
+                      : 'bg-battle-bg text-battle-muted hover:text-white'
+                  }`}
+                >
+                  {skipPenalty > 0 ? '-1 Pt' : '0 (No Penalty)'}
+                </button>
+              </div>
+
+              {/* Timeout Penalty */}
+              <div className="p-3 rounded-2xl bg-battle-surface/60 border border-battle-border space-y-1.5">
+                <span className="text-battle-muted text-[11px] block">Timeout Penalty</span>
+                <button
+                  type="button"
+                  onClick={() => setTimeoutPenalty(timeoutPenalty === 0 ? 1 : 0)}
+                  className={`w-full py-1.5 px-2 rounded-xl font-bold transition-all text-center ${
+                    timeoutPenalty > 0
+                      ? 'bg-red-500 text-white font-black shadow-sm'
+                      : 'bg-battle-bg text-battle-muted hover:text-white'
+                  }`}
+                >
+                  {timeoutPenalty > 0 ? '-1 Pt' : '0 (No Penalty)'}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* RIGHT COLUMN: IMPORT PROMPT LIST (7 COLS) */}
@@ -495,22 +609,76 @@ export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
 
             {/* TAB 1: PRESET ROSTER */}
             {importMode === 'preset' && !importedData && (
-              <div className="p-4 rounded-2xl bg-battle-surface/40 border border-battle-border space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">🎬</span>
-                    <div>
-                      <h4 className="font-broadcast font-bold text-sm text-white">
-                        Verified Tamil Cinema Blockbusters
-                      </h4>
-                      <span className="text-xs font-mono text-battle-muted">
-                        30 Curated iconic films (Baasha, Enthiran, Vikram, Leo, etc.)
-                      </span>
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {/* Preset 1: Tamil Cinema */}
+                  <button
+                    type="button"
+                    onClick={() => setActivePreset('tamil')}
+                    className={`p-3.5 rounded-2xl border text-left transition-all space-y-1.5 ${
+                      activePreset === 'tamil'
+                        ? 'bg-brand-purple/15 border-brand-purple shadow-glow-purple/20'
+                        : 'bg-battle-surface/40 border-battle-border hover:border-brand-purple/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl">🎬</span>
+                      <Badge variant={activePreset === 'tamil' ? 'purple' : 'secondary'} className="text-[10px]">
+                        30 Films
+                      </Badge>
                     </div>
-                  </div>
-                  <Badge variant="neon">READY</Badge>
+                    <div>
+                      <h4 className="font-broadcast font-bold text-xs text-white">Tamil Cinema Hits</h4>
+                      <span className="text-[10px] font-mono text-battle-muted block">Baasha, Enthiran, Vikram, Leo...</span>
+                    </div>
+                  </button>
+
+                  {/* Preset 2: MCU */}
+                  <button
+                    type="button"
+                    onClick={() => setActivePreset('mcu')}
+                    className={`p-3.5 rounded-2xl border text-left transition-all space-y-1.5 ${
+                      activePreset === 'mcu'
+                        ? 'bg-brand-cyan/15 border-brand-cyan shadow-glow-cyan/20'
+                        : 'bg-battle-surface/40 border-battle-border hover:border-brand-cyan/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl">🛡️</span>
+                      <Badge variant={activePreset === 'mcu' ? 'cyan' : 'secondary'} className="text-[10px]">
+                        16 Films
+                      </Badge>
+                    </div>
+                    <div>
+                      <h4 className="font-broadcast font-bold text-xs text-white">Marvel / MCU</h4>
+                      <span className="text-[10px] font-mono text-battle-muted block">Endgame, Iron Man, Thor...</span>
+                    </div>
+                  </button>
+
+                  {/* Preset 3: Mixed Multiverse */}
+                  <button
+                    type="button"
+                    onClick={() => setActivePreset('mixed')}
+                    className={`p-3.5 rounded-2xl border text-left transition-all space-y-1.5 ${
+                      activePreset === 'mixed'
+                        ? 'bg-brand-orange/15 border-brand-orange shadow-glow-orange/20'
+                        : 'bg-battle-surface/40 border-battle-border hover:border-brand-orange/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl">⚡</span>
+                      <Badge variant={activePreset === 'mixed' ? 'orange' : 'secondary'} className="text-[10px]">
+                        46 Films
+                      </Badge>
+                    </div>
+                    <div>
+                      <h4 className="font-broadcast font-bold text-xs text-white">Cinema Multiverse</h4>
+                      <span className="text-[10px] font-mono text-battle-muted block">Kollywood & MCU Superpack</span>
+                    </div>
+                  </button>
                 </div>
-                <p className="text-[11px] text-battle-muted font-mono leading-relaxed">
+
+                <p className="text-[11px] text-battle-muted font-mono leading-relaxed bg-battle-bg p-3 rounded-2xl border border-battle-border">
                   ✓ Ready to play immediately. Each movie title will be randomly shuffled and strictly consumed once revealed.
                 </p>
               </div>

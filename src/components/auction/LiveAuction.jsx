@@ -822,13 +822,15 @@ export const LiveAuction = () => {
                     onClick={() => handleTeamBidClick(t.id)}
                     title={subReason}
                     className={`p-3 rounded-2xl border text-left transition-all duration-200 relative overflow-hidden flex flex-col justify-between ${
-                      isDisabled
+                      isLeading
+                        ? 'bg-battle-surface/90 border-brand-cyan ring-2 ring-brand-cyan/80 shadow-glow-cyan cursor-not-allowed'
+                        : isDisabled
                         ? 'bg-battle-surface/40 border-battle-border opacity-45 cursor-not-allowed text-battle-muted'
                         : 'bg-battle-surface shadow-md hover:shadow-xl cursor-pointer'
                     }`}
                     style={{
-                      borderColor: isDisabled ? undefined : t.color,
-                      boxShadow: isDisabled ? undefined : `0 4px 18px ${t.color}25`,
+                      borderColor: isLeading ? '#00D9FF' : isDisabled ? undefined : t.color,
+                      boxShadow: isLeading ? '0 0 20px rgba(0, 217, 255, 0.35)' : isDisabled ? undefined : `0 4px 18px ${t.color}25`,
                     }}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -838,23 +840,32 @@ export const LiveAuction = () => {
                           {t.name}
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono text-brand-neon font-bold">
-                        {formatCurrency(t.purse, currency)}
-                      </span>
+                      <div className="flex items-center gap-1">
+                        {isLeading && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan animate-ping" />
+                        )}
+                        <span className="text-[10px] font-mono text-brand-neon font-bold">
+                          {formatCurrency(t.purse, currency)}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex items-center justify-between mt-1">
                       <span
                         className="font-black text-xs uppercase tracking-wider font-broadcast"
-                        style={{ color: isDisabled ? undefined : t.color }}
+                        style={{ color: isLeading ? '#00D9FF' : isDisabled ? undefined : t.color }}
                       >
                         {actionLabel}
                       </span>
-                      {subReason && (
+                      {isLeading ? (
+                        <span className="text-[9px] text-brand-cyan font-broadcast font-bold uppercase tracking-wider">
+                          Active Lead
+                        </span>
+                      ) : subReason ? (
                         <span className="text-[9px] text-battle-muted font-broadcast truncate max-w-[80px]">
                           {subReason}
                         </span>
-                      )}
+                      ) : null}
                     </div>
                   </motion.button>
                 );

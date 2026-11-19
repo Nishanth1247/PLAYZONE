@@ -21,8 +21,13 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useBattleArena } from '../../context/BattleArenaContext';
 import { PassTheLaptopScreen } from '../party/common/PassTheLaptopScreen';
+import { BattleReplayViewer } from './BattleReplayViewer';
+import { soundService } from '../../services/soundService';
 
 export const BattleArenaMatch = () => {
+  const [preMatchCountdown, setPreMatchCountdown] = useState(null);
+  const [showReplay, setShowReplay] = useState(false);
+
   const {
     battleState,
     startFighterSelection,
@@ -78,6 +83,24 @@ export const BattleArenaMatch = () => {
     'faceoff'
   );
 
+  // Pre-match countdown handler
+  React.useEffect(() => {
+    let timer = null;
+    if (preMatchCountdown !== null && preMatchCountdown > 0) {
+      soundService?.play?.('countdown_tick');
+      timer = setTimeout(() => {
+        setPreMatchCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+    } else if (preMatchCountdown === 0) {
+      soundService?.play?.('round_start');
+      setPreMatchCountdown(null);
+      startFighterSelection();
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [preMatchCountdown, startFighterSelection]);
+
   return (
     <div className="max-w-[1500px] mx-auto px-4 py-6 space-y-6">
       
@@ -94,11 +117,30 @@ export const BattleArenaMatch = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          {completedMatches.length > 0 && (
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={() => setShowReplay(!showReplay)}
+              className="text-xs font-mono text-battle-muted hover:text-brand-orange"
+            >
+              <span>{showReplay ? 'Hide Replay' : `Replay Matches (${completedMatches.length})`}</span>
+            </Button>
+          )}
           <Badge variant="neon" className="font-mono text-xs">
             Win = +3 Pts • Draw = +1 Pt
           </Badge>
         </div>
       </div>
+
+      {/* REPLAY VIEWER (IF TOGGLED) */}
+      {showReplay && completedMatches.length > 0 && (
+        <BattleReplayViewer
+          completedMatches={completedMatches}
+          teams={teams}
+          onClose={() => setShowReplay(false)}
+        />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
@@ -232,16 +274,30 @@ export const BattleArenaMatch = () => {
                 )}
               </div>
 
-              {/* CTA Action Button */}
-              <Button
-                variant="accent"
-                size="xl"
-                onClick={startFighterSelection}
-                className="w-full font-broadcast text-lg shadow-glow-orange flex items-center justify-center gap-3 py-4"
-              >
-                <span>PROCEED TO FIGHTER SELECTION</span>
-                <ArrowRight className="w-5 h-5" />
-              </Button>
+              {/* CTA Action Button or Pre-Match Countdown */}
+              {preMatchCountdown !== null ? (
+                <div className="p-8 rounded-3xl bg-battle-bg border-2 border-brand-orange text-center space-y-3 shadow-glow-orange/20">
+                  <span className="text-xs font-mono font-bold tracking-widest text-brand-orange uppercase">
+                    MATCH #{currentMatchIndex + 1} DEPLOYMENT STARTING IN
+                  </span>
+                  <div className="font-broadcast text-7xl sm:text-8xl font-black text-brand-orange animate-pulse">
+                    {preMatchCountdown}
+                  </div>
+                  <span className="text-xs font-mono text-battle-muted block">
+                    Prepare to pass the laptop to {teamA.name}!
+                  </span>
+                </div>
+              ) : (
+                <Button
+                  variant="accent"
+                  size="xl"
+                  onClick={() => setPreMatchCountdown(3)}
+                  className="w-full font-broadcast text-lg shadow-glow-orange flex items-center justify-center gap-3 py-4"
+                >
+                  <span>PROCEED TO FIGHTER SELECTION</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              )}
             </motion.div>
           )}
 
