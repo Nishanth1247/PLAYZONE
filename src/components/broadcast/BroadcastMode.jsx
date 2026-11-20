@@ -31,6 +31,8 @@ import { AuctionBroadcast } from './AuctionBroadcast';
 import { BattleBroadcast } from './BattleBroadcast';
 import { PartyBroadcast } from './PartyBroadcast';
 import { ChampionshipCeremony } from './ChampionshipCeremony';
+import { ChampionshipBracket } from '../tournaments/ChampionshipBracket';
+import { tournamentFormatService } from '../../services/tournamentFormatService';
 import { useAuction } from '../../context/AuctionContext';
 import { useBattleArena } from '../../context/BattleArenaContext';
 import { usePartyGame } from '../../context/PartyGameContext';
@@ -118,6 +120,7 @@ export const BroadcastMode = ({
   const scenes = useMemo(() => {
     return [
       { id: 'intros', title: 'Franchise Intros' },
+      { id: 'bracket', title: 'Fixtures & Bracket' },
       { id: 'arena', title: activeArena === 'auction' ? 'Live Auction' : activeArena === 'battle' ? 'Battle Clash' : 'Party Showdown' },
       { id: 'standings', title: 'Live Standings' },
     ];
@@ -387,6 +390,16 @@ export const BroadcastMode = ({
                 )}
 
                 {currentSceneIndex === 1 && (
+                  <div className="flex-1 w-full max-w-6xl mx-auto px-4 py-4 overflow-y-auto">
+                    <ChampionshipBracket
+                      tournament={tournament}
+                      bracketData={tournament?.bracketData || (tournament && tournament.franchisesSnapshot?.length >= 2 ? tournamentFormatService.generateTournamentBracket({ tournamentId: tournament.id, format: tournament.format || 'round_robin', franchises: tournament.franchisesSnapshot, config: tournament.formatConfig || {} }) : null)}
+                      isReadOnly={true}
+                    />
+                  </div>
+                )}
+
+                {currentSceneIndex === 2 && (
                   <>
                     {activeArena === 'auction' && (
                       <AuctionBroadcast
@@ -412,7 +425,7 @@ export const BroadcastMode = ({
                   </>
                 )}
 
-                {currentSceneIndex === 2 && (
+                {currentSceneIndex === 3 && (
                   <div className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col justify-between text-[#F5F3EE]">
                     <div className="text-center space-y-2">
                       <span className="px-3 py-1 rounded-full bg-[#D4B879]/20 border border-[#D4B879] text-xs font-mono font-black text-[#D4B879] uppercase">

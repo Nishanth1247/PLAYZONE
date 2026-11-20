@@ -29,6 +29,8 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { franchiseService } from '../../services/franchiseService';
 import { tournamentHubService } from '../../services/tournamentHubService';
+import { ChampionshipBracket } from './ChampionshipBracket';
+import { tournamentFormatService, FORMAT_TYPES } from '../../services/tournamentFormatService';
 import { toast } from 'sonner';
 
 export const TournamentDetails = ({
@@ -109,6 +111,24 @@ export const TournamentDetails = ({
     day: 'numeric',
     year: 'numeric',
   });
+
+  // Resolve authoritative bracket data
+  const resolvedBracketData = useMemo(() => {
+    if (tournament.bracketData) return tournament.bracketData;
+    if (franchises.length >= 2) {
+      try {
+        return tournamentFormatService.generateTournamentBracket({
+          tournamentId: tournament.id,
+          format: tournament.format || FORMAT_TYPES.ROUND_ROBIN,
+          franchises,
+          config: tournament.formatConfig || {},
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }, [tournament, franchises]);
 
   return (
     <div className="max-w-6xl mx-auto py-6 px-4 space-y-6">
@@ -205,6 +225,11 @@ export const TournamentDetails = ({
                     {season}
                   </span>
                 )}
+                {tournament.format && (
+                  <span className="px-2.5 py-0.5 rounded-lg bg-[#111827] border border-[#39465A] text-xs font-mono font-bold text-[#00D9FF]">
+                    {tournament.format.replace(/_/g, ' ').toUpperCase()}
+                  </span>
+                )}
                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-heading font-black tracking-wider uppercase border ${
                   isActive
                     ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40 shadow-sm animate-pulse'
@@ -275,8 +300,9 @@ export const TournamentDetails = ({
       <div className="flex items-center gap-1 p-1 rounded-2xl bg-[#222F43] border border-[#39465A] overflow-x-auto text-xs font-heading font-bold">
         {[
           { id: 'overview', label: 'Overview', icon: Trophy },
+          { id: 'brackets', label: 'Fixtures & Brackets', icon: Swords },
           { id: 'franchises', label: `Franchises (${franchises.length})`, icon: Users },
-          { id: 'arenas', label: 'Arenas & Stages', icon: Swords },
+          { id: 'arenas', label: 'Arenas & Stages', icon: Layers },
           { id: 'standings', label: 'Standings & Results', icon: Crown },
           { id: 'log', label: 'Activity Log', icon: History },
         ].map((tab) => {
@@ -299,6 +325,23 @@ export const TournamentDetails = ({
           );
         })}
       </div>
+
+      {/* Tab: Fixtures & Brackets */}
+      {activeTab === 'brackets' && (
+        <div className="space-y-6">
+          <ChampionshipBracket
+            tournament={tournament}
+            bracketData={resolvedBracketData}
+            onLaunchMatch={(match) => {
+              window.dispatchEvent(new CustomEvent('playzone_launch_bracket_match', {
+                detail: { tournamentId: tournament.id, matchId: match.id }
+              }));
+              onLaunchArena(tournament);
+            }}
+            isReadOnly={isCompleted}
+          />
+        </div>
+      )}
 
       {/* Tab 1: Overview */}
       {activeTab === 'overview' && (

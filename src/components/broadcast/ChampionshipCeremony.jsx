@@ -81,6 +81,11 @@ export const ChampionshipCeremony = ({
             <span className="text-xs text-[#AEB9CC] font-mono">
               STAGE {ceremonyStep} OF 5
             </span>
+            {tournament?.format && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold text-[#00D9FF] bg-[#111827] border border-[#39465A]">
+                {tournament.format.replace(/_/g, ' ').toUpperCase()} FORMAT
+              </span>
+            )}
           </div>
           <h2 className="font-heading font-black text-2xl sm:text-3xl text-[#F5F3EE] tracking-tight mt-1">
             {tournament?.name || 'PLAYZONE Championship'}

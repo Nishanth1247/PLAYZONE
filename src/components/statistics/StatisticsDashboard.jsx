@@ -41,6 +41,7 @@ export const StatisticsDashboard = ({ onNavigateToGame }) => {
   const [selectedTournament, setSelectedTournament] = useState('all');
   const [selectedFranchise, setSelectedFranchise] = useState('all');
   const [selectedArena, setSelectedArena] = useState('all');
+  const [selectedFormat, setSelectedFormat] = useState('all');
 
   // Head-to-Head rival selector
   const [rivalA, setRivalA] = useState('team-nishanth');
@@ -59,8 +60,9 @@ export const StatisticsDashboard = ({ onNavigateToGame }) => {
       tournamentId: selectedTournament,
       franchiseId: selectedFranchise,
       arenaType: selectedArena,
+      format: selectedFormat,
     });
-  }, [selectedSeason, selectedTournament, selectedFranchise, selectedArena]);
+  }, [selectedSeason, selectedTournament, selectedFranchise, selectedArena, selectedFormat]);
 
   // Head-to-Head data
   const headToHead = useMemo(() => {
@@ -105,6 +107,7 @@ export const StatisticsDashboard = ({ onNavigateToGame }) => {
     setSelectedTournament('all');
     setSelectedFranchise('all');
     setSelectedArena('all');
+    setSelectedFormat('all');
   };
 
   const navTabs = [
@@ -201,6 +204,21 @@ export const StatisticsDashboard = ({ onNavigateToGame }) => {
               {stats.availableFilters.franchises.map((f) => (
                 <option key={f.id} value={f.id}>{f.name}</option>
               ))}
+            </select>
+
+            {/* Competition Format Filter */}
+            <select
+              value={selectedFormat}
+              onChange={(e) => setSelectedFormat(e.target.value)}
+              aria-label="Filter competition format"
+              className="px-3 py-1.5 rounded-xl bg-[#222F43] border border-[#39465A] text-xs font-heading font-bold text-[#F5F3EE] focus:outline-none focus:border-[#D4B879]"
+            >
+              <option value="all">All Formats</option>
+              <option value="round_robin">League / Round Robin</option>
+              <option value="single_elimination">Single Elimination</option>
+              <option value="double_elimination">Double Elimination</option>
+              <option value="group_stage_knockout">Group Stage + Knockout</option>
+              <option value="custom">Custom Format</option>
             </select>
 
             {/* Arena Type Pills */}
@@ -1017,6 +1035,11 @@ export const StatisticsDashboard = ({ onNavigateToGame }) => {
                         <span className="text-xs font-mono text-[#AEB9CC]">
                           {t.season}
                         </span>
+                        {t.format && (
+                          <span className="px-2 py-0.5 rounded-lg bg-[#111827] border border-[#39465A] text-[10px] font-mono font-bold text-[#00D9FF] uppercase">
+                            {t.format.replace(/_/g, ' ')}
+                          </span>
+                        )}
                       </div>
                       <Badge variant="green" className="text-[10px] py-0.5">
                         COMPLETED

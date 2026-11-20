@@ -19,6 +19,7 @@ export const statisticsService = {
       tournamentId = 'all',
       franchiseId = 'all',
       arenaType = 'all',
+      format = 'all',
     } = filters;
 
     // 1. Load authoritative tournaments
@@ -32,10 +33,20 @@ export const statisticsService = {
     const availableSeasons = Array.from(
       new Set(allTournaments.map((t) => t.season).filter(Boolean))
     );
+    const availableFormats = Array.from(
+      new Set(allTournaments.map((t) => t.format || 'round_robin').filter(Boolean))
+    );
 
     // Apply Filter: Season
     if (season !== 'all') {
       completedTournaments = completedTournaments.filter((t) => t.season === season);
+    }
+
+    // Apply Filter: Format
+    if (format !== 'all') {
+      completedTournaments = completedTournaments.filter(
+        (t) => (t.format || 'round_robin') === format
+      );
     }
 
     // Apply Filter: Tournament ID
@@ -384,6 +395,7 @@ export const statisticsService = {
       },
       availableFilters: {
         seasons: availableSeasons,
+        formats: availableFormats,
         tournaments: completedTournaments.map((t) => ({ id: t.id, name: t.name, season: t.season })),
         franchises: allFranchises.map((f) => ({ id: f.id, name: f.name })),
       },
@@ -417,11 +429,13 @@ export const statisticsService = {
         name: t.name,
         category: t.category,
         season: t.season,
+        format: t.format || 'round_robin',
         completedAt: t.results?.completedAt || new Date(t.updatedAt).toISOString(),
         championName: t.results?.championTeamName || 'Joint Champions',
         championColor: t.results?.championColor || '#D4B879',
         championLogo: t.results?.championLogo || '👑',
         runnerUpName: t.results?.runnerUpTeamName || null,
+        thirdPlaceName: t.results?.thirdPlaceTeamName || (t.bracketData?.thirdPlaceId ? allFranchises.find(f => f.id === t.bracketData.thirdPlaceId)?.name : null),
         franchisesSnapshot: t.franchisesSnapshot || [],
         gameModes: t.gameModes || [],
         standings: t.results?.standings || [],

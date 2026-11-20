@@ -6,6 +6,7 @@
 
 import { franchiseService } from './franchiseService.js';
 import { AUCTION_PRESETS } from './presets.js';
+import { tournamentFormatService, FORMAT_TYPES } from './tournamentFormatService.js';
 
 export const TOURNAMENT_STORAGE_KEY = 'playzone_tournaments_v1';
 export const ACTIVE_TOURNAMENT_ID_KEY = 'playzone_current_active_tournament_id_v1';
@@ -44,6 +45,11 @@ export const DEFAULT_TOURNAMENTS = [
     endDate: '2026-12-15',
     status: 'active',
     franchiseIds: ['team-nishanth', 'team-ajmal', 'team-praneeth', 'team-nagulan'],
+    format: FORMAT_TYPES.SINGLE_ELIMINATION,
+    formatConfig: {
+      thirdPlacePlayoff: true,
+      seedingMethod: 'standard',
+    },
     gameModes: ['auction', 'battle'],
     auctionConfig: {
       presetId: 'tamil_cinema_heroes_2026',
@@ -88,6 +94,13 @@ export const DEFAULT_TOURNAMENTS = [
     endDate: '2025-10-25',
     status: 'completed',
     franchiseIds: ['team-nishanth', 'team-ajmal', 'team-praneeth'],
+    format: FORMAT_TYPES.ROUND_ROBIN,
+    formatConfig: {
+      roundRobinType: 'single',
+      pointsWin: 3,
+      pointsDraw: 1,
+      pointsLoss: 0,
+    },
     franchisesSnapshot: [
       { id: 'team-nishanth', name: 'Nishanth', color: '#8875A8', startingPurse: 100, purse: 31.5, squadCount: 3, logo: '👑' },
       { id: 'team-ajmal', name: 'Ajmal', color: '#D97858', startingPurse: 100, purse: 31.5, squadCount: 3, logo: '🦁' },
@@ -370,6 +383,29 @@ export const tournamentHubService = {
       .map((fId) => activeFranchises.find((f) => f.id === fId) || franchiseService.getFranchiseById(fId))
       .filter(Boolean);
 
+    const format = payload.format || FORMAT_TYPES.ROUND_ROBIN;
+    const formatConfig = payload.formatConfig || {
+      roundRobinType: 'single',
+      pointsWin: 3,
+      pointsDraw: 1,
+      pointsLoss: 0,
+      seedingMethod: 'standard',
+    };
+
+    let bracketData = payload.bracketData || null;
+    if (!bracketData && franchisesSnapshot.length >= 2) {
+      try {
+        bracketData = tournamentFormatService.generateTournamentBracket({
+          tournamentId: id,
+          format,
+          franchises: franchisesSnapshot,
+          config: formatConfig,
+        });
+      } catch (e) {
+        console.warn('Auto bracket generation on create skipped:', e);
+      }
+    }
+
     const newTournament = {
       id,
       name: payload.name.trim(),
@@ -383,6 +419,9 @@ export const tournamentHubService = {
       status: payload.status || 'upcoming', // 'draft' | 'upcoming'
       franchiseIds: [...payload.franchiseIds],
       franchisesSnapshot,
+      format,
+      formatConfig,
+      bracketData,
       gameModes: [...payload.gameModes],
       auctionConfig: payload.auctionConfig || null,
       battleConfig: payload.battleConfig || null,
@@ -498,15 +537,34 @@ export const tournamentHubService = {
       copyName = `${source.name} (Copy ${counter})`;
     }
 
+    const newId = `tourn-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    let freshBracketData = null;
+    if (source.format && source.franchisesSnapshot && source.franchisesSnapshot.length >= 2) {
+      try {
+        freshBracketData = tournamentFormatService.generateTournamentBracket({
+          tournamentId: newId,
+          format: source.format,
+          franchises: source.franchisesSnapshot,
+          config: source.formatConfig || {},
+        });
+      } catch (e) {
+        console.warn('Auto bracket generation on duplicate skipped:', e);
+      }
+    }
+
     const newTournament = {
       ...source,
-      id: `tourn-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      id: newId,
       name: copyName,
-      status: 'upcoming',
+      status: 'draft',
       arenaState: null,
+      bracketData: freshBracketData,
+      championId: null,
+      runnerUpId: null,
+      thirdPlaceId: null,
       progress: {
         percentage: 0,
-        currentStage: 'Ready to Launch',
+        currentStage: 'Draft',
         completedStages: [],
         totalStages: source.gameModes?.length ? source.gameModes.length * 2 : 2,
       },

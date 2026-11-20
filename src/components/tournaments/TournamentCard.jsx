@@ -161,6 +161,11 @@ export const TournamentCard = ({
                 {season}
               </span>
             )}
+            {tournament.format && (
+              <span className="px-2.5 py-0.5 rounded-lg bg-[#111827] border border-[#39465A] text-[10px] font-mono font-bold text-[#00D9FF]">
+                {tournament.format.replace(/_/g, ' ').toUpperCase()}
+              </span>
+            )}
           </div>
           <div>{getStatusBadge()}</div>
         </div>

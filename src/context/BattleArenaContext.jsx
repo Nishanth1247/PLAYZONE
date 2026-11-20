@@ -20,6 +20,7 @@ import {
   getTeamMatchSlotIndex
 } from '../services/battleEngine';
 import { soundService } from '../services/soundService';
+import { tournamentFormatService, FORMAT_TYPES } from '../services/tournamentFormatService';
 import { toast } from 'sonner';
 
 const BattleArenaContext = createContext(null);
@@ -435,7 +436,10 @@ export const BattleArenaProvider = ({ children }) => {
 
     // If tournament has saved battle state, restore it directly
     if (tournament.arenaState?.battle) {
-      setBattleState(tournament.arenaState.battle);
+      setBattleState({
+        ...tournament.arenaState.battle,
+        tournamentBracketData: tournament.bracketData || tournament.arenaState.battle.tournamentBracketData || null,
+      });
       return true;
     }
 
@@ -447,7 +451,7 @@ export const BattleArenaProvider = ({ children }) => {
       ? tournament.franchisesSnapshot
       : (tournament.franchiseIds || []).map((id) => franchiseService.getFranchiseById(id)).filter(Boolean);
 
-    return initializeBattleTournament({
+    const initialized = initializeBattleTournament({
       preset,
       teamCount: teamsToUse.length,
       selectedTeams: teamsToUse,
@@ -457,8 +461,18 @@ export const BattleArenaProvider = ({ children }) => {
       customTournament: {
         id: tournament.id,
         name: tournament.name,
+        bracketData: tournament.bracketData || null,
       },
     });
+
+    if (tournament.bracketData) {
+      setBattleState((prev) => ({
+        ...prev,
+        tournamentBracketData: tournament.bracketData,
+      }));
+    }
+
+    return initialized;
   };
 
   // 2. Place Bid in Battle Auction
@@ -815,6 +829,41 @@ export const BattleArenaProvider = ({ children }) => {
       const updatedCompleted = [...prev.completedMatches, evaluatedMatch];
       const updatedLeaderboard = calculateLeaderboard(prev.teams, updatedCompleted);
 
+      // Advance authoritative Tournament Bracket if attached
+      let updatedBracket = prev.tournamentBracketData || null;
+      if (updatedBracket) {
+        try {
+          updatedBracket = tournamentFormatService.advanceMatchResult({
+            bracketData: prev.tournamentBracketData,
+            matchId: currentMatch.id,
+            result: evaluatedMatch,
+            allFranchises: prev.teams,
+          });
+
+          const activeTournId = tournamentHubService.getActiveTournamentId();
+          if (activeTournId) {
+            const updates = { bracketData: updatedBracket };
+            if (updatedBracket.championId) {
+              const champ = prev.teams.find((t) => t.id === updatedBracket.championId);
+              const runUp = prev.teams.find((t) => t.id === updatedBracket.runnerUpId);
+              updates.results = {
+                championTeamId: updatedBracket.championId,
+                championTeamName: champ ? champ.name : 'Champion',
+                championColor: champ?.color || '#D4B879',
+                championLogo: champ?.logo || '👑',
+                runnerUpTeamId: updatedBracket.runnerUpId || null,
+                runnerUpTeamName: runUp ? runUp.name : null,
+                completedAt: new Date().toISOString(),
+              };
+              updates.status = 'completed';
+            }
+            tournamentHubService.updateTournament(activeTournId, updates);
+          }
+        } catch (e) {
+          console.warn('Could not advance tournament bracket for match:', e);
+        }
+      }
+
       toast.success('Match result confirmed! Tournament standings updated.');
 
       return {
@@ -823,6 +872,7 @@ export const BattleArenaProvider = ({ children }) => {
         completedMatches: updatedCompleted,
         usedPlayerIds: [...prev.usedPlayerIds, playerA.id, playerB.id],
         leaderboard: updatedLeaderboard,
+        tournamentBracketData: updatedBracket,
         matchStage: 'confirmed',
       };
     });
