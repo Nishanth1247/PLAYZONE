@@ -25,6 +25,7 @@ import {
   BookOpen
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
+import { tournamentHubService } from '../../services/tournamentHubService';
 
 export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
   const { 
@@ -46,6 +47,9 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+
+  const activeTournId = tournamentHubService.getActiveTournamentId();
+  const activeTournament = activeTournId ? tournamentHubService.getTournamentById(activeTournId) : null;
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -136,6 +140,8 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                 ? 'Party Arena • Local Pass & Play'
                 : platformMode === 'battle'
                 ? 'Battle Arena • Tactical Clash'
+                : platformMode === 'tournaments'
+                ? 'Tournament Hub • Season Manager'
                 : platformMode === 'rules'
                 ? 'Official Rulebooks & Guides'
                 : platformMode === 'franchises'
@@ -208,6 +214,20 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
 
           <button
             type="button"
+            onClick={() => setPlatformMode('tournaments')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              platformMode === 'tournaments'
+                ? 'bg-[#D4B879] text-[#111827] font-bold shadow-sm'
+                : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+            }`}
+          >
+            <Trophy className="w-3.5 h-3.5 text-[#D4B879]" />
+            <span className="hidden sm:inline">TOURNAMENTS</span>
+            <span className="sm:hidden">HUB</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setPlatformMode('franchises')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
               platformMode === 'franchises'
@@ -222,7 +242,7 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
         </div>
 
         {/* Navigation Tabs (if inside party or auction mode) */}
-        {platformMode !== 'rules' && platformMode !== 'franchises' && (
+        {platformMode !== 'rules' && platformMode !== 'franchises' && platformMode !== 'tournaments' && (
           <nav className="hidden lg:flex items-center gap-1 p-1 rounded-xl bg-[#222F43] border border-[#39465A] text-xs font-medium relative font-heading">
             {platformMode === 'party' ? (
               partyNavItems.map((item) => {
@@ -271,6 +291,19 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
 
         {/* Right Controls: Sound, Fullscreen */}
         <div className="flex items-center gap-2">
+          {/* Active Tournament Indicator */}
+          {activeTournament && (platformMode === 'auction' || platformMode === 'battle') && (
+            <button
+              onClick={() => setPlatformMode('tournaments')}
+              title={`Active Tournament: ${activeTournament.name}. Click to view in Tournament Hub.`}
+              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#D4B879]/15 border border-[#D4B879]/30 text-[#D4B879] hover:bg-[#D4B879]/25 hover:text-[#F5F3EE] text-xs font-semibold font-heading transition-all"
+            >
+              <Trophy className="w-3.5 h-3.5 text-[#D4B879]" />
+              <span className="truncate max-w-[130px]">{activeTournament.name}</span>
+              <span className="text-[10px] text-[#AEB9CC] font-normal">Hub →</span>
+            </button>
+          )}
+
           {/* Sound Toggle */}
           <button
             onClick={handleToggleSound}

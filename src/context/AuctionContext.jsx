@@ -4,6 +4,7 @@ import { storageService } from '../services/storageService';
 import { soundService } from '../services/soundService';
 import { AUCTION_PRESETS, FIXED_TEAMS, shuffleArray, getScoreMetricLabel } from '../services/presets';
 import { franchiseService } from '../services/franchiseService';
+import { tournamentHubService } from '../services/tournamentHubService';
 import { calculateTeamRankings } from '../services/scoringEngine';
 import { validateBid, toPaise, fromPaise, DEFAULT_INCREMENTS, calculateNextBid, AUCTION_MODES } from '../services/auctionEngine';
 
@@ -72,6 +73,10 @@ export const AuctionProvider = ({ children }) => {
   useEffect(() => {
     if (auction) {
       storageService.saveActiveAuction(auction);
+      const activeTournamentId = tournamentHubService.getActiveTournamentId();
+      if (activeTournamentId) {
+        tournamentHubService.syncArenaState(activeTournamentId, 'auction', auction);
+      }
     }
   }, [auction]);
 
@@ -429,6 +434,59 @@ export const AuctionProvider = ({ children }) => {
     storageService.saveCustomTournament(tournamentData);
     setCustomTournaments(storageService.getCustomTournaments());
     launchCustomTournamentPlayNow(tournamentData);
+  };
+
+  // 2e. Launch from Central Tournament Hub
+  const launchHubTournament = (tournament) => {
+    if (!tournament) return;
+    tournamentHubService.setActiveTournamentId(tournament.id);
+
+    // If tournament already has saved live auction state, restore directly
+    if (tournament.arenaState?.auction) {
+      setAuction(tournament.arenaState.auction);
+      setActivePage('live');
+      return;
+    }
+
+    // Resolve preset items
+    const presetId = tournament.auctionConfig?.presetId;
+    const matchedPreset = AUCTION_PRESETS.find((p) => p.id === presetId) || AUCTION_PRESETS[0];
+    const items = tournament.auctionConfig?.poolItems || matchedPreset.items;
+
+    // Resolve teams
+    const defaultPurse = Number(tournament.auctionConfig?.defaultPurse || 100);
+    const teamsToUse = (tournament.franchisesSnapshot && tournament.franchisesSnapshot.length >= 2)
+      ? tournament.franchisesSnapshot
+      : (tournament.franchiseIds || []).map((id) => franchiseService.getFranchiseById(id)).filter(Boolean);
+
+    const configuredTeams = (teamsToUse.length >= 2 ? teamsToUse : franchiseService.getActiveFranchises().slice(0, 4)).map((t) => ({
+      ...t,
+      initialPurse: defaultPurse,
+      purse: defaultPurse,
+      itemsPurchased: [],
+    }));
+
+    createNewAuction({
+      id: tournament.id,
+      name: tournament.name,
+      category: tournament.category,
+      scoreLabel: matchedPreset.scoreLabel,
+      scoreMetric: matchedPreset.scoreMetric || 'points',
+      mode: 'standard',
+      description: tournament.description,
+      currency: { symbol: '₹', unit: 'Cr' },
+      rules: {
+        countdownDuration: Number(tournament.auctionConfig?.timerDuration) || 20,
+        maxSquadSize: Number(tournament.auctionConfig?.maxSquadSize) || 5,
+        minSquadSize: Number(tournament.auctionConfig?.minSquadSize) || 3,
+        antiSelfBidding: tournament.auctionConfig?.antiSelfBidding ?? true,
+        customIncrements: '0.20, 0.50, 1.00, 2.00, 5.00',
+        minIncrement: 0.50,
+      },
+      teams: configuredTeams,
+      items,
+    });
+    setActivePage('live');
   };
 
   // Restart an active tournament as a fresh game (new Fisher-Yates shuffle, reset purses)
@@ -1401,6 +1459,7 @@ export const AuctionProvider = ({ children }) => {
         refreshCustomTournaments,
         launchCustomTournamentPlayNow,
         saveAndLaunchCustomTournament,
+        launchHubTournament,
         restartTournamentFresh,
         placeBid,
         placeIncrementBid,

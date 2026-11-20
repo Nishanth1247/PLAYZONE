@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { FIXED_TEAMS, AUCTION_PRESETS } from '../services/presets';
 import { franchiseService } from '../services/franchiseService';
+import { tournamentHubService } from '../services/tournamentHubService';
 import { 
   toPaise, 
   fromPaise, 
@@ -74,9 +75,13 @@ export const BattleArenaProvider = ({ children }) => {
 
   const timerRef = useRef(null);
 
-  // Auto-persist battle tournament state to LocalStorage
+  // Auto-persist battle tournament state to LocalStorage & Tournament Hub
   useEffect(() => {
     saveBattleState(battleState);
+    const activeTournamentId = tournamentHubService.getActiveTournamentId();
+    if (activeTournamentId && battleState) {
+      tournamentHubService.syncArenaState(activeTournamentId, 'battle', battleState);
+    }
   }, [battleState]);
 
   // Auction Timer Loop for Round 1
@@ -421,6 +426,39 @@ export const BattleArenaProvider = ({ children }) => {
     soundService.playBid();
     toast.success(`⚔️ Battle Arena Initialized: ${teamCount} Teams • Squad Size ${squadSize}!`);
     return true;
+  };
+
+  // Launch from Central Tournament Hub
+  const launchBattleHubTournament = (tournament) => {
+    if (!tournament) return false;
+    tournamentHubService.setActiveTournamentId(tournament.id);
+
+    // If tournament has saved battle state, restore it directly
+    if (tournament.arenaState?.battle) {
+      setBattleState(tournament.arenaState.battle);
+      return true;
+    }
+
+    const squadSize = Number(tournament.battleConfig?.squadSize) || 3;
+    const startingPurse = Number(tournament.battleConfig?.startingPurse) || 100;
+    const preset = AUCTION_PRESETS[0];
+
+    const teamsToUse = (tournament.franchisesSnapshot && tournament.franchisesSnapshot.length >= 2)
+      ? tournament.franchisesSnapshot
+      : (tournament.franchiseIds || []).map((id) => franchiseService.getFranchiseById(id)).filter(Boolean);
+
+    return initializeBattleTournament({
+      preset,
+      teamCount: teamsToUse.length,
+      selectedTeams: teamsToUse,
+      squadSize,
+      startingPurse,
+      countdownDuration: 20,
+      customTournament: {
+        id: tournament.id,
+        name: tournament.name,
+      },
+    });
   };
 
   // 2. Place Bid in Battle Auction
@@ -954,6 +992,7 @@ export const BattleArenaProvider = ({ children }) => {
         toggleBattleTimer,
         resetBattleTimer,
         resetBattleTournament,
+        launchBattleHubTournament,
       }}
     >
       {children}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuctionProvider, useAuction } from './context/AuctionContext';
 import { PartyGameProvider, usePartyGame } from './context/PartyGameContext';
-import { BattleArenaProvider } from './context/BattleArenaContext';
+import { BattleArenaProvider, useBattleArena } from './context/BattleArenaContext';
 import { Navbar } from './components/common/Navbar';
 import { Home } from './components/landing/Home';
 import { SetupWizard } from './components/setup/SetupWizard';
@@ -17,17 +17,41 @@ import { PartyResultsScreen } from './components/party/PartyResultsScreen';
 import { BattleArenaManager } from './components/battle/BattleArenaManager';
 import { GameRules } from './components/rules/GameRules';
 import { FranchiseManager } from './components/franchise/FranchiseManager';
+import { TournamentHub } from './components/tournaments/TournamentHub';
 import { GAME_REGISTRY } from './services/party/gameRegistry';
 import { Toaster } from './components/ui/Toaster';
 import { WifiOff, Heart, BookOpen } from 'lucide-react';
 
 const MainContent = ({ platformMode, setPlatformMode, rulesTab, setRulesTab, previousMode }) => {
-  const { activePage, setActivePage } = useAuction();
+  const { activePage, setActivePage, launchHubTournament } = useAuction();
+  const { launchBattleHubTournament } = useBattleArena();
   const { partyView, openGameLobby } = usePartyGame();
 
   return (
     <main className="flex-1 pb-12">
-      {platformMode === 'rules' ? (
+      {platformMode === 'tournaments' ? (
+        <div key="tournament_hub" className="transition-opacity duration-300">
+          <TournamentHub
+            onNavigateToArena={(arena, tournament) => {
+              if (arena === 'auction') {
+                if (tournament) {
+                  launchHubTournament(tournament);
+                } else {
+                  setActivePage('setup');
+                }
+                setPlatformMode('auction');
+              } else if (arena === 'battle') {
+                if (tournament) {
+                  launchBattleHubTournament(tournament);
+                }
+                setPlatformMode('battle');
+              } else if (arena === 'party') {
+                setPlatformMode('party');
+              }
+            }}
+          />
+        </div>
+      ) : platformMode === 'rules' ? (
         <div key={`rules_${rulesTab}`} className="transition-opacity duration-300">
           <GameRules
             initialTab={rulesTab}
@@ -107,11 +131,20 @@ export function AppContent() {
       setPlatformMode('franchises');
     };
 
+    const handleOpenTournaments = () => {
+      if (platformMode !== 'rules' && platformMode !== 'tournaments') {
+        setPreviousMode(platformMode);
+      }
+      setPlatformMode('tournaments');
+    };
+
     window.addEventListener('bidbattle_open_rules', handleOpenRules);
     window.addEventListener('bidbattle_open_franchises', handleOpenFranchises);
+    window.addEventListener('bidbattle_open_tournaments', handleOpenTournaments);
     return () => {
       window.removeEventListener('bidbattle_open_rules', handleOpenRules);
       window.removeEventListener('bidbattle_open_franchises', handleOpenFranchises);
+      window.removeEventListener('bidbattle_open_tournaments', handleOpenTournaments);
     };
   }, [platformMode]);
 

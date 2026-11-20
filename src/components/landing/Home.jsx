@@ -245,6 +245,18 @@ export const Home = ({ onSwitchToParty }) => {
             </Button>
 
             <Button
+              variant="champagne"
+              size="xl"
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('bidbattle_open_tournaments'));
+              }}
+              className="border-[#D4B879]/50 text-[#111827] bg-[#D4B879] hover:bg-[#c9ad6a] font-heading font-black shadow-lg shadow-[#D4B879]/20"
+            >
+              <Trophy className="w-5 h-5 text-[#111827]" />
+              <span>Tournaments Hub</span>
+            </Button>
+
+            <Button
               variant="secondary"
               size="xl"
               onClick={() => {
