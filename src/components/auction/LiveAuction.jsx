@@ -27,7 +27,8 @@ import {
   CheckCircle2,
   XCircle,
   Activity,
-  BookOpen
+  BookOpen,
+  Tv
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -218,6 +219,20 @@ export const LiveAuction = () => {
           >
             <BookOpen className="w-3.5 h-3.5 text-[#D4B879]" />
             <span className="hidden md:inline">Rules</span>
+          </button>
+
+          {/* Broadcast Trigger */}
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('bidbattle_open_broadcast', {
+                detail: { arena: 'auction', mode: 'live' }
+              }));
+            }}
+            className="px-2.5 py-1 rounded-xl bg-[#D4B879]/15 hover:bg-[#D4B879]/30 border border-[#D4B879]/40 text-[#D4B879] hover:text-[#F5F3EE] text-xs font-heading font-bold flex items-center gap-1.5 transition-all shadow-sm"
+            title="Launch Spectator Broadcast View"
+          >
+            <Tv className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Broadcast</span>
           </button>
 
           {/* Lot Queue Drawer Trigger */}

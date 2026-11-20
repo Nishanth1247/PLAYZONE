@@ -26,7 +26,8 @@ import {
   Crown,
   HelpCircle,
   Zap,
-  Star
+  Star,
+  Tv
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -359,6 +360,20 @@ export const ResultsScreen = () => {
           >
             <FileJson className="w-4 h-4 text-brand-purple" />
             <span>Download JSON</span>
+          </Button>
+
+          <Button
+            variant="champagne"
+            size="md"
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('bidbattle_open_broadcast', {
+                detail: { arena: 'auction', mode: 'ceremony' }
+              }));
+            }}
+            className="flex items-center gap-2 font-heading font-black text-xs shadow-md"
+          >
+            <Tv className="w-4 h-4" />
+            <span>Broadcast Ceremony</span>
           </Button>
 
           <Button

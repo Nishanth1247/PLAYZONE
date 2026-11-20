@@ -20,7 +20,8 @@ import {
   RotateCcw,
   Sparkles,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Tv
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { franchiseService } from '../../services/franchiseService';
@@ -348,6 +349,20 @@ export const TournamentCard = ({
               )}
             </button>
           )}
+
+          {/* Broadcast Mode Action */}
+          <button
+            type="button"
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('bidbattle_open_broadcast', {
+                detail: { tournamentId: id, mode: isCompleted ? 'ceremony' : 'live' }
+              }));
+            }}
+            className="p-1.5 rounded-xl bg-[#2C394C] hover:bg-[#D4B879]/20 border border-[#39465A] hover:border-[#D4B879] text-[#D4B879] hover:text-[#F5F3EE] transition-colors"
+            title="Open Cinematic Broadcast Mode"
+          >
+            <Tv className="w-3.5 h-3.5" />
+          </button>
 
           {/* View Details */}
           <button

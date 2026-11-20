@@ -18,6 +18,7 @@ import { BattleArenaManager } from './components/battle/BattleArenaManager';
 import { GameRules } from './components/rules/GameRules';
 import { FranchiseManager } from './components/franchise/FranchiseManager';
 import { TournamentHub } from './components/tournaments/TournamentHub';
+import { BroadcastMode } from './components/broadcast/BroadcastMode';
 import { GAME_REGISTRY } from './services/party/gameRegistry';
 import { Toaster } from './components/ui/Toaster';
 import { WifiOff, Heart, BookOpen } from 'lucide-react';
@@ -114,6 +115,12 @@ export function AppContent() {
   const [platformMode, setPlatformMode] = useState('party'); // 'party' | 'auction' | 'battle' | 'rules'
   const [previousMode, setPreviousMode] = useState('party');
   const [rulesTab, setRulesTab] = useState('auction');
+  const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
+  const [broadcastConfig, setBroadcastConfig] = useState({
+    tournamentId: null,
+    mode: 'live',
+    arena: null,
+  });
 
   React.useEffect(() => {
     const handleOpenRules = (e) => {
@@ -138,13 +145,25 @@ export function AppContent() {
       setPlatformMode('tournaments');
     };
 
+    const handleOpenBroadcast = (e) => {
+      const detail = e.detail || {};
+      setBroadcastConfig({
+        tournamentId: detail.tournamentId || null,
+        mode: detail.mode || 'live',
+        arena: detail.arena || null,
+      });
+      setIsBroadcastOpen(true);
+    };
+
     window.addEventListener('bidbattle_open_rules', handleOpenRules);
     window.addEventListener('bidbattle_open_franchises', handleOpenFranchises);
     window.addEventListener('bidbattle_open_tournaments', handleOpenTournaments);
+    window.addEventListener('bidbattle_open_broadcast', handleOpenBroadcast);
     return () => {
       window.removeEventListener('bidbattle_open_rules', handleOpenRules);
       window.removeEventListener('bidbattle_open_franchises', handleOpenFranchises);
       window.removeEventListener('bidbattle_open_tournaments', handleOpenTournaments);
+      window.removeEventListener('bidbattle_open_broadcast', handleOpenBroadcast);
     };
   }, [platformMode]);
 
@@ -171,6 +190,13 @@ export function AppContent() {
         rulesTab={rulesTab}
         setRulesTab={setRulesTab}
         previousMode={previousMode}
+      />
+      <BroadcastMode
+        isOpen={isBroadcastOpen}
+        onClose={() => setIsBroadcastOpen(false)}
+        initialTournamentId={broadcastConfig.tournamentId}
+        initialMode={broadcastConfig.mode}
+        initialArena={broadcastConfig.arena}
       />
       <Toaster />
 

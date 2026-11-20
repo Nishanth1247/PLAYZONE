@@ -11,7 +11,8 @@ import {
   HelpCircle,
   Film,
   Upload,
-  BookOpen
+  BookOpen,
+  Tv
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -58,6 +59,20 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
             >
               <BookOpen className="w-3.5 h-3.5" />
               <span>Party Rulebooks</span>
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('bidbattle_open_broadcast', {
+                  detail: { arena: 'party', mode: 'live' }
+                }));
+              }}
+              className="font-heading text-xs flex items-center gap-1.5 border-[#00D9FF]/40 text-[#00D9FF] hover:bg-[#00D9FF]/10"
+            >
+              <Tv className="w-3.5 h-3.5" />
+              <span>Broadcast View</span>
             </Button>
 
             {onSwitchToAuction && (

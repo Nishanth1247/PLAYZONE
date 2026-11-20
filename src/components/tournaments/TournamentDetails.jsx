@@ -22,7 +22,8 @@ import {
   Archive,
   Trash2,
   Download,
-  Share2
+  Share2,
+  Tv
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -123,6 +124,21 @@ export const TournamentDetails = ({
         </button>
 
         <div className="flex items-center gap-2">
+          {/* Broadcast Mode Action */}
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('bidbattle_open_broadcast', {
+                detail: { tournamentId: tournament.id, mode: isCompleted ? 'ceremony' : 'live' }
+              }));
+            }}
+            className="flex items-center gap-2 font-heading font-black text-xs border-[#D4B879]/40 text-[#D4B879] hover:bg-[#D4B879]/15 shadow-md"
+          >
+            <Tv className="w-3.5 h-3.5" />
+            <span>BROADCAST MODE</span>
+          </Button>
+
           {/* Quick Action Button */}
           <Button
             variant="champagne"

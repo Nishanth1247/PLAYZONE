@@ -14,7 +14,8 @@ import {
   Shield,
   Coins,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Tv
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -114,6 +115,20 @@ export const BattleAuctionStage = () => {
 
         {/* Right: Controls (Pause/Resume, Reset, Exit) */}
         <div className="flex items-center gap-2">
+          {/* Broadcast Trigger */}
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('bidbattle_open_broadcast', {
+                detail: { arena: 'battle', mode: 'live' }
+              }));
+            }}
+            className="px-2.5 py-1.5 rounded-xl border border-[#D4B879]/40 bg-[#D4B879]/15 hover:bg-[#D4B879]/30 text-[#D4B879] hover:text-[#F5F3EE] text-xs font-broadcast font-bold flex items-center gap-1.5 transition-all shadow-sm"
+            title="Launch Spectator Broadcast View"
+          >
+            <Tv className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Broadcast</span>
+          </button>
+
           <button
             onClick={toggleBattleTimer}
             className={`px-3 py-1.5 rounded-xl border text-xs font-broadcast font-bold flex items-center gap-1.5 transition-all ${

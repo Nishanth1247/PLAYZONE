@@ -22,7 +22,8 @@ import {
   ChevronDown,
   Layers,
   Settings,
-  BookOpen
+  BookOpen,
+  Tv
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { tournamentHubService } from '../../services/tournamentHubService';
@@ -291,6 +292,24 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
 
         {/* Right Controls: Sound, Fullscreen */}
         <div className="flex items-center gap-2">
+          {/* Quick Broadcast Mode Trigger */}
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('bidbattle_open_broadcast', {
+                detail: {
+                  tournamentId: activeTournId || null,
+                  arena: platformMode === 'auction' ? 'auction' : platformMode === 'battle' ? 'battle' : platformMode === 'party' ? 'party' : null,
+                  mode: 'live'
+                }
+              }));
+            }}
+            title="Launch Spectator Broadcast Mode"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#00D9FF]/15 hover:bg-[#00D9FF]/30 border border-[#00D9FF]/40 text-[#00D9FF] hover:text-[#F5F3EE] text-xs font-heading font-black transition-all shadow-sm"
+          >
+            <Tv className="w-3.5 h-3.5" />
+            <span className="hidden xl:inline">BROADCAST</span>
+          </button>
+
           {/* Active Tournament Indicator */}
           {activeTournament && (platformMode === 'auction' || platformMode === 'battle') && (
             <button

@@ -16,7 +16,8 @@ import {
   Star,
   Zap,
   Shield,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Tv
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -173,6 +174,20 @@ export const BattleResultsScreen = ({ onReturnHome }) => {
 
         {/* Action Controls */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-3">
+          <Button
+            variant="champagne"
+            size="md"
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('bidbattle_open_broadcast', {
+                detail: { arena: 'battle', mode: 'ceremony' }
+              }));
+            }}
+            className="font-heading text-xs text-[#0B0F17] flex items-center gap-2 shadow-md"
+          >
+            <Tv className="w-4 h-4" />
+            <span>BROADCAST CEREMONY</span>
+          </Button>
+
           <Button
             variant="secondary"
             size="md"
