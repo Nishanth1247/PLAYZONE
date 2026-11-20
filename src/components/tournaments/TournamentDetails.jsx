@@ -23,7 +23,8 @@ import {
   Trash2,
   Download,
   Share2,
-  Tv
+  Tv,
+  Layers
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
