@@ -88,7 +88,12 @@ export const DEFAULT_TOURNAMENTS = [
     endDate: '2025-10-25',
     status: 'completed',
     franchiseIds: ['team-nishanth', 'team-ajmal', 'team-praneeth'],
-    gameModes: ['auction'],
+    franchisesSnapshot: [
+      { id: 'team-nishanth', name: 'Nishanth', color: '#8875A8', startingPurse: 100, purse: 31.5, squadCount: 3, logo: '👑' },
+      { id: 'team-ajmal', name: 'Ajmal', color: '#D97858', startingPurse: 100, purse: 31.5, squadCount: 3, logo: '🦁' },
+      { id: 'team-praneeth', name: 'Praneeth', color: '#4D908E', startingPurse: 100, purse: 35.0, squadCount: 3, logo: '⚔️' },
+    ],
+    gameModes: ['auction', 'battle'],
     auctionConfig: {
       presetId: 'tamil_cinema_heroes_2026',
       presetName: 'Tamil Cinema Heroes',
@@ -98,6 +103,45 @@ export const DEFAULT_TOURNAMENTS = [
       minSquadSize: 3,
       timerDuration: 15,
       antiSelfBidding: true,
+    },
+    battleConfig: {
+      squadSize: 3,
+      startingPurse: 100,
+      scheduleType: 'round_robin',
+      scoringSystem: '3_1_0',
+    },
+    arenaState: {
+      auction: {
+        items: [
+          { id: 'lot-1', name: 'Rajinikanth', role: 'Superstar Hero', basePrice: 2.0, soldPrice: 38.5, status: 'sold', soldTo: 'team-nishanth', buyerName: 'Nishanth', settlementType: 'normal' },
+          { id: 'lot-2', name: 'Kamal Haasan', role: 'Ulaganayagan', basePrice: 2.0, soldPrice: 32.0, status: 'sold', soldTo: 'team-ajmal', buyerName: 'Ajmal', settlementType: 'normal' },
+          { id: 'lot-3', name: 'Vijay', role: 'Thalapathy', basePrice: 2.0, soldPrice: 35.0, status: 'sold', soldTo: 'team-praneeth', buyerName: 'Praneeth', settlementType: 'normal' },
+          { id: 'lot-4', name: 'Ajith Kumar', role: 'Ultimate Star', basePrice: 2.0, soldPrice: 28.5, status: 'sold', soldTo: 'team-nishanth', buyerName: 'Nishanth', settlementType: 'normal' },
+          { id: 'lot-5', name: 'Suriya', role: 'Versatile Action Hero', basePrice: 1.5, soldPrice: 22.0, status: 'sold', soldTo: 'team-ajmal', buyerName: 'Ajmal', settlementType: 'normal' },
+          { id: 'lot-6', name: 'Dhanush', role: 'National Award Icon', basePrice: 1.5, soldPrice: 18.0, status: 'sold', soldTo: 'team-praneeth', buyerName: 'Praneeth', settlementType: 'normal' },
+          { id: 'lot-7', name: 'Vikram', role: 'Chiyaan Chameleon', basePrice: 1.5, soldPrice: 1.5, status: 'sold', soldTo: 'team-nishanth', buyerName: 'Nishanth', settlementType: 'mandatory_last_bidder' },
+          { id: 'lot-8', name: 'Sivakarthikeyan', role: 'Prince of Entertainment', basePrice: 1.0, soldPrice: 14.5, status: 'sold', soldTo: 'team-ajmal', buyerName: 'Ajmal', settlementType: 'normal' },
+          { id: 'lot-9', name: 'Silambarasan TR', role: 'Little Superstar', basePrice: 1.0, soldPrice: 0, status: 'unsold', settlementType: 'unsold' },
+          { id: 'lot-10', name: 'Fahadh Faasil', role: 'Method Legend', basePrice: 1.0, soldPrice: 12.0, status: 'sold', soldTo: 'team-praneeth', buyerName: 'Praneeth', settlementType: 'normal' },
+        ],
+        teams: [
+          { id: 'team-nishanth', name: 'Nishanth', color: '#8875A8', purse: 31.5, initialPurse: 100, squad: [{ name: 'Rajinikanth' }, { name: 'Ajith Kumar' }, { name: 'Vikram' }] },
+          { id: 'team-ajmal', name: 'Ajmal', color: '#D97858', purse: 31.5, initialPurse: 100, squad: [{ name: 'Kamal Haasan' }, { name: 'Suriya' }, { name: 'Sivakarthikeyan' }] },
+          { id: 'team-praneeth', name: 'Praneeth', color: '#4D908E', purse: 35.0, initialPurse: 100, squad: [{ name: 'Vijay' }, { name: 'Dhanush' }, { name: 'Fahadh Faasil' }] },
+        ],
+      },
+      battle: {
+        completedMatches: [
+          { matchId: 'm-1', teamAId: 'team-nishanth', teamBId: 'team-ajmal', teamAName: 'Nishanth', teamBName: 'Ajmal', scoreA: 88, scoreB: 84, winnerId: 'team-nishanth', isDraw: false, scoreDiff: 4 },
+          { matchId: 'm-2', teamAId: 'team-ajmal', teamBId: 'team-praneeth', teamAName: 'Ajmal', teamBName: 'Praneeth', scoreA: 86, scoreB: 82, winnerId: 'team-ajmal', isDraw: false, scoreDiff: 4 },
+          { matchId: 'm-3', teamAId: 'team-nishanth', teamBId: 'team-praneeth', teamAName: 'Nishanth', teamBName: 'Praneeth', scoreA: 92, scoreB: 85, winnerId: 'team-nishanth', isDraw: false, scoreDiff: 7 },
+        ],
+        teams: [
+          { id: 'team-nishanth', name: 'Nishanth', points: 6, wins: 2, draws: 0, losses: 0, purse: 31.5, color: '#8875A8' },
+          { id: 'team-ajmal', name: 'Ajmal', points: 3, wins: 1, draws: 0, losses: 1, purse: 31.5, color: '#D97858' },
+          { id: 'team-praneeth', name: 'Praneeth', points: 0, wins: 0, draws: 0, losses: 2, purse: 35.0, color: '#4D908E' },
+        ],
+      },
     },
     progress: {
       percentage: 100,
@@ -117,6 +161,11 @@ export const DEFAULT_TOURNAMENTS = [
         'team-ajmal': 342,
         'team-praneeth': 310,
       },
+      standings: [
+        { rank: 1, teamId: 'team-nishanth', teamName: 'Nishanth', points: 365, wins: 2, draws: 0, losses: 0, color: '#8875A8', purseRemaining: 31.5, squadCount: 3 },
+        { rank: 2, teamId: 'team-ajmal', teamName: 'Ajmal', points: 342, wins: 1, draws: 0, losses: 1, color: '#D97858', purseRemaining: 31.5, squadCount: 3 },
+        { rank: 3, teamId: 'team-praneeth', teamName: 'Praneeth', points: 310, wins: 0, draws: 0, losses: 2, color: '#4D908E', purseRemaining: 35.0, squadCount: 3 },
+      ],
       completedAt: '2025-10-25T18:30:00Z',
       summaryNotes: 'Nishanth secured championship victory with a total score of 365 pts.',
     },

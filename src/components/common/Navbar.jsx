@@ -23,7 +23,8 @@ import {
   Layers,
   Settings,
   BookOpen,
-  Tv
+  Tv,
+  BarChart3
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { tournamentHubService } from '../../services/tournamentHubService';
@@ -127,6 +128,8 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                 <BookOpen className="w-4 h-4 text-[#D4B879] group-hover:scale-105 transition-transform" />
               ) : platformMode === 'franchises' ? (
                 <Users className="w-4 h-4 text-[#D97858] group-hover:scale-105 transition-transform" />
+              ) : platformMode === 'statistics' ? (
+                <BarChart3 className="w-4 h-4 text-[#D97858] group-hover:scale-105 transition-transform" />
               ) : (
                 <Gavel className="w-4 h-4 text-[#D97858] group-hover:rotate-6 transition-transform" />
               )}
@@ -147,6 +150,8 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
                 ? 'Official Rulebooks & Guides'
                 : platformMode === 'franchises'
                 ? 'Franchise Manager • Team Branding'
+                : platformMode === 'statistics'
+                ? 'Statistics & Records • All-Time Leaderboards'
                 : 'Auction Arena • Franchise Bidding'}
             </p>
           </div>
@@ -240,10 +245,24 @@ export const Navbar = ({ platformMode = 'party', setPlatformMode }) => {
             <span className="hidden sm:inline">FRANCHISES</span>
             <span className="sm:hidden">TEAMS</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setPlatformMode('statistics')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+              platformMode === 'statistics'
+                ? 'bg-[#D97858] text-[#F5F3EE] font-bold shadow-sm'
+                : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">STATISTICS</span>
+            <span className="sm:hidden">STATS</span>
+          </button>
         </div>
 
         {/* Navigation Tabs (if inside party or auction mode) */}
-        {platformMode !== 'rules' && platformMode !== 'franchises' && platformMode !== 'tournaments' && (
+        {platformMode !== 'rules' && platformMode !== 'franchises' && platformMode !== 'tournaments' && platformMode !== 'statistics' && (
           <nav className="hidden lg:flex items-center gap-1 p-1 rounded-xl bg-[#222F43] border border-[#39465A] text-xs font-medium relative font-heading">
             {platformMode === 'party' ? (
               partyNavItems.map((item) => {

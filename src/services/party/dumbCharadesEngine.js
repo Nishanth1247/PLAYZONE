@@ -57,6 +57,8 @@ export function createDumbCharadesTournament({
       bestStreak: 0,
       streakBonusPoints: 0,
       penaltyPoints: 0,
+      earlyGuesses: 0,
+      earlyBonusPoints: 0,
     };
   });
 
@@ -189,20 +191,39 @@ export function recordDumbCharadesTurnOutcome(currentState, outcomeType, seconds
     bestStreak: 0,
     streakBonusPoints: 0,
     penaltyPoints: 0,
+    earlyGuesses: 0,
+    earlyBonusPoints: 0,
   };
 
   let pointsAwarded = 0;
   let streakBonus = 0;
+  let earlyBonus = 0;
+  let isEarlyGuess = false;
   let penaltyApplied = 0;
   let updatedCurrentStreak = currentStats.currentStreak || 0;
   let updatedBestStreak = currentStats.bestStreak || 0;
   let updatedStreakBonusPoints = currentStats.streakBonusPoints || 0;
   let updatedPenaltyPoints = currentStats.penaltyPoints || 0;
+  let updatedEarlyGuesses = currentStats.earlyGuesses || 0;
+  let updatedEarlyBonusPoints = currentStats.earlyBonusPoints || 0;
+
+  const roundDuration = Number(currentState.timerDuration) || 60;
+  const earlyThreshold = roundDuration * 0.5;
+  const elapsed = Math.max(0, Number(secondsUsed) || 0);
 
   if (outcomeType === 'found') {
     updatedCurrentStreak += 1;
     if (updatedCurrentStreak > updatedBestStreak) {
       updatedBestStreak = updatedCurrentStreak;
+    }
+
+    // FEATURE 2: DUMB CHARADES EARLY GUESS BONUS
+    // Additional +1 point if guessed within the first 50% of round allotted time
+    if (elapsed <= earlyThreshold) {
+      isEarlyGuess = true;
+      earlyBonus = 1;
+      updatedEarlyGuesses += 1;
+      updatedEarlyBonusPoints += 1;
     }
 
     // Check optional streak bonus: 3 in a row = +2, 5 in a row = +5, every subsequent 5 = +5
@@ -216,7 +237,7 @@ export function recordDumbCharadesTurnOutcome(currentState, outcomeType, seconds
       }
     }
 
-    pointsAwarded = scoringConfig.basePoints + streakBonus;
+    pointsAwarded = scoringConfig.basePoints + streakBonus + earlyBonus;
     updatedStreakBonusPoints += streakBonus;
   } else if (outcomeType === 'timeout') {
     updatedCurrentStreak = 0;
@@ -249,6 +270,8 @@ export function recordDumbCharadesTurnOutcome(currentState, outcomeType, seconds
       bestStreak: updatedBestStreak,
       streakBonusPoints: updatedStreakBonusPoints,
       penaltyPoints: updatedPenaltyPoints,
+      earlyGuesses: updatedEarlyGuesses,
+      earlyBonusPoints: updatedEarlyBonusPoints,
     },
   };
 
@@ -262,10 +285,15 @@ export function recordDumbCharadesTurnOutcome(currentState, outcomeType, seconds
     promptName: activePrompt?.name || activePrompt?.title,
     result: outcomeType,
     points: pointsAwarded,
+    basePoints: outcomeType === 'found' ? (scoringConfig.basePoints || 1) : 0,
     streakBonus,
+    isEarlyGuess,
+    earlyBonus,
     penaltyApplied,
     currentStreak: updatedCurrentStreak,
-    secondsUsed,
+    secondsUsed: elapsed,
+    roundDuration,
+    earlyThreshold,
     timestamp: Date.now(),
   };
 
@@ -355,6 +383,8 @@ export function replayDumbCharadesWithUnusedPrompts(currentState) {
       bestStreak: 0,
       streakBonusPoints: 0,
       penaltyPoints: 0,
+      earlyGuesses: 0,
+      earlyBonusPoints: 0,
     };
   });
 
@@ -480,4 +510,99 @@ export function getDumbCharadesPerformanceSummary(teamStats = {}, selectedTeamsO
     highestStreak,
     bestStreakTeam,
   };
+}
+
+/**
+ * Early guess threshold helper: exactly 50% of round duration
+ */
+export function getEarlyGuessThreshold(roundDurationSeconds = 60) {
+  return Number(roundDurationSeconds) * 0.5;
+}
+
+/**
+ * Checks if a guess qualifies for the early guess bonus
+ */
+export function isEarlyGuessEligible(elapsedSeconds, roundDurationSeconds = 60) {
+  const threshold = getEarlyGuessThreshold(roundDurationSeconds);
+  return Number(elapsedSeconds) <= threshold;
+}
+
+/**
+ * Reverses the last turn outcome cleanly.
+ * Re-stores prompt, deducts points, reverses streak and early bonuses.
+ */
+export function undoLastTurnOutcome(currentState) {
+  const history = currentState.turnHistory || [];
+  if (history.length === 0) return currentState;
+
+  const lastRecord = history[history.length - 1];
+  const newHistory = history.slice(0, -1);
+
+  // Restore consumed prompt
+  const updatedConsumed = (currentState.consumedPromptIds || []).filter(
+    (id) => id !== lastRecord.promptId
+  );
+
+  // Revert team stats
+  const currentStats = currentState.teamStats[lastRecord.teamId];
+  if (!currentStats) return currentState;
+
+  const isFound = lastRecord.result === 'found';
+  const isTimeout = lastRecord.result === 'timeout';
+  const isSkip = lastRecord.result === 'not_found';
+
+  // Deduct points awarded
+  const newScore = Math.max(0, currentStats.score - (lastRecord.points || 0));
+  const newEarlyGuesses = Math.max(0, (currentStats.earlyGuesses || 0) - (lastRecord.isEarlyGuess ? 1 : 0));
+  const newEarlyBonusPoints = Math.max(0, (currentStats.earlyBonusPoints || 0) - (lastRecord.earlyBonus || 0));
+  const newStreakBonus = Math.max(0, (currentStats.streakBonusPoints || 0) - (lastRecord.streakBonus || 0));
+
+  // Recalculate streak from previous history for this team
+  const teamHistory = newHistory.filter((h) => h.teamId === lastRecord.teamId);
+  let streak = 0;
+  let best = 0;
+  for (let i = 0; i < teamHistory.length; i++) {
+    if (teamHistory[i].result === 'found') {
+      streak += 1;
+      if (streak > best) best = streak;
+    } else {
+      streak = 0;
+    }
+  }
+
+  const updatedTeamStats = {
+    ...currentState.teamStats,
+    [lastRecord.teamId]: {
+      ...currentStats,
+      found: Math.max(0, currentStats.found - (isFound ? 1 : 0)),
+      notFound: Math.max(0, currentStats.notFound - (isSkip ? 1 : 0)),
+      timeout: Math.max(0, currentStats.timeout - (isTimeout ? 1 : 0)),
+      score: newScore,
+      currentStreak: streak,
+      bestStreak: best,
+      streakBonusPoints: newStreakBonus,
+      earlyGuesses: newEarlyGuesses,
+      earlyBonusPoints: newEarlyBonusPoints,
+    },
+  };
+
+  // Restore previous team index
+  const teamIndex = currentState.selectedTeams.findIndex((t) => t.id === lastRecord.teamId);
+  const previousTeamIndex = teamIndex >= 0 ? teamIndex : 0;
+
+  const revertedState = {
+    ...currentState,
+    teamStats: updatedTeamStats,
+    turnHistory: newHistory,
+    consumedPromptIds: updatedConsumed,
+    currentTeamIndex: previousTeamIndex,
+    turnState: 'pass',
+    activePrompt: null,
+    isCompleted: false,
+    lastTurnOutcome: newHistory.length > 0 ? newHistory[newHistory.length - 1] : null,
+    remainingTime: currentState.timerDuration,
+  };
+
+  saveDumbCharadesState(revertedState);
+  return revertedState;
 }

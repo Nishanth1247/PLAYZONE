@@ -688,12 +688,12 @@ const CharadesRulesSection = ({ onPlay }) => {
           </p>
           <ul className="space-y-2.5 text-xs sm:text-sm text-[#F5F3EE]/90">
             <li className="flex items-start gap-2">
-              <Flame className="w-4 h-4 text-[#D97858] flex-shrink-0 mt-0.5" />
-              <span><strong>Hot Streaks:</strong> 3 consecutive correct turns activates a 1.5x multiplier. 5 streaks unlock a 2x bonus!</span>
+              <Zap className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <span><strong>Early Guess Bonus (+1 Point):</strong> Correctly guess the prompt within the first half (50%) of the round timer to earn an additional +1 early-guess bonus point (e.g. within the first 30 seconds of a 60-second round).</span>
             </li>
             <li className="flex items-start gap-2">
-              <Clock className="w-4 h-4 text-[#D4B879] flex-shrink-0 mt-0.5" />
-              <span><strong>Speed Bonus:</strong> Solving the title in under 15 seconds awards +50 lightning points.</span>
+              <Flame className="w-4 h-4 text-[#D97858] flex-shrink-0 mt-0.5" />
+              <span><strong>Hot Streaks:</strong> Consecutive correct turns unlock streak multipliers and milestone bonuses!</span>
             </li>
           </ul>
         </div>

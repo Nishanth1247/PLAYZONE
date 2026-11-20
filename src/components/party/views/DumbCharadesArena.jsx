@@ -160,7 +160,12 @@ export const DumbCharadesArena = ({
     // Audio SFX & toast feedback
     if (outcomeType === 'found') {
       soundService?.play?.('success');
-      toast.success(`${currentTeam?.name} FOUND the prompt!`);
+      const isEarly = timeUsed <= timerDuration * 0.5;
+      if (isEarly) {
+        toast.success(`⚡ EARLY GUESS! ${currentTeam?.name} earned +1 BONUS point!`);
+      } else {
+        toast.success(`${currentTeam?.name} FOUND the prompt!`);
+      }
     } else if (outcomeType === 'timeout') {
       soundService?.play?.('timer_expired');
       toast.warning(`Time ran out for ${currentTeam?.name}!`);
@@ -671,7 +676,7 @@ export const DumbCharadesArena = ({
           </div>
 
           {/* Points & Streak Banner */}
-          <div className="p-3 rounded-2xl bg-[#2C394C] border border-[#39465A] max-w-sm mx-auto space-y-1">
+          <div className="p-3.5 rounded-2xl bg-[#2C394C] border border-[#39465A] max-w-sm mx-auto space-y-2">
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#AEB9CC]">
               POINTS EARNED
             </span>
@@ -680,6 +685,19 @@ export const DumbCharadesArena = ({
             }`}>
               +{lastTurnOutcome.points} PTS
             </div>
+
+            {/* Early Guess Celebratory Banner */}
+            {lastTurnOutcome.isEarlyGuess && (
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="py-1 px-2.5 rounded-xl bg-amber-400/20 border border-amber-400/40 text-amber-300 text-xs font-mono font-bold flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                <span>EARLY GUESS! +1 BONUS POINT</span>
+              </motion.div>
+            )}
+
             {lastTurnOutcome.streakBonus > 0 && (
               <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#D4B879] font-bold">
                 <Flame className="w-3 h-3" /> +{lastTurnOutcome.streakBonus} Streak Bonus Awarded!

@@ -19,6 +19,7 @@ import { GameRules } from './components/rules/GameRules';
 import { FranchiseManager } from './components/franchise/FranchiseManager';
 import { TournamentHub } from './components/tournaments/TournamentHub';
 import { BroadcastMode } from './components/broadcast/BroadcastMode';
+import { StatisticsDashboard } from './components/statistics/StatisticsDashboard';
 import { GAME_REGISTRY } from './services/party/gameRegistry';
 import { Toaster } from './components/ui/Toaster';
 import { WifiOff, Heart, BookOpen } from 'lucide-react';
@@ -30,7 +31,24 @@ const MainContent = ({ platformMode, setPlatformMode, rulesTab, setRulesTab, pre
 
   return (
     <main className="flex-1 pb-12">
-      {platformMode === 'tournaments' ? (
+      {platformMode === 'statistics' ? (
+        <div key="statistics_dashboard" className="transition-opacity duration-300">
+          <StatisticsDashboard
+            onNavigateToGame={(game) => {
+              if (game === 'auction') {
+                setPlatformMode('auction');
+                setActivePage('setup');
+              } else if (game === 'battle') {
+                setPlatformMode('battle');
+              } else if (game === 'party') {
+                setPlatformMode('party');
+              } else if (game === 'tournaments') {
+                setPlatformMode('tournaments');
+              }
+            }}
+          />
+        </div>
+      ) : platformMode === 'tournaments' ? (
         <div key="tournament_hub" className="transition-opacity duration-300">
           <TournamentHub
             onNavigateToArena={(arena, tournament) => {
@@ -145,6 +163,13 @@ export function AppContent() {
       setPlatformMode('tournaments');
     };
 
+    const handleOpenStatistics = () => {
+      if (platformMode !== 'rules' && platformMode !== 'statistics') {
+        setPreviousMode(platformMode);
+      }
+      setPlatformMode('statistics');
+    };
+
     const handleOpenBroadcast = (e) => {
       const detail = e.detail || {};
       setBroadcastConfig({
@@ -158,11 +183,13 @@ export function AppContent() {
     window.addEventListener('bidbattle_open_rules', handleOpenRules);
     window.addEventListener('bidbattle_open_franchises', handleOpenFranchises);
     window.addEventListener('bidbattle_open_tournaments', handleOpenTournaments);
+    window.addEventListener('bidbattle_open_statistics', handleOpenStatistics);
     window.addEventListener('bidbattle_open_broadcast', handleOpenBroadcast);
     return () => {
       window.removeEventListener('bidbattle_open_rules', handleOpenRules);
       window.removeEventListener('bidbattle_open_franchises', handleOpenFranchises);
       window.removeEventListener('bidbattle_open_tournaments', handleOpenTournaments);
+      window.removeEventListener('bidbattle_open_statistics', handleOpenStatistics);
       window.removeEventListener('bidbattle_open_broadcast', handleOpenBroadcast);
     };
   }, [platformMode]);

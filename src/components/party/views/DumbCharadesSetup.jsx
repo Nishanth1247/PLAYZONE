@@ -15,7 +15,8 @@ import {
   Play, 
   ArrowLeft,
   Film,
-  BookOpen
+  BookOpen,
+  Zap
 } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { Badge } from '../../ui/Badge';
@@ -536,6 +537,14 @@ export const DumbCharadesSetup = ({ onLaunchTournament, onBack }) => {
                 >
                   {timeoutPenalty > 0 ? '-1 Pt' : '0 (No Penalty)'}
                 </button>
+              </div>
+
+              {/* Early Guess Bonus Indicator */}
+              <div className="col-span-2 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-2.5 text-xs text-amber-300 font-mono">
+                <Zap className="w-4 h-4 text-amber-400 shrink-0 fill-current" />
+                <span>
+                  <strong>Early Guess Bonus:</strong> Automatic +1 PT awarded if prompt is correctly guessed within the first 50% of the timer!
+                </span>
               </div>
             </div>
           </div>
