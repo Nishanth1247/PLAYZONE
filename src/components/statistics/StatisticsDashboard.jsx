@@ -122,7 +122,7 @@ export const StatisticsDashboard = ({ onNavigateToGame }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#111827] text-[#F5F3EE] font-sans pb-20 selection:bg-[#D97858] selection:text-[#F5F3EE]">
+    <div className="min-h-screen bg-[#101418] text-[#EDF2F3] font-sans pb-20 selection:bg-[#45C4A1] selection:text-[#101418]">
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         {/* ========================================================
@@ -234,8 +234,8 @@ export const StatisticsDashboard = ({ onNavigateToGame }) => {
                   onClick={() => setSelectedArena(a.id)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-heading font-bold transition-all ${
                     selectedArena === a.id
-                      ? 'bg-[#00D9FF] text-[#0B0F17] shadow-sm'
-                      : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+                      ? 'bg-[#45C4A1] text-[#101418] shadow-sm font-black'
+                      : 'text-[#A5B2B8] hover:text-[#EDF2F3]'
                   }`}
                 >
                   {a.label}
@@ -269,8 +269,8 @@ export const StatisticsDashboard = ({ onNavigateToGame }) => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-heading font-black tracking-wide transition-all shrink-0 ${
                   isActive
-                    ? 'bg-[#D4B879] text-[#0B0F17] shadow-lg'
-                    : 'bg-[#222F43] text-[#AEB9CC] hover:text-[#F5F3EE] hover:bg-[#2C394C] border border-[#39465A]'
+                    ? 'bg-[#45C4A1] text-[#101418] shadow-lg font-black'
+                    : 'bg-[#1C252D] text-[#A5B2B8] hover:text-[#EDF2F3] hover:bg-[#25313A] border border-[#34414A]'
                 }`}
               >
                 <Icon className="w-4 h-4" />

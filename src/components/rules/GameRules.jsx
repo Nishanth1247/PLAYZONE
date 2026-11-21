@@ -42,9 +42,9 @@ export const GameRules = ({ initialTab = 'auction', onClose, onNavigateToGame })
   ];
 
   return (
-    <div className="min-h-screen bg-[#111827] text-[#F5F3EE] font-sans pb-20 selection:bg-[#D97858] selection:text-[#F5F3EE]">
+    <div className="min-h-screen bg-[#101418] text-[#EDF2F3] font-sans pb-20 selection:bg-[#45C4A1] selection:text-[#101418]">
       {/* Top Banner / Breadcrumb */}
-      <div className="border-b border-[#39465A] bg-[#222F43]/80 backdrop-blur-md sticky top-16 z-30">
+      <div className="border-b border-[#34414A] bg-[#151C22]/90 backdrop-blur-md sticky top-16 z-30">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {onClose && (
@@ -59,14 +59,14 @@ export const GameRules = ({ initialTab = 'auction', onClose, onNavigateToGame })
               </Button>
             )}
             <div className="flex items-center gap-2">
-              <span className="p-2 rounded-lg bg-[#2C394C] border border-[#39465A] text-[#D4B879]">
+              <span className="p-2 rounded-lg bg-[#1C252D] border border-[#34414A] text-[#45C4A1]">
                 <BookOpen className="w-4 h-4" />
               </span>
               <div>
-                <h1 className="font-heading text-xl sm:text-2xl font-black text-[#F5F3EE] tracking-tight">
+                <h1 className="font-heading text-xl sm:text-2xl font-black text-[#EDF2F3] tracking-tight">
                   OFFICIAL RULEBOOKS
                 </h1>
-                <p className="text-xs text-[#AEB9CC]">
+                <p className="text-xs text-[#A5B2B8]">
                   Pass-and-play local multiplayer competition guidelines & mechanics
                 </p>
               </div>
@@ -74,7 +74,7 @@ export const GameRules = ({ initialTab = 'auction', onClose, onNavigateToGame })
           </div>
 
           {/* Quick tab switcher */}
-          <div className="flex items-center gap-1.5 overflow-x-auto p-1 rounded-xl bg-[#111827] border border-[#39465A]">
+          <div className="flex items-center gap-1.5 overflow-x-auto p-1 rounded-xl bg-[#101418] border border-[#34414A]">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -84,8 +84,8 @@ export const GameRules = ({ initialTab = 'auction', onClose, onNavigateToGame })
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-heading font-bold transition-all whitespace-nowrap ${
                     isActive
-                      ? 'bg-[#D97858] text-[#F5F3EE] shadow-md'
-                      : 'text-[#AEB9CC] hover:text-[#F5F3EE] hover:bg-[#222F43]'
+                      ? 'bg-[#45C4A1] text-[#101418] shadow-md font-black'
+                      : 'text-[#A5B2B8] hover:text-[#EDF2F3] hover:bg-[#1C252D]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />

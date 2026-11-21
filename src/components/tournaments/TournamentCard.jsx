@@ -330,10 +330,10 @@ export const TournamentCard = ({
               onClick={() => onContinue(tournament)}
               className={`px-3 py-1.5 rounded-xl font-heading font-black text-xs transition-all flex items-center gap-1.5 shadow-md ${
                 isActive || isPaused
-                  ? 'bg-[#00D9FF] hover:bg-[#00c4e6] text-[#0B0F17]'
+                  ? 'bg-[#45C4A1] hover:bg-[#3BB090] text-[#101418]'
                   : isCompleted
-                  ? 'bg-[#D4B879] hover:bg-[#c9ad6a] text-[#0B0F17]'
-                  : 'bg-[#D97858] hover:bg-[#c86c4d] text-[#F5F3EE]'
+                  ? 'bg-[#D6A568] hover:bg-[#C49457] text-[#101418]'
+                  : 'bg-[#45C4A1] hover:bg-[#3BB090] text-[#101418]'
               }`}
             >
               {isActive || isPaused ? (

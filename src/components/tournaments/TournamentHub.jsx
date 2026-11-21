@@ -296,10 +296,10 @@ export const TournamentHub = ({ onNavigateToArena }) => {
           </button>
 
           <Button
-            variant="champagne"
+            variant="primary"
             size="lg"
             onClick={() => setViewMode('create')}
-            className="flex items-center gap-2 font-heading font-black text-xs sm:text-sm shadow-xl shadow-[#D4B879]/20"
+            className="flex items-center gap-2 font-heading font-black text-xs sm:text-sm shadow-xl shadow-[#45C4A1]/20"
           >
             <PlusCircle className="w-4 h-4" />
             <span>CREATE TOURNAMENT</span>
@@ -428,8 +428,8 @@ export const TournamentHub = ({ onNavigateToArena }) => {
                 onClick={() => setStatusFilter(st.id)}
                 className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition-all ${
                   statusFilter === st.id
-                    ? 'bg-[#D4B879] text-[#111827] font-black shadow-sm'
-                    : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+                    ? 'bg-[#45C4A1] text-[#101418] font-black shadow-sm'
+                    : 'text-[#A5B2B8] hover:text-[#EDF2F3]'
                 }`}
               >
                 {st.label}

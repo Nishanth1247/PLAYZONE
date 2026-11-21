@@ -144,21 +144,21 @@ export const FranchiseManager = ({ onNavigateToArena = null }) => {
       {/* 1. TOP BROADCAST HERO SECTION */}
       <div className="bg-[#222F43] rounded-3xl p-6 sm:p-8 border border-[#39465A] shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
         {/* Subtle Ambient Light */}
-        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-[#D97858]/10 blur-3xl pointer-events-none" />
+        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-[#45C4A1]/10 blur-3xl pointer-events-none" />
 
         <div className="space-y-2 max-w-2xl relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2C394C] border border-[#39465A] text-xs font-mono font-bold text-[#D4B879]">
-            <Users className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25313A] border border-[#34414A] text-xs font-mono font-bold text-[#D6A568]">
+            <Users className="w-3.5 h-3.5 text-[#45C4A1]" />
             <span>CENTRAL FRANCHISE SYSTEM</span>
             <span>•</span>
-            <span className="text-[#F5F3EE]">{activeCount} Contenders Active</span>
+            <span className="text-[#EDF2F3]">{activeCount} Contenders Active</span>
           </div>
 
-          <h1 className="font-heading font-black text-3xl sm:text-5xl tracking-wide uppercase text-[#F5F3EE] leading-none">
+          <h1 className="font-heading font-black text-3xl sm:text-5xl tracking-wide uppercase text-[#EDF2F3] leading-none">
             FRANCHISE MANAGER
           </h1>
 
-          <p className="text-xs sm:text-sm text-[#AEB9CC] leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#A5B2B8] leading-relaxed">
             Create, brand, edit, duplicate, and customize tournament franchises. All contenders scale dynamically across Auction Arena, Battle Arena, and Leaderboards.
           </p>
         </div>
@@ -169,7 +169,7 @@ export const FranchiseManager = ({ onNavigateToArena = null }) => {
             variant="primary"
             size="lg"
             onClick={handleAddNew}
-            className="font-heading text-xs font-black bg-[#D97858] hover:bg-white text-[#F5F3EE] hover:text-[#111827] shadow-lg px-5 py-3 flex items-center gap-2"
+            className="font-heading text-xs font-black bg-[#45C4A1] hover:bg-[#3BB090] text-[#101418] shadow-lg shadow-[#45C4A1]/20 px-5 py-3 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             <span>ADD FRANCHISE</span>
@@ -219,8 +219,8 @@ export const FranchiseManager = ({ onNavigateToArena = null }) => {
               onClick={() => setFilterStatus('all')}
               className={`px-3 py-1 rounded-lg transition-all ${
                 filterStatus === 'all'
-                  ? 'bg-[#2C394C] text-[#F5F3EE] font-bold shadow-sm'
-                  : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+                  ? 'bg-[#45C4A1] text-[#101418] font-bold shadow-sm'
+                  : 'text-[#A5B2B8] hover:text-[#EDF2F3]'
               }`}
             >
               All ({franchises.length})
@@ -230,8 +230,8 @@ export const FranchiseManager = ({ onNavigateToArena = null }) => {
               onClick={() => setFilterStatus('active')}
               className={`px-3 py-1 rounded-lg transition-all ${
                 filterStatus === 'active'
-                  ? 'bg-[#2C394C] text-[#91A98B] font-bold shadow-sm'
-                  : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+                  ? 'bg-[#45C4A1] text-[#101418] font-bold shadow-sm'
+                  : 'text-[#A5B2B8] hover:text-[#EDF2F3]'
               }`}
             >
               Active ({activeCount})
@@ -241,8 +241,8 @@ export const FranchiseManager = ({ onNavigateToArena = null }) => {
               onClick={() => setFilterStatus('archived')}
               className={`px-3 py-1 rounded-lg transition-all ${
                 filterStatus === 'archived'
-                  ? 'bg-[#2C394C] text-[#AEB9CC] font-bold shadow-sm'
-                  : 'text-[#AEB9CC] hover:text-[#F5F3EE]'
+                  ? 'bg-[#45C4A1] text-[#101418] font-bold shadow-sm'
+                  : 'text-[#A5B2B8] hover:text-[#EDF2F3]'
               }`}
             >
               Archived ({archivedCount})

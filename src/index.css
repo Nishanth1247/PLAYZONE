@@ -4,16 +4,23 @@
 
 @layer base {
   :root {
-    /* Default: Alpine Editorial (Main Website) */
-    --theme-bg: #F4F1E8;
-    --theme-card: #FFFFFF;
-    --theme-surface-secondary: #EAE6DC;
-    --theme-text: #26343B;
-    --theme-text-secondary: #697477;
-    --theme-accent-primary: #176B68;
-    --theme-accent-action: #C46A45;
-    --theme-accent-secondary: #A8B8A3;
-    --theme-border: #D9D5CA;
+    /* Default: Midnight Obsidian (Main Website) */
+    --theme-bg: #101418;
+    --theme-card: #1C252D;
+    --theme-surface-secondary: #151C22;
+    --theme-card-secondary: #25313A;
+    --theme-elevated: #2B3841;
+    --theme-text: #EDF2F3;
+    --theme-text-secondary: #A5B2B8;
+    --theme-muted: #788890;
+    --theme-accent-primary: #45C4A1;
+    --theme-accent-action: #45C4A1;
+    --theme-accent-secondary: #258C76;
+    --theme-highlight: #D6A568;
+    --theme-border: #34414A;
+    --theme-success: #58B68C;
+    --theme-warning: #E2AE61;
+    --theme-danger: #D87878;
 
     /* Legacy mapping for backwards compatibility */
     --color-bg: var(--theme-bg);
@@ -32,56 +39,75 @@
   }
 
   [data-theme="website"] {
-    --theme-bg: #F4F1E8;
-    --theme-card: #FFFFFF;
-    --theme-surface-secondary: #EAE6DC;
-    --theme-text: #26343B;
-    --theme-text-secondary: #697477;
-    --theme-accent-primary: #176B68;
-    --theme-accent-action: #C46A45;
-    --theme-accent-secondary: #A8B8A3;
-    --theme-border: #D9D5CA;
+    --theme-bg: #101418;
+    --theme-card: #1C252D;
+    --theme-surface-secondary: #151C22;
+    --theme-card-secondary: #25313A;
+    --theme-elevated: #2B3841;
+    --theme-text: #EDF2F3;
+    --theme-text-secondary: #A5B2B8;
+    --theme-muted: #788890;
+    --theme-accent-primary: #45C4A1;
+    --theme-accent-action: #45C4A1;
+    --theme-accent-secondary: #258C76;
+    --theme-highlight: #D6A568;
+    --theme-border: #34414A;
+    --theme-success: #58B68C;
+    --theme-warning: #E2AE61;
+    --theme-danger: #D87878;
   }
 
   [data-theme="auction"] {
-    --theme-bg: #102C27;
-    --theme-card: #193B33;
-    --theme-surface-secondary: #244A40;
+    --theme-bg: #0B211D;
+    --theme-card: #15352D;
+    --theme-surface-secondary: #20483D;
+    --theme-card-secondary: #20483D;
+    --theme-elevated: #20483D;
     --theme-text: #F5F0E5;
     --theme-text-secondary: #B6C5B5;
+    --theme-muted: #8E9E8D;
     --theme-accent-primary: #C5A46D;
-    --theme-accent-action: #D77A54;
+    --theme-accent-action: #D17B55;
     --theme-accent-secondary: #B6C5B5;
-    --theme-border: #35574B;
+    --theme-highlight: #C5A46D;
+    --theme-border: #244F43;
   }
 
   [data-theme="battle"] {
-    --theme-bg: #101B32;
-    --theme-card: #1C2D4B;
-    --theme-surface-secondary: #293D5C;
+    --theme-bg: #0A1224;
+    --theme-card: #172744;
+    --theme-surface-secondary: #233B5C;
+    --theme-card-secondary: #233B5C;
+    --theme-elevated: #293D5C;
     --theme-text: #F0F3F8;
-    --theme-text-secondary: #B7C3D4;
-    --theme-accent-primary: #6198E8;
+    --theme-text-secondary: #AAB8CB;
+    --theme-muted: #7E8D9F;
+    --theme-accent-primary: #568BE0;
     --theme-accent-action: #C5A46D;
-    --theme-accent-secondary: #C6D0DD;
-    --theme-border: #394C69;
+    --theme-accent-secondary: #AAB8CB;
+    --theme-highlight: #568BE0;
+    --theme-border: #2C4468;
   }
 
   [data-theme="party"] {
-    --theme-bg: #F8F1EB;
-    --theme-card: #FFFFFF;
-    --theme-surface-secondary: #F0E5EC;
-    --theme-text: #342B3B;
-    --theme-text-secondary: #776B7D;
-    --theme-accent-primary: #D97567;
-    --theme-accent-action: #D7AC64;
-    --theme-accent-secondary: #9581B5;
-    --theme-border: #E4D6DC;
+    --theme-bg: #1B1521;
+    --theme-card: #302438;
+    --theme-surface-secondary: #413148;
+    --theme-card-secondary: #413148;
+    --theme-elevated: #493952;
+    --theme-text: #F5EFF8;
+    --theme-text-secondary: #B3A2BC;
+    --theme-muted: #8F7F98;
+    --theme-accent-primary: #C77B79;
+    --theme-accent-action: #D6A568;
+    --theme-accent-secondary: #A18BC2;
+    --theme-highlight: #C77B79;
+    --theme-border: #4A3A54;
   }
 
   body {
-    background-color: var(--theme-bg, #F4F1E8);
-    color: var(--theme-text, #26343B);
+    background-color: var(--theme-bg, #101418);
+    color: var(--theme-text, #EDF2F3);
     font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
   }
@@ -95,11 +121,11 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--theme-border, #D9D5CA);
+    background: var(--theme-border, #34414A);
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--theme-accent-primary, #176B68);
+    background: var(--theme-accent-primary, #45C4A1);
   }
 }
 
@@ -108,35 +134,28 @@
   .bg-grid-pattern {
     background-size: 32px 32px;
     background-image: 
-      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
-  }
-
-  [data-theme="auction"] .bg-grid-pattern,
-  [data-theme="battle"] .bg-grid-pattern {
-    background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   }
 
   /* Structural Panels adapted dynamically to active theme */
   .battle-panel {
-    background: var(--theme-card, #FFFFFF);
-    border: 1px solid var(--theme-border, #D9D5CA);
-    color: var(--theme-text, #26343B);
-    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08);
+    background: var(--theme-card, #1C252D);
+    border: 1px solid var(--theme-border, #34414A);
+    color: var(--theme-text, #EDF2F3);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
   }
 
   .battle-panel-interactive {
-    background: var(--theme-card, #FFFFFF);
-    border: 1px solid var(--theme-border, #D9D5CA);
-    color: var(--theme-text, #26343B);
+    background: var(--theme-card, #1C252D);
+    border: 1px solid var(--theme-border, #34414A);
+    color: var(--theme-text, #EDF2F3);
     transition: all 0.15s ease-in-out;
   }
 
   .battle-panel-interactive:hover {
-    background: var(--theme-surface-secondary, #EAE6DC);
-    border-color: var(--theme-accent-primary, #176B68);
+    background: var(--theme-surface-secondary, #25313A);
+    border-color: var(--theme-accent-primary, #45C4A1);
     transform: translateY(-1px);
   }
 
@@ -171,49 +190,49 @@
   /* Ensures existing hardcoded Tailwind utility classes inherit section tokens */
   /* ========================================================================= */
 
-  /* 1. ALPINE EDITORIAL (Main Website) */
+  /* 1. MIDNIGHT OBSIDIAN (Main Website) */
   [data-theme="website"] .bg-\[\#111827\],
   [data-theme="website"] .bg-battle-bg {
-    background-color: #F4F1E8 !important;
+    background-color: #101418 !important;
   }
   [data-theme="website"] .bg-\[\#222F43\],
   [data-theme="website"] .bg-battle-surface {
-    background-color: #FFFFFF !important;
+    background-color: #1C252D !important;
   }
   [data-theme="website"] .bg-\[\#2C394C\],
   [data-theme="website"] .bg-battle-elevated {
-    background-color: #EAE6DC !important;
+    background-color: #25313A !important;
   }
   [data-theme="website"] .border-\[\#39465A\],
   [data-theme="website"] .border-battle-border {
-    border-color: #D9D5CA !important;
+    border-color: #34414A !important;
   }
   [data-theme="website"] .text-\[\#F5F3EE\],
   [data-theme="website"] .text-white {
-    color: #26343B !important;
+    color: #EDF2F3 !important;
   }
   [data-theme="website"] .text-\[\#AEB9CC\],
   [data-theme="website"] .text-\[\#7E8B9F\],
   [data-theme="website"] .text-battle-muted {
-    color: #697477 !important;
+    color: #A5B2B8 !important;
   }
 
   /* 2. EMERALD & IVORY (Auction Arena) */
   [data-theme="auction"] .bg-\[\#111827\],
   [data-theme="auction"] .bg-battle-bg {
-    background-color: #102C27 !important;
+    background-color: #0B211D !important;
   }
   [data-theme="auction"] .bg-\[\#222F43\],
   [data-theme="auction"] .bg-battle-surface {
-    background-color: #193B33 !important;
+    background-color: #15352D !important;
   }
   [data-theme="auction"] .bg-\[\#2C394C\],
   [data-theme="auction"] .bg-battle-elevated {
-    background-color: #244A40 !important;
+    background-color: #20483D !important;
   }
   [data-theme="auction"] .border-\[\#39465A\],
   [data-theme="auction"] .border-battle-border {
-    border-color: #35574B !important;
+    border-color: #244F43 !important;
   }
   [data-theme="auction"] .text-\[\#F5F3EE\],
   [data-theme="auction"] .text-white {
@@ -225,22 +244,22 @@
     color: #B6C5B5 !important;
   }
 
-  /* 3. COBALT & SILVER (Battle Arena) */
+  /* 3. MIDNIGHT COBALT & STEEL (Battle Arena) */
   [data-theme="battle"] .bg-\[\#111827\],
   [data-theme="battle"] .bg-battle-bg {
-    background-color: #101B32 !important;
+    background-color: #0A1224 !important;
   }
   [data-theme="battle"] .bg-\[\#222F43\],
   [data-theme="battle"] .bg-battle-surface {
-    background-color: #1C2D4B !important;
+    background-color: #172744 !important;
   }
   [data-theme="battle"] .bg-\[\#2C394C\],
   [data-theme="battle"] .bg-battle-elevated {
-    background-color: #293D5C !important;
+    background-color: #233B5C !important;
   }
   [data-theme="battle"] .border-\[\#39465A\],
   [data-theme="battle"] .border-battle-border {
-    border-color: #394C69 !important;
+    border-color: #2C4468 !important;
   }
   [data-theme="battle"] .text-\[\#F5F3EE\],
   [data-theme="battle"] .text-white {
@@ -249,34 +268,34 @@
   [data-theme="battle"] .text-\[\#AEB9CC\],
   [data-theme="battle"] .text-\[\#7E8B9F\],
   [data-theme="battle"] .text-battle-muted {
-    color: #B7C3D4 !important;
+    color: #AAB8CB !important;
   }
 
-  /* 4. CORAL & LAVENDER (Party Arena) */
+  /* 4. DARK PLUM & MUTED CORAL (Party Arena) */
   [data-theme="party"] .bg-\[\#111827\],
   [data-theme="party"] .bg-battle-bg {
-    background-color: #F8F1EB !important;
+    background-color: #1B1521 !important;
   }
   [data-theme="party"] .bg-\[\#222F43\],
   [data-theme="party"] .bg-battle-surface {
-    background-color: #FFFFFF !important;
+    background-color: #302438 !important;
   }
   [data-theme="party"] .bg-\[\#2C394C\],
   [data-theme="party"] .bg-battle-elevated {
-    background-color: #F0E5EC !important;
+    background-color: #413148 !important;
   }
   [data-theme="party"] .border-\[\#39465A\],
   [data-theme="party"] .border-battle-border {
-    border-color: #E4D6DC !important;
+    border-color: #4A3A54 !important;
   }
   [data-theme="party"] .text-\[\#F5F3EE\],
   [data-theme="party"] .text-white {
-    color: #342B3B !important;
+    color: #F5EFF8 !important;
   }
   [data-theme="party"] .text-\[\#AEB9CC\],
   [data-theme="party"] .text-\[\#7E8B9F\],
   [data-theme="party"] .text-battle-muted {
-    color: #776B7D !important;
+    color: #B3A2BC !important;
   }
 
   /* Typography utilities */

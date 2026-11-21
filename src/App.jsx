@@ -221,7 +221,7 @@ export function AppContent() {
       activePage={activePage} 
       broadcastArena={isBroadcastOpen ? broadcastConfig.arena : null}
     >
-      <div className="min-h-screen flex flex-col font-sans relative selection:bg-[#C46A45] selection:text-[#FFFFFF]">
+      <div className="min-h-screen flex flex-col font-sans relative selection:bg-[#45C4A1] selection:text-[#101418]">
         <Navbar 
           platformMode={platformMode} 
           setPlatformMode={handleModeChange} 

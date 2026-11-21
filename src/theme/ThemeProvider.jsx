@@ -39,8 +39,8 @@ export const ThemeProvider = ({ children, platformMode = 'home', activePage, bro
     colors: activeTheme.colors,
     typography: activeTheme.typography,
     shadows: activeTheme.shadows,
-    isDark: activeTheme.id === 'auction' || activeTheme.id === 'battle',
-    isLight: activeTheme.id === 'website' || activeTheme.id === 'party',
+    isDark: true,
+    isLight: false,
   }), [activeTheme]);
 
   return (
@@ -65,12 +65,12 @@ export const useTheme = () => {
     return {
       theme: THEMES.website,
       themeId: 'website',
-      themeName: 'Alpine Editorial',
+      themeName: 'Midnight Obsidian',
       colors: THEMES.website.colors,
       typography: THEMES.website.typography,
       shadows: THEMES.website.shadows,
-      isDark: false,
-      isLight: true,
+      isDark: true,
+      isLight: false,
     };
   }
   return context;

@@ -30,7 +30,9 @@ import {
   ArrowLeft,
   Menu,
   X,
-  Compass
+  Compass,
+  Flame,
+  Shield
 } from 'lucide-react';
 import { tournamentHubService } from '../../services/tournamentHubService';
 
@@ -55,20 +57,15 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isArenasMenuOpen, setIsArenasMenuOpen] = useState(false);
-  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const arenasMenuRef = useRef(null);
-  const moreMenuRef = useRef(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (arenasMenuRef.current && !arenasMenuRef.current.contains(e.target)) {
         setIsArenasMenuOpen(false);
-      }
-      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target)) {
-        setIsMoreMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -122,12 +119,12 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
       className="sticky top-0 z-40 w-full border-b transition-colors duration-200 backdrop-blur-md"
       style={{
         backgroundColor: themeId === 'website' 
-          ? 'rgba(244, 241, 232, 0.96)' 
+          ? 'rgba(16, 20, 24, 0.94)' 
           : themeId === 'party'
-          ? 'rgba(248, 241, 235, 0.96)'
+          ? 'rgba(27, 21, 33, 0.94)'
           : themeId === 'auction'
-          ? 'rgba(16, 44, 39, 0.96)'
-          : 'rgba(16, 27, 50, 0.96)',
+          ? 'rgba(11, 33, 29, 0.94)'
+          : 'rgba(10, 18, 36, 0.94)',
         borderColor: theme.colors.border,
         color: theme.colors.text,
       }}
@@ -135,7 +132,7 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
       <div className="max-w-[1700px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
         
         {/* ========================================================= */}
-        {/* LEFT: BRAND OR ARENA CONTEXT                              */}
+        {/* LEFT: REFINED BRANDING OR ARENA CONTEXT                   */}
         {/* ========================================================= */}
         <div className="flex items-center gap-3 shrink-0">
           {/* Logo / Arena Indicator */}
@@ -145,51 +142,55 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
             className="flex items-center gap-2.5 text-left group"
           >
             <div 
-              className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm shadow-sm transition-transform group-hover:scale-105"
+              className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm shadow-sm transition-all group-hover:scale-105 border"
               style={{
-                backgroundColor: theme.colors.accentPrimary,
-                color: '#FFFFFF'
+                backgroundColor: themeId === 'website' ? '#1C252D' : theme.colors.card,
+                borderColor: themeId === 'website' ? '#34414A' : theme.colors.border,
+                color: theme.colors.accentPrimary
               }}
             >
               {platformMode === 'auction' ? (
-                <Gavel className="w-4 h-4" />
+                <Gavel className="w-4 h-4 text-[#C5A46D]" />
               ) : platformMode === 'battle' ? (
-                <Swords className="w-4 h-4" />
+                <Swords className="w-4 h-4 text-[#568BE0]" />
               ) : platformMode === 'party' ? (
-                <Gamepad2 className="w-4 h-4" />
+                <Gamepad2 className="w-4 h-4 text-[#C77B79]" />
               ) : (
-                <Sparkles className="w-4 h-4" />
+                <Sparkles className="w-4 h-4 text-[#45C4A1]" />
               )}
             </div>
 
             <div className="hidden sm:block">
-              <span className="font-heading font-black text-lg tracking-tight leading-none block" style={{ color: theme.colors.text }}>
-                PLAYZONE
-              </span>
-              <span className="text-[10px] font-mono tracking-wider uppercase block" style={{ color: theme.colors.textSecondary }}>
+              <div className="flex items-center">
+                <span className="font-heading font-black text-lg tracking-wider leading-none text-[#EDF2F3]">
+                  PLAY<span className="text-[#45C4A1]">ZONE</span>
+                </span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#45C4A1] ml-1 mb-1.5 animate-pulse" />
+              </div>
+              <span className="text-[9px] font-mono tracking-widest uppercase block text-[#788890]">
                 {platformMode === 'auction'
-                  ? 'Auction Arena'
+                  ? 'Auction Arena • Emerald'
                   : platformMode === 'battle'
-                  ? 'Battle Arena'
+                  ? 'Battle Arena • Cobalt'
                   : platformMode === 'party'
-                  ? 'Party Arena'
-                  : 'Tournament Platform'}
+                  ? 'Party Arena • Plum'
+                  : 'Sports-Tech Gaming Hub'}
               </span>
             </div>
           </button>
 
           {/* Active Tournament Breadcrumb (If launched from a tournament) */}
           {activeTournament && (
-            <div className="hidden md:flex items-center gap-2 pl-3 border-l" style={{ borderColor: theme.colors.border }}>
+            <div className="hidden md:flex items-center gap-2 pl-3 border-l border-[#34414A]">
               <div 
-                className="px-2.5 py-1 rounded-lg text-xs font-heading font-semibold flex items-center gap-1.5"
+                className="px-2.5 py-1 rounded-lg text-xs font-heading font-semibold flex items-center gap-1.5 border"
                 style={{
-                  backgroundColor: theme.colors.surfaceSecondary,
+                  backgroundColor: theme.colors.card,
                   color: theme.colors.text,
-                  border: `1px solid ${theme.colors.border}`,
+                  borderColor: theme.colors.border,
                 }}
               >
-                <Trophy className="w-3.5 h-3.5" style={{ color: theme.colors.accentPrimary }} />
+                <Trophy className="w-3.5 h-3.5 text-[#D6A568]" />
                 <span className="truncate max-w-[150px]">{activeTournament.name}</span>
               </div>
 
@@ -197,8 +198,7 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                 <button
                   type="button"
                   onClick={handleReturnToHub}
-                  className="text-[11px] font-heading font-bold px-2 py-1 rounded hover:underline flex items-center gap-1 transition-colors"
-                  style={{ color: theme.colors.accentAction }}
+                  className="text-[11px] font-heading font-bold px-2 py-1 rounded hover:underline flex items-center gap-1 transition-colors text-[#45C4A1]"
                   title="Return to Tournament workspace (gameplay saved)"
                 >
                   <ArrowLeft className="w-3 h-3" />
@@ -213,19 +213,17 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
         {/* CENTRE: ADAPTIVE NAVIGATION                               */}
         {/* ========================================================= */}
         <div className="hidden lg:flex items-center gap-1">
-          {/* 1. MAIN WEBSITE NAVIGATION (Alpine Editorial) */}
+          {/* 1. MAIN WEBSITE NAVIGATION (Midnight Obsidian) */}
           {!isArenaMode ? (
             <nav className="flex items-center gap-1 font-heading text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setPlatformMode('home')}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
-                  platformMode === 'home' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                  platformMode === 'home'
+                    ? 'bg-[#45C4A1]/15 text-[#45C4A1] border border-[#45C4A1]/35 font-bold shadow-sm'
+                    : 'text-[#A5B2B8] hover:text-[#EDF2F3] hover:bg-[#1C252D]'
                 }`}
-                style={{
-                  backgroundColor: platformMode === 'home' ? theme.colors.accentPrimary : 'transparent',
-                  color: platformMode === 'home' ? '#FFFFFF' : theme.colors.text,
-                }}
               >
                 HOME
               </button>
@@ -234,12 +232,10 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                 type="button"
                 onClick={() => setPlatformMode('tournaments')}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
-                  platformMode === 'tournaments' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                  platformMode === 'tournaments'
+                    ? 'bg-[#45C4A1]/15 text-[#45C4A1] border border-[#45C4A1]/35 font-bold shadow-sm'
+                    : 'text-[#A5B2B8] hover:text-[#EDF2F3] hover:bg-[#1C252D]'
                 }`}
-                style={{
-                  backgroundColor: platformMode === 'tournaments' ? theme.colors.accentPrimary : 'transparent',
-                  color: platformMode === 'tournaments' ? '#FFFFFF' : theme.colors.text,
-                }}
               >
                 TOURNAMENTS
               </button>
@@ -249,90 +245,93 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                 <button
                   type="button"
                   onClick={() => setIsArenasMenuOpen(!isArenasMenuOpen)}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg hover:opacity-80 transition-all"
-                  style={{ color: theme.colors.text }}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-all ${
+                    isArenasMenuOpen
+                      ? 'bg-[#1C252D] text-[#EDF2F3]'
+                      : 'text-[#A5B2B8] hover:text-[#EDF2F3] hover:bg-[#1C252D]'
+                  }`}
                 >
                   <span>ARENAS</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isArenasMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isArenasMenuOpen ? 'rotate-180 text-[#45C4A1]' : ''}`} />
                 </button>
 
                 <AnimatePresence>
                   {isArenasMenuOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 6, scale: 0.95 }}
+                      exit={{ opacity: 0, y: 6, scale: 0.96 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute top-full left-0 mt-2 w-72 rounded-2xl shadow-xl p-2 z-50 border"
-                      style={{
-                        backgroundColor: theme.colors.card,
-                        borderColor: theme.colors.border,
-                      }}
+                      className="absolute top-full left-0 mt-2 w-80 rounded-2xl shadow-2xl p-2.5 z-50 border bg-[#1C252D] border-[#34414A]"
                     >
+                      <div className="px-2 py-1 mb-1 text-[10px] font-mono text-[#788890] uppercase tracking-wider">
+                        Choose Arena
+                      </div>
+
+                      {/* 1. Auction Arena Option */}
                       <button
                         type="button"
                         onClick={() => {
                           setPlatformMode('auction');
                           setIsArenasMenuOpen(false);
                         }}
-                        className="w-full text-left p-2.5 rounded-xl flex items-start gap-3 hover:opacity-90 transition-all"
-                        style={{ backgroundColor: 'rgba(16, 44, 39, 0.08)' }}
+                        className="w-full text-left p-2.5 rounded-xl flex items-start gap-3 hover:bg-[#15352D]/40 transition-all border border-transparent hover:border-[#244F43]"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-[#102C27] text-[#C5A46D] flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-[#0B211D] border border-[#244F43] text-[#C5A46D] flex items-center justify-center shrink-0">
                           <Gavel className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="font-heading font-bold text-xs flex items-center gap-1.5">
+                          <div className="font-heading font-bold text-xs flex items-center gap-1.5 text-[#F5F0E5]">
                             <span>Auction Arena</span>
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#C5A46D]/20 text-[#C5A46D]">EMERALD</span>
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#C5A46D]/20 text-[#C5A46D] border border-[#C5A46D]/30 font-mono">EMERALD</span>
                           </div>
-                          <p className="text-[11px] leading-tight mt-0.5" style={{ color: theme.colors.textSecondary }}>
+                          <p className="text-[11px] leading-tight mt-0.5 text-[#B6C5B5]">
                             Tactical franchise auction with live bidding & hidden ratings.
                           </p>
                         </div>
                       </button>
 
+                      {/* 2. Battle Arena Option */}
                       <button
                         type="button"
                         onClick={() => {
                           setPlatformMode('battle');
                           setIsArenasMenuOpen(false);
                         }}
-                        className="w-full text-left p-2.5 rounded-xl flex items-start gap-3 hover:opacity-90 transition-all mt-1"
-                        style={{ backgroundColor: 'rgba(16, 27, 50, 0.08)' }}
+                        className="w-full text-left p-2.5 rounded-xl flex items-start gap-3 hover:bg-[#172744]/40 transition-all mt-1 border border-transparent hover:border-[#2C4468]"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-[#101B32] text-[#6198E8] flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-[#0A1224] border border-[#2C4468] text-[#568BE0] flex items-center justify-center shrink-0">
                           <Swords className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="font-heading font-bold text-xs flex items-center gap-1.5">
+                          <div className="font-heading font-bold text-xs flex items-center gap-1.5 text-[#F0F3F8]">
                             <span>Battle Arena</span>
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#6198E8]/20 text-[#6198E8]">COBALT</span>
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#568BE0]/20 text-[#568BE0] border border-[#568BE0]/30 font-mono">COBALT</span>
                           </div>
-                          <p className="text-[11px] leading-tight mt-0.5" style={{ color: theme.colors.textSecondary }}>
+                          <p className="text-[11px] leading-tight mt-0.5 text-[#AAB8CB]">
                             Head-to-head combat with tactical draft & secret reveals.
                           </p>
                         </div>
                       </button>
 
+                      {/* 3. Party Arena Option */}
                       <button
                         type="button"
                         onClick={() => {
                           setPlatformMode('party');
                           setIsArenasMenuOpen(false);
                         }}
-                        className="w-full text-left p-2.5 rounded-xl flex items-start gap-3 hover:opacity-90 transition-all mt-1"
-                        style={{ backgroundColor: 'rgba(217, 117, 103, 0.08)' }}
+                        className="w-full text-left p-2.5 rounded-xl flex items-start gap-3 hover:bg-[#302438]/40 transition-all mt-1 border border-transparent hover:border-[#4A3A54]"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-[#F8F1EB] text-[#D97567] flex items-center justify-center shrink-0 border border-[#E4D6DC]">
+                        <div className="w-8 h-8 rounded-lg bg-[#1B1521] border border-[#4A3A54] text-[#C77B79] flex items-center justify-center shrink-0">
                           <Gamepad2 className="w-4 h-4" />
                         </div>
                         <div>
-                          <div className="font-heading font-bold text-xs flex items-center gap-1.5">
+                          <div className="font-heading font-bold text-xs flex items-center gap-1.5 text-[#F5EFF8]">
                             <span>Party Arena</span>
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#D97567]/20 text-[#D97567]">CORAL</span>
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#C77B79]/20 text-[#C77B79] border border-[#C77B79]/30 font-mono">PLUM</span>
                           </div>
-                          <p className="text-[11px] leading-tight mt-0.5" style={{ color: theme.colors.textSecondary }}>
+                          <p className="text-[11px] leading-tight mt-0.5 text-[#B3A2BC]">
                             Local pass-the-laptop Dumb Charades & Who Am I?
                           </p>
                         </div>
@@ -346,12 +345,10 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                 type="button"
                 onClick={() => setPlatformMode('franchises')}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
-                  platformMode === 'franchises' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                  platformMode === 'franchises'
+                    ? 'bg-[#45C4A1]/15 text-[#45C4A1] border border-[#45C4A1]/35 font-bold shadow-sm'
+                    : 'text-[#A5B2B8] hover:text-[#EDF2F3] hover:bg-[#1C252D]'
                 }`}
-                style={{
-                  backgroundColor: platformMode === 'franchises' ? theme.colors.accentPrimary : 'transparent',
-                  color: platformMode === 'franchises' ? '#FFFFFF' : theme.colors.text,
-                }}
               >
                 FRANCHISES
               </button>
@@ -360,12 +357,10 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                 type="button"
                 onClick={() => setPlatformMode('statistics')}
                 className={`px-3 py-1.5 rounded-lg transition-all ${
-                  platformMode === 'statistics' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                  platformMode === 'statistics'
+                    ? 'bg-[#45C4A1]/15 text-[#45C4A1] border border-[#45C4A1]/35 font-bold shadow-sm'
+                    : 'text-[#A5B2B8] hover:text-[#EDF2F3] hover:bg-[#1C252D]'
                 }`}
-                style={{
-                  backgroundColor: platformMode === 'statistics' ? theme.colors.accentPrimary : 'transparent',
-                  color: platformMode === 'statistics' ? '#FFFFFF' : theme.colors.text,
-                }}
               >
                 STATISTICS
               </button>
@@ -373,11 +368,7 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
               <button
                 type="button"
                 onClick={handleOpenBroadcast}
-                className="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 hover:opacity-80"
-                style={{
-                  backgroundColor: 'transparent',
-                  color: theme.colors.accentAction,
-                }}
+                className="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-[#D6A568] hover:bg-[#D6A568]/10"
               >
                 <Tv className="w-3.5 h-3.5" />
                 <span>BROADCAST</span>
@@ -390,12 +381,10 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                 type="button"
                 onClick={() => setActivePage('setup')}
                 className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-                  activePage === 'setup' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                  activePage === 'setup'
+                    ? 'bg-[#C5A46D] text-[#0B211D] font-bold shadow-sm'
+                    : 'text-[#B6C5B5] hover:text-[#F5F0E5] hover:bg-[#15352D]'
                 }`}
-                style={{
-                  backgroundColor: activePage === 'setup' ? theme.colors.accentPrimary : 'transparent',
-                  color: activePage === 'setup' ? '#102C27' : theme.colors.text,
-                }}
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 <span>Setup</span>
@@ -407,12 +396,10 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                     type="button"
                     onClick={() => setActivePage('live')}
                     className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-                      activePage === 'live' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                      activePage === 'live'
+                        ? 'bg-[#D17B55] text-white font-bold shadow-sm'
+                        : 'text-[#B6C5B5] hover:text-[#F5F0E5] hover:bg-[#15352D]'
                     }`}
-                    style={{
-                      backgroundColor: activePage === 'live' ? theme.colors.accentAction : 'transparent',
-                      color: activePage === 'live' ? '#FFFFFF' : theme.colors.text,
-                    }}
                   >
                     <Radio className="w-3.5 h-3.5 animate-pulse" />
                     <span>Live Arena</span>
@@ -422,12 +409,10 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                     type="button"
                     onClick={() => setActivePage('teams')}
                     className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-                      activePage === 'teams' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                      activePage === 'teams'
+                        ? 'bg-[#C5A46D] text-[#0B211D] font-bold shadow-sm'
+                        : 'text-[#B6C5B5] hover:text-[#F5F0E5] hover:bg-[#15352D]'
                     }`}
-                    style={{
-                      backgroundColor: activePage === 'teams' ? theme.colors.accentPrimary : 'transparent',
-                      color: activePage === 'teams' ? '#102C27' : theme.colors.text,
-                    }}
                   >
                     <Users className="w-3.5 h-3.5" />
                     <span>Teams ({auction.teams?.length || 0})</span>
@@ -437,12 +422,10 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                     type="button"
                     onClick={() => setActivePage('unsold')}
                     className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-                      activePage === 'unsold' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                      activePage === 'unsold'
+                        ? 'bg-[#C5A46D] text-[#0B211D] font-bold shadow-sm'
+                        : 'text-[#B6C5B5] hover:text-[#F5F0E5] hover:bg-[#15352D]'
                     }`}
-                    style={{
-                      backgroundColor: activePage === 'unsold' ? theme.colors.accentPrimary : 'transparent',
-                      color: activePage === 'unsold' ? '#102C27' : theme.colors.text,
-                    }}
                   >
                     <Archive className="w-3.5 h-3.5" />
                     <span>Unsold ({unsoldItemsCount})</span>
@@ -452,12 +435,10 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                     type="button"
                     onClick={() => setActivePage('results')}
                     className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-                      activePage === 'results' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                      activePage === 'results'
+                        ? 'bg-[#C5A46D] text-[#0B211D] font-bold shadow-sm'
+                        : 'text-[#B6C5B5] hover:text-[#F5F0E5] hover:bg-[#15352D]'
                     }`}
-                    style={{
-                      backgroundColor: activePage === 'results' ? theme.colors.accentPrimary : 'transparent',
-                      color: activePage === 'results' ? '#102C27' : theme.colors.text,
-                    }}
                   >
                     <Trophy className="w-3.5 h-3.5" />
                     <span>Podium</span>
@@ -468,11 +449,7 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
               <button
                 type="button"
                 onClick={handleReturnToHub}
-                className="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80 flex items-center gap-1 border"
-                style={{
-                  borderColor: theme.colors.border,
-                  color: theme.colors.textSecondary,
-                }}
+                className="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 border border-[#244F43] text-[#B6C5B5] hover:text-[#F5F0E5] hover:bg-[#15352D]"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Exit Arena</span>
@@ -481,26 +458,15 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
           ) : platformMode === 'battle' ? (
             /* 3. ADAPTIVE BATTLE ARENA SUB-NAV */
             <nav className="flex items-center gap-2 font-heading text-xs">
-              <div 
-                className="px-3 py-1.5 rounded-lg border flex items-center gap-2"
-                style={{
-                  backgroundColor: theme.colors.surfaceSecondary,
-                  borderColor: theme.colors.border,
-                  color: theme.colors.text,
-                }}
-              >
-                <Swords className="w-3.5 h-3.5" style={{ color: theme.colors.accentPrimary }} />
+              <div className="px-3 py-1.5 rounded-lg border border-[#2C4468] bg-[#172744] text-[#F0F3F8] flex items-center gap-2">
+                <Swords className="w-3.5 h-3.5 text-[#568BE0]" />
                 <span>Stage: <strong className="uppercase">{battleState.phase.replace('_', ' ')}</strong></span>
               </div>
 
               <button
                 type="button"
                 onClick={handleReturnToHub}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80 flex items-center gap-1 border"
-                style={{
-                  borderColor: theme.colors.border,
-                  color: theme.colors.textSecondary,
-                }}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 border border-[#2C4468] text-[#AAB8CB] hover:text-[#F0F3F8] hover:bg-[#172744]"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Exit Battle</span>
@@ -513,25 +479,17 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
                 type="button"
                 onClick={returnToArenaHome}
                 className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-                  partyView === 'arena' ? 'font-bold shadow-sm' : 'hover:opacity-80'
+                  partyView === 'arena'
+                    ? 'bg-[#C77B79] text-white font-bold shadow-sm'
+                    : 'text-[#B3A2BC] hover:text-[#F5EFF8] hover:bg-[#302438]'
                 }`}
-                style={{
-                  backgroundColor: partyView === 'arena' ? theme.colors.accentPrimary : 'transparent',
-                  color: partyView === 'arena' ? '#FFFFFF' : theme.colors.text,
-                }}
               >
                 <Gamepad2 className="w-3.5 h-3.5" />
                 <span>Party Games</span>
               </button>
 
               {partyView === 'playing' && (
-                <div 
-                  className="px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 shadow-sm"
-                  style={{
-                    backgroundColor: theme.colors.accentAction,
-                    color: '#FFFFFF'
-                  }}
-                >
+                <div className="px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 shadow-sm bg-[#D6A568] text-[#1B1521]">
                   <Radio className="w-3.5 h-3.5 animate-pulse" />
                   <span>{selectedGame?.title || 'Live Game'}</span>
                 </div>
@@ -540,11 +498,7 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
               {partyView === 'results' && (
                 <button
                   type="button"
-                  className="px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5"
-                  style={{
-                    backgroundColor: theme.colors.accentPrimary,
-                    color: '#FFFFFF',
-                  }}
+                  className="px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 bg-[#C77B79] text-white"
                 >
                   <Trophy className="w-3.5 h-3.5" />
                   <span>Results</span>
@@ -554,11 +508,7 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
               <button
                 type="button"
                 onClick={handleReturnToHub}
-                className="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-80 flex items-center gap-1 border"
-                style={{
-                  borderColor: theme.colors.border,
-                  color: theme.colors.textSecondary,
-                }}
+                className="ml-2 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 border border-[#4A3A54] text-[#B3A2BC] hover:text-[#F5EFF8] hover:bg-[#302438]"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Exit Party</span>
@@ -568,7 +518,7 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
         </div>
 
         {/* ========================================================= */}
-        {/* RIGHT: UTILITIES & MORE MENU                              */}
+        {/* RIGHT: UTILITIES & ACTIONS                                */}
         {/* ========================================================= */}
         <div className="flex items-center gap-2">
           {/* Rules Action */}
@@ -577,15 +527,10 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
             onClick={() => {
               window.dispatchEvent(new CustomEvent('bidbattle_open_rules', { detail: { tab: isArenaMode ? platformMode : 'auction' } }));
             }}
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-heading font-semibold transition-all border"
-            style={{
-              backgroundColor: theme.colors.card,
-              borderColor: theme.colors.border,
-              color: theme.colors.text,
-            }}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-heading font-semibold transition-all border border-[#34414A] bg-[#1C252D] text-[#EDF2F3] hover:border-[#45C4A1]/50"
             title="Official Game Rulebooks"
           >
-            <BookOpen className="w-3.5 h-3.5" style={{ color: theme.colors.accentPrimary }} />
+            <BookOpen className="w-3.5 h-3.5 text-[#45C4A1]" />
             <span>RULES</span>
           </button>
 
@@ -593,11 +538,9 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
           <button
             type="button"
             onClick={handleToggleSound}
-            className="p-2 rounded-lg transition-all border"
+            className="p-2 rounded-lg transition-all border border-[#34414A] bg-[#1C252D] hover:border-[#45C4A1]/50"
             style={{
-              backgroundColor: theme.colors.card,
-              borderColor: theme.colors.border,
-              color: isMuted ? theme.colors.textSecondary : theme.colors.accentPrimary,
+              color: isMuted ? '#788890' : '#45C4A1',
             }}
             title={isMuted ? 'Unmute Sound FX' : 'Mute Sound FX'}
           >
@@ -608,12 +551,7 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
           <button
             type="button"
             onClick={toggleFullscreen}
-            className="p-2 rounded-lg transition-all border hidden sm:flex"
-            style={{
-              backgroundColor: theme.colors.card,
-              borderColor: theme.colors.border,
-              color: theme.colors.text,
-            }}
+            className="p-2 rounded-lg transition-all border border-[#34414A] bg-[#1C252D] text-[#A5B2B8] hover:text-[#EDF2F3] hover:border-[#45C4A1]/50 hidden sm:flex"
             title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
           >
             {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
@@ -623,12 +561,7 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-lg transition-all border lg:hidden"
-            style={{
-              backgroundColor: theme.colors.card,
-              borderColor: theme.colors.border,
-              color: theme.colors.text,
-            }}
+            className="p-2 rounded-lg transition-all border border-[#34414A] bg-[#1C252D] text-[#EDF2F3] lg:hidden"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -644,74 +577,62 @@ export const Navbar = ({ platformMode = 'home', setPlatformMode }) => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden border-t px-4 py-3 space-y-2 font-heading text-xs"
-            style={{
-              backgroundColor: theme.colors.bg,
-              borderColor: theme.colors.border,
-            }}
+            className="lg:hidden border-t px-4 py-3 space-y-2 font-heading text-xs bg-[#101418] border-[#34414A]"
           >
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => { setPlatformMode('home'); setIsMobileMenuOpen(false); }}
-                className="p-2 rounded-lg font-bold text-left border"
-                style={{ backgroundColor: theme.colors.card, borderColor: theme.colors.border }}
+                className="p-2 rounded-lg font-bold text-left border border-[#34414A] bg-[#1C252D] text-[#EDF2F3] hover:border-[#45C4A1]"
               >
                 🏠 Home
               </button>
               <button
                 type="button"
                 onClick={() => { setPlatformMode('tournaments'); setIsMobileMenuOpen(false); }}
-                className="p-2 rounded-lg font-bold text-left border"
-                style={{ backgroundColor: theme.colors.card, borderColor: theme.colors.border }}
+                className="p-2 rounded-lg font-bold text-left border border-[#34414A] bg-[#1C252D] text-[#EDF2F3] hover:border-[#45C4A1]"
               >
                 🏆 Tournaments
               </button>
               <button
                 type="button"
                 onClick={() => { setPlatformMode('auction'); setIsMobileMenuOpen(false); }}
-                className="p-2 rounded-lg font-bold text-left border text-[#C5A46D]"
-                style={{ backgroundColor: theme.colors.card, borderColor: theme.colors.border }}
+                className="p-2 rounded-lg font-bold text-left border border-[#244F43] bg-[#0B211D] text-[#C5A46D]"
               >
                 🔨 Auction Arena
               </button>
               <button
                 type="button"
                 onClick={() => { setPlatformMode('battle'); setIsMobileMenuOpen(false); }}
-                className="p-2 rounded-lg font-bold text-left border text-[#6198E8]"
-                style={{ backgroundColor: theme.colors.card, borderColor: theme.colors.border }}
+                className="p-2 rounded-lg font-bold text-left border border-[#2C4468] bg-[#0A1224] text-[#568BE0]"
               >
                 ⚔️ Battle Arena
               </button>
               <button
                 type="button"
                 onClick={() => { setPlatformMode('party'); setIsMobileMenuOpen(false); }}
-                className="p-2 rounded-lg font-bold text-left border text-[#D97567]"
-                style={{ backgroundColor: theme.colors.card, borderColor: theme.colors.border }}
+                className="p-2 rounded-lg font-bold text-left border border-[#4A3A54] bg-[#1B1521] text-[#C77B79]"
               >
                 🎮 Party Arena
               </button>
               <button
                 type="button"
                 onClick={() => { setPlatformMode('franchises'); setIsMobileMenuOpen(false); }}
-                className="p-2 rounded-lg font-bold text-left border"
-                style={{ backgroundColor: theme.colors.card, borderColor: theme.colors.border }}
+                className="p-2 rounded-lg font-bold text-left border border-[#34414A] bg-[#1C252D] text-[#EDF2F3] hover:border-[#45C4A1]"
               >
                 👥 Franchises
               </button>
               <button
                 type="button"
                 onClick={() => { setPlatformMode('statistics'); setIsMobileMenuOpen(false); }}
-                className="p-2 rounded-lg font-bold text-left border"
-                style={{ backgroundColor: theme.colors.card, borderColor: theme.colors.border }}
+                className="p-2 rounded-lg font-bold text-left border border-[#34414A] bg-[#1C252D] text-[#EDF2F3] hover:border-[#45C4A1]"
               >
                 📊 Statistics
               </button>
               <button
                 type="button"
                 onClick={() => { handleOpenBroadcast(); setIsMobileMenuOpen(false); }}
-                className="p-2 rounded-lg font-bold text-left border"
-                style={{ backgroundColor: theme.colors.card, borderColor: theme.colors.border }}
+                className="p-2 rounded-lg font-bold text-left border border-[#34414A] bg-[#1C252D] text-[#D6A568]"
               >
                 📺 Broadcast
               </button>

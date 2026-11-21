@@ -1,25 +1,28 @@
 /**
- * CORAL & LAVENDER - PARTY ARENA THEME
+ * DARK PLUM & MUTED CORAL - PARTY ARENA THEME
  * Applied to: Party Arena Home, Dumb Charades Setup & Live Gameplay,
  * Who Am I? Setup & Live Gameplay, Party Results, and Party Broadcast.
+ * 
+ * Cheerful in-person social gaming identity in dark plum & muted coral:
+ * Dark plum canvas, deep purple cards, muted coral accents & soft lavender highlights.
  */
 
 export const partyTheme = {
   id: 'party',
-  name: 'Coral & Lavender',
+  name: 'Dark Plum & Muted Coral',
   colors: {
-    bg: '#F8F1EB',              // Warm cream
-    card: '#FFFFFF',            // White
-    surfaceSecondary: '#F0E5EC',// Soft blush lavender
-    text: '#342B3B',            // Deep plum
-    textSecondary: '#776B7D',   // Muted mauve
-    accentPrimary: '#D97567',   // Coral
-    accentSecondary: '#9581B5', // Lavender
-    accentAction: '#D7AC64',    // Warm gold
-    border: '#E4D6DC',          // Soft rose grey
-    badgeBg: '#F0E5EC',
-    badgeText: '#342B3B',
-    highlight: '#D97567',
+    bg: '#1B1521',              // Dark plum floor
+    card: '#302438',            // Deep plum card
+    surfaceSecondary: '#413148',// Plum elevated surface
+    text: '#F5EFF8',            // Soft white with plum tint
+    textSecondary: '#B3A2BC',   // Muted lavender grey
+    accentPrimary: '#C77B79',   // Muted coral
+    accentSecondary: '#A18BC2', // Lavender
+    accentAction: '#D6A568',    // Warm amber
+    border: '#4A3A54',          // Soft plum border
+    badgeBg: '#413148',
+    badgeText: '#F5EFF8',
+    highlight: '#C77B79',
   },
   typography: {
     fontHeading: '"Outfit", system-ui, sans-serif',
@@ -28,19 +31,19 @@ export const partyTheme = {
     fontMono: '"IBM Plex Mono", monospace',
   },
   shadows: {
-    subtle: '0 1px 3px rgba(52, 43, 59, 0.05), 0 1px 2px rgba(52, 43, 59, 0.03)',
-    card: '0 4px 16px -2px rgba(52, 43, 59, 0.08), 0 0 1px 1px rgba(228, 214, 220, 0.4)',
-    elevated: '0 10px 25px -5px rgba(52, 43, 59, 0.12), 0 0 1px 1px rgba(217, 117, 103, 0.15)',
+    subtle: '0 2px 6px rgba(0, 0, 0, 0.4)',
+    card: '0 6px 20px -3px rgba(27, 21, 33, 0.6), 0 0 1px 1px rgba(199, 123, 121, 0.1)',
+    elevated: '0 12px 32px -4px rgba(27, 21, 33, 0.8), 0 0 1px 1px rgba(161, 139, 194, 0.18)',
   },
   cssVars: {
-    '--theme-bg': '#F8F1EB',
-    '--theme-card': '#FFFFFF',
-    '--theme-surface-secondary': '#F0E5EC',
-    '--theme-text': '#342B3B',
-    '--theme-text-secondary': '#776B7D',
-    '--theme-accent-primary': '#D97567',
-    '--theme-accent-action': '#D7AC64',
-    '--theme-accent-secondary': '#9581B5',
-    '--theme-border': '#E4D6DC',
+    '--theme-bg': '#1B1521',
+    '--theme-card': '#302438',
+    '--theme-surface-secondary': '#413148',
+    '--theme-text': '#F5EFF8',
+    '--theme-text-secondary': '#B3A2BC',
+    '--theme-accent-primary': '#C77B79',
+    '--theme-accent-action': '#D6A568',
+    '--theme-accent-secondary': '#A18BC2',
+    '--theme-border': '#4A3A54',
   }
 };

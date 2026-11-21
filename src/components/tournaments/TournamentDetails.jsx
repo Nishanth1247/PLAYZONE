@@ -162,10 +162,10 @@ export const TournamentDetails = ({
 
           {/* Quick Action Button */}
           <Button
-            variant="champagne"
+            variant="primary"
             size="md"
             onClick={() => onLaunchArena(tournament)}
-            className="flex items-center gap-2 font-heading font-black text-xs shadow-md"
+            className="flex items-center gap-2 font-heading font-black text-xs shadow-md shadow-[#45C4A1]/20"
           >
             {isActive || isPaused ? (
               <>
@@ -316,8 +316,8 @@ export const TournamentDetails = ({
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl whitespace-nowrap transition-all ${
                 isSelected
-                  ? 'bg-[#D97858] text-[#F5F3EE] font-black shadow-md'
-                  : 'text-[#AEB9CC] hover:text-[#F5F3EE] hover:bg-[#2C394C]'
+                  ? 'bg-[#45C4A1] text-[#101418] font-black shadow-md'
+                  : 'text-[#A5B2B8] hover:text-[#EDF2F3] hover:bg-[#25313A]'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
