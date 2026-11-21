@@ -12,7 +12,11 @@ import {
   Film,
   Upload,
   BookOpen,
-  Tv
+  Tv,
+  Clock,
+  Shield,
+  Flame,
+  Award
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -23,56 +27,54 @@ import { openGameRules } from '../rules/GameRules';
 export const PartyArenaHome = ({ onSwitchToAuction }) => {
   const { openGameLobby } = usePartyGame();
 
+  const dumbCharadesGame = GAME_REGISTRY.find(g => g.id === 'party_dumb_charades');
+  const whoAmIGame = GAME_REGISTRY.find(g => g.id === 'party_who_am_i');
+
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#111827] pb-8">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-5 relative z-10 space-y-6">
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#F8F1EB] text-[#342B3B] pb-16">
+      <div className="max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-8">
         
-        {/* 1. COMPACT HERO SECTION */}
-        <div className="text-center max-w-3xl mx-auto pt-1 space-y-2.5">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#222F43] border border-[#39465A] text-xs font-heading font-bold text-[#AEB9CC] shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-[#D4B879]" />
-            <span className="text-[#F5F3EE]">Party Arena</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#39465A]" />
-            <span className="text-[#AEB9CC] font-mono tracking-wider text-[11px]">2–4 LOCAL PLAYERS • 1 LAPTOP</span>
+        {/* 1. HERO HEADER */}
+        <div className="text-center max-w-3xl mx-auto pt-2 space-y-3">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FFFFFF] border border-[#E4D6DC] text-xs font-heading font-bold text-[#776B7D] shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-[#D97567]" />
+            <span className="text-[#342B3B]">Local Multiplayer Game Night</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E4D6DC]" />
+            <span className="text-[#776B7D] font-mono tracking-wider text-[11px]">1 LAPTOP • 2–4 FRANCHISES</span>
           </div>
 
-          <h1 className="font-title text-4xl sm:text-6xl font-black tracking-wider uppercase text-[#F5F3EE] leading-none">
+          <h1 className="font-title text-5xl sm:text-7xl font-black tracking-wider uppercase text-[#342B3B] leading-none">
             PARTY ARENA
           </h1>
 
-          <p className="text-xs sm:text-sm text-[#AEB9CC] max-w-xl mx-auto leading-relaxed">
-            The ultimate local multiplayer party game night experience. Play high-stakes Dumb Charades with secret prompt passing or deduce identities in Who Am I? on a single shared screen!
+          <p className="text-sm sm:text-base text-[#776B7D] max-w-xl mx-auto leading-relaxed">
+            The ultimate local pass-and-play party games. Act silently in Dumb Charades with pass-the-laptop secrecy or deduce personas in Who Am I? on a shared screen.
           </p>
 
-          {/* Quick Action Bar */}
+          {/* Quick Action Pills */}
           <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#222F43] border border-[#39465A] text-xs font-mono text-[#AEB9CC]">
-              <Upload className="w-3.5 h-3.5 text-[#D4B879]" />
-              <span>Universal JSON / CSV / TXT Import</span>
-            </div>
-
             <Button
-              variant="champagne"
+              variant="outline"
               size="sm"
               onClick={() => openGameRules('charades')}
-              className="font-heading text-xs flex items-center gap-1.5"
+              className="font-heading text-xs flex items-center gap-1.5 bg-[#FFFFFF] border-[#E4D6DC] text-[#342B3B] hover:bg-[#F0E5EC]"
             >
-              <BookOpen className="w-3.5 h-3.5" />
+              <BookOpen className="w-3.5 h-3.5 text-[#D97567]" />
               <span>Party Rulebooks</span>
             </Button>
 
             <Button
-              variant="secondary"
+              variant="outline"
               size="sm"
               onClick={() => {
                 window.dispatchEvent(new CustomEvent('bidbattle_open_broadcast', {
                   detail: { arena: 'party', mode: 'live' }
                 }));
               }}
-              className="font-heading text-xs flex items-center gap-1.5 border-[#00D9FF]/40 text-[#00D9FF] hover:bg-[#00D9FF]/10"
+              className="font-heading text-xs flex items-center gap-1.5 bg-[#FFFFFF] border-[#E4D6DC] text-[#D97567] hover:bg-[#F0E5EC]"
             >
               <Tv className="w-3.5 h-3.5" />
-              <span>Broadcast View</span>
+              <span>Spectator Broadcast</span>
             </Button>
 
             {onSwitchToAuction && (
@@ -80,7 +82,7 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
                 variant="ghost"
                 size="sm"
                 onClick={onSwitchToAuction}
-                className="font-heading text-xs text-[#AEB9CC] hover:text-[#F5F3EE] hover:bg-[#222F43] flex items-center gap-1.5"
+                className="font-heading text-xs text-[#776B7D] hover:text-[#342B3B] hover:bg-[#F0E5EC] flex items-center gap-1.5"
               >
                 <Gavel className="w-3.5 h-3.5" />
                 <span>AUCTION ARENA →</span>
@@ -89,140 +91,159 @@ export const PartyArenaHome = ({ onSwitchToAuction }) => {
           </div>
         </div>
 
-        {/* 2. OFFICIAL GAMES GRID (BALANCED 2-COLUMN DESKTOP LAYOUT) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-6xl mx-auto">
-          {GAME_REGISTRY.map((game) => {
-            const isDumbCharades = game.id === 'party_dumb_charades';
+        {/* 2. OFFICIAL TWO GAMES CARDS (PART 7.1) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          
+          {/* GAME 1: DUMB CHARADES */}
+          <motion.div
+            whileHover={{ y: -4, transition: { duration: 0.15 } }}
+            className="rounded-3xl p-6 sm:p-8 bg-[#FFFFFF] border border-[#E4D6DC] shadow-md flex flex-col justify-between space-y-6 relative overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 right-0 h-2 bg-[#D97567]" />
 
-            return (
-              <motion.div
-                key={game.id}
-                whileHover={{ y: -3, scale: 1.008 }}
-                transition={{ duration: 0.2 }}
-                className="bg-[#222F43] rounded-3xl p-5 sm:p-6 border border-[#39465A] hover:border-[#D97858]/60 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group shadow-xl"
-              >
-                <div className="space-y-4 relative z-10">
-                  {/* Card Top Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl sm:text-4xl p-3 rounded-2xl bg-[#2C394C] border border-[#39465A] shadow-inner">
-                        {game.icon}
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-[#AEB9CC]">
-                            Official Party Game
-                          </span>
-                          <span className="text-[#39465A] text-xs">•</span>
-                          <Badge 
-                            variant="subtle" 
-                            className="text-[10px] px-2 py-0 bg-[#2C394C] text-[#D4B879] border border-[#39465A]"
-                          >
-                            {game.badge}
-                          </Badge>
-                        </div>
-                        <h2 className="font-heading text-xl sm:text-2xl font-black text-[#F5F3EE] tracking-wide">
-                          {game.title}
-                        </h2>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2C394C] border border-[#39465A] text-[11px] font-mono font-bold text-[#AEB9CC] self-start sm:self-auto">
-                      <Users className="w-3 h-3 text-[#D4B879]" />
-                      <span>2–4 Franchises</span>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-xs sm:text-sm text-[#AEB9CC] leading-relaxed">
-                    {game.shortDesc}
-                  </p>
-
-                  {/* Feature Tags */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {game.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2.5 py-1 rounded-xl bg-[#2C394C] border border-[#39465A] text-[11px] font-mono text-[#AEB9CC]"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                    <span className="px-2.5 py-1 rounded-xl border border-[#39465A] bg-[#111827] text-[11px] font-mono font-bold text-[#91A98B]">
-                      Universal Content Import
-                    </span>
-                  </div>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-[#F0E5EC] border border-[#E4D6DC] flex items-center justify-center text-2xl shadow-sm">
+                  🎭
                 </div>
-
-                {/* Card Action Footer */}
-                <div className="pt-4 mt-5 border-t border-[#39465A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
-                  <span className="text-[11px] font-mono text-[#AEB9CC] flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#91A98B]" />
-                    <span>
-                      {isDumbCharades
-                        ? 'Pass-the-Laptop Privacy Screen'
-                        : 'Shared-Screen Guesser Setup'}
-                    </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#F0E5EC] text-[#D97567] font-bold border border-[#E4D6DC]">
+                    Pass-the-Screen
                   </span>
-
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => openGameRules(isDumbCharades ? 'charades' : 'whoami')}
-                      className="font-heading text-xs flex items-center gap-1.5 border-[#39465A] text-[#AEB9CC] hover:text-[#F5F3EE]"
-                    >
-                      <BookOpen className="w-3.5 h-3.5" />
-                      <span>Rules</span>
-                    </Button>
-
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={() => openGameLobby(game.id)}
-                      className="font-heading text-xs font-black flex items-center justify-center gap-2 group-hover:scale-102 transition-transform flex-1 sm:flex-initial px-5 py-2 shadow-md"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current" />
-                      <span>PLAY {game.title.toUpperCase()}</span>
-                      <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* 3. COMPACT FOUR FIXED PLAYERS SHOWCASE FOOTER */}
-        <div className="bg-[#222F43] rounded-2xl p-4 border border-[#39465A] text-center space-y-3 max-w-6xl mx-auto shadow-md">
-          <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#AEB9CC]">
-            The Fixed Four Squad (Single Shared Screen)
-          </span>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-4xl mx-auto">
-            {[
-              { name: 'Nishanth', color: '#8875A8', avatar: '👑', title: 'The Mastermind' },
-              { name: 'Ajmal', color: '#71999B', avatar: '⚡', title: 'The Speedster' },
-              { name: 'Praneeth', color: '#B68B68', avatar: '🔥', title: 'The Strategist' },
-              { name: 'Nagulan', color: '#84977B', avatar: '🛡️', title: 'The Enforcer' },
-            ].map((p) => (
-              <div
-                key={p.name}
-                className="p-2.5 rounded-xl bg-[#111827] border border-[#39465A] flex items-center gap-2.5 text-left"
-              >
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-base font-bold text-[#F5F3EE] shadow"
-                  style={{ backgroundColor: p.color }}
-                >
-                  {p.avatar}
-                </div>
-                <div className="min-w-0">
-                  <h4 className="font-heading font-bold text-xs text-[#F5F3EE] truncate">{p.name}</h4>
-                  <span className="text-[9px] font-mono text-[#AEB9CC] block truncate">{p.title}</span>
+                  <Badge variant="outline" className="text-[10px] border-[#E4D6DC] text-[#776B7D]">
+                    2–4 Teams
+                  </Badge>
                 </div>
               </div>
-            ))}
-          </div>
+
+              <div>
+                <h3 className="font-title text-2xl sm:text-3xl font-black uppercase tracking-wider text-[#342B3B]">
+                  Dumb Charades
+                </h3>
+                <p className="text-xs sm:text-sm text-[#776B7D] leading-relaxed mt-1">
+                  Pass the laptop secretly to view your movie prompt. Act silently without speaking or mouthing words while your teammates guess against the countdown clock!
+                </p>
+              </div>
+
+              {/* Game Feature Badges */}
+              <div className="grid grid-cols-2 gap-2 text-xs font-heading">
+                <div className="p-2 rounded-xl bg-[#F8F1EB] border border-[#E4D6DC] flex items-center gap-2 text-[#342B3B]">
+                  <Clock className="w-3.5 h-3.5 text-[#D97567]" />
+                  <span>Early Guess Bonus (+1)</span>
+                </div>
+                <div className="p-2 rounded-xl bg-[#F8F1EB] border border-[#E4D6DC] flex items-center gap-2 text-[#342B3B]">
+                  <Flame className="w-3.5 h-3.5 text-[#D7AC64]" />
+                  <span>Streak Multipliers</span>
+                </div>
+                <div className="p-2 rounded-xl bg-[#F8F1EB] border border-[#E4D6DC] flex items-center gap-2 text-[#342B3B]">
+                  <Shield className="w-3.5 h-3.5 text-[#9581B5]" />
+                  <span>Pass Screen Privacy</span>
+                </div>
+                <div className="p-2 rounded-xl bg-[#F8F1EB] border border-[#E4D6DC] flex items-center gap-2 text-[#342B3B]">
+                  <Award className="w-3.5 h-3.5 text-[#D97567]" />
+                  <span>Tamil Cinema Database</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 pt-2">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => dumbCharadesGame && openGameLobby(dumbCharadesGame)}
+                className="flex-1 bg-[#D97567] hover:bg-[#c46457] text-[#FFFFFF] font-black uppercase tracking-wider text-xs shadow-md shadow-[#D97567]/20"
+              >
+                <Play className="w-4 h-4 fill-current mr-1" />
+                <span>Start Dumb Charades</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() => openGameRules('charades')}
+                className="border-[#E4D6DC] text-[#776B7D] hover:text-[#342B3B] hover:bg-[#F0E5EC]"
+              >
+                <span>Rules</span>
+              </Button>
+            </div>
+          </motion.div>
+
+          {/* GAME 2: WHO AM I? */}
+          <motion.div
+            whileHover={{ y: -4, transition: { duration: 0.15 } }}
+            className="rounded-3xl p-6 sm:p-8 bg-[#FFFFFF] border border-[#E4D6DC] shadow-md flex flex-col justify-between space-y-6 relative overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 right-0 h-2 bg-[#9581B5]" />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-[#F0E5EC] border border-[#E4D6DC] flex items-center justify-center text-2xl shadow-sm">
+                  ❓
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#F0E5EC] text-[#9581B5] font-bold border border-[#E4D6DC]">
+                    Shared Screen
+                  </span>
+                  <Badge variant="outline" className="text-[10px] border-[#E4D6DC] text-[#776B7D]">
+                    2–4 Teams
+                  </Badge>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-title text-2xl sm:text-3xl font-black uppercase tracking-wider text-[#342B3B]">
+                  Who Am I?
+                </h3>
+                <p className="text-xs sm:text-sm text-[#776B7D] leading-relaxed mt-1">
+                  The guesser looks away while the audience sees the secret persona! Ask Yes/No questions to deduce your identity within 20 questions before the clock expires.
+                </p>
+              </div>
+
+              {/* Game Feature Badges */}
+              <div className="grid grid-cols-2 gap-2 text-xs font-heading">
+                <div className="p-2 rounded-xl bg-[#F8F1EB] border border-[#E4D6DC] flex items-center gap-2 text-[#342B3B]">
+                  <HelpCircle className="w-3.5 h-3.5 text-[#9581B5]" />
+                  <span>20 Questions Tracker</span>
+                </div>
+                <div className="p-2 rounded-xl bg-[#F8F1EB] border border-[#E4D6DC] flex items-center gap-2 text-[#342B3B]">
+                  <Clock className="w-3.5 h-3.5 text-[#D7AC64]" />
+                  <span>Speed Bonus (&le; 10 Qs)</span>
+                </div>
+                <div className="p-2 rounded-xl bg-[#F8F1EB] border border-[#E4D6DC] flex items-center gap-2 text-[#342B3B]">
+                  <Shield className="w-3.5 h-3.5 text-[#D97567]" />
+                  <span>Guesser Privacy Guard</span>
+                </div>
+                <div className="p-2 rounded-xl bg-[#F8F1EB] border border-[#E4D6DC] flex items-center gap-2 text-[#342B3B]">
+                  <Award className="w-3.5 h-3.5 text-[#9581B5]" />
+                  <span>Universal Character Bank</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 pt-2">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => whoAmIGame && openGameLobby(whoAmIGame)}
+                className="flex-1 bg-[#9581B5] hover:bg-[#836fa3] text-[#FFFFFF] font-black uppercase tracking-wider text-xs shadow-md shadow-[#9581B5]/20"
+              >
+                <Play className="w-4 h-4 fill-current mr-1" />
+                <span>Start Who Am I?</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() => openGameRules('whoami')}
+                className="border-[#E4D6DC] text-[#776B7D] hover:text-[#342B3B] hover:bg-[#F0E5EC]"
+              >
+                <span>Rules</span>
+              </Button>
+            </div>
+          </motion.div>
+
         </div>
 
       </div>

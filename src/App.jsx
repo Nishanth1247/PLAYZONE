@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuctionProvider, useAuction } from './context/AuctionContext';
 import { PartyGameProvider, usePartyGame } from './context/PartyGameContext';
 import { BattleArenaProvider, useBattleArena } from './context/BattleArenaContext';
+import { ThemeProvider, useTheme } from './theme/ThemeProvider';
 import { Navbar } from './components/common/Navbar';
 import { Home } from './components/landing/Home';
 import { SetupWizard } from './components/setup/SetupWizard';
@@ -31,7 +32,14 @@ const MainContent = ({ platformMode, setPlatformMode, rulesTab, setRulesTab, pre
 
   return (
     <main className="flex-1 pb-12">
-      {platformMode === 'statistics' ? (
+      {platformMode === 'home' ? (
+        <div key="website_home" className="transition-opacity duration-300">
+          <Home 
+            onSwitchToParty={() => setPlatformMode('party')} 
+            onNavigateToArena={(arena) => setPlatformMode(arena)}
+          />
+        </div>
+      ) : platformMode === 'statistics' ? (
         <div key="statistics_dashboard" className="transition-opacity duration-300">
           <StatisticsDashboard
             onNavigateToGame={(game) => {
@@ -74,7 +82,7 @@ const MainContent = ({ platformMode, setPlatformMode, rulesTab, setRulesTab, pre
         <div key={`rules_${rulesTab}`} className="transition-opacity duration-300">
           <GameRules
             initialTab={rulesTab}
-            onClose={() => setPlatformMode(previousMode || 'auction')}
+            onClose={() => setPlatformMode(previousMode || 'home')}
             onNavigateToGame={(game) => {
               if (game === 'auction') {
                 setPlatformMode('auction');
@@ -130,8 +138,8 @@ const MainContent = ({ platformMode, setPlatformMode, rulesTab, setRulesTab, pre
 };
 
 export function AppContent() {
-  const [platformMode, setPlatformMode] = useState('party'); // 'party' | 'auction' | 'battle' | 'rules'
-  const [previousMode, setPreviousMode] = useState('party');
+  const [platformMode, setPlatformMode] = useState('home'); // Start at Home (Alpine Editorial)
+  const [previousMode, setPreviousMode] = useState('home');
   const [rulesTab, setRulesTab] = useState('auction');
   const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
   const [broadcastConfig, setBroadcastConfig] = useState({
@@ -139,6 +147,8 @@ export function AppContent() {
     mode: 'live',
     arena: null,
   });
+
+  const { activePage } = useAuction();
 
   React.useEffect(() => {
     const handleOpenRules = (e) => {
@@ -175,7 +185,7 @@ export function AppContent() {
       setBroadcastConfig({
         tournamentId: detail.tournamentId || null,
         mode: detail.mode || 'live',
-        arena: detail.arena || null,
+        arena: detail.arena || (platformMode === 'auction' || platformMode === 'battle' || platformMode === 'party' ? platformMode : null),
       });
       setIsBroadcastOpen(true);
     };
@@ -206,62 +216,81 @@ export function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#111827] text-[#F5F3EE] flex flex-col font-sans selection:bg-[#D97858] selection:text-[#F5F3EE] relative">
-      <Navbar 
-        platformMode={platformMode} 
-        setPlatformMode={handleModeChange} 
-      />
-      <MainContent 
-        platformMode={platformMode} 
-        setPlatformMode={handleModeChange}
-        rulesTab={rulesTab}
-        setRulesTab={setRulesTab}
-        previousMode={previousMode}
-      />
-      <BroadcastMode
-        isOpen={isBroadcastOpen}
-        onClose={() => setIsBroadcastOpen(false)}
-        initialTournamentId={broadcastConfig.tournamentId}
-        initialMode={broadcastConfig.mode}
-        initialArena={broadcastConfig.arena}
-      />
-      <Toaster />
+    <ThemeProvider 
+      platformMode={platformMode} 
+      activePage={activePage} 
+      broadcastArena={isBroadcastOpen ? broadcastConfig.arena : null}
+    >
+      <div className="min-h-screen flex flex-col font-sans relative selection:bg-[#C46A45] selection:text-[#FFFFFF]">
+        <Navbar 
+          platformMode={platformMode} 
+          setPlatformMode={handleModeChange} 
+        />
+        <MainContent 
+          platformMode={platformMode} 
+          setPlatformMode={handleModeChange}
+          rulesTab={rulesTab}
+          setRulesTab={setRulesTab}
+          previousMode={previousMode}
+        />
+        <BroadcastMode
+          isOpen={isBroadcastOpen}
+          onClose={() => setIsBroadcastOpen(false)}
+          initialTournamentId={broadcastConfig.tournamentId}
+          initialMode={broadcastConfig.mode}
+          initialArena={broadcastConfig.arena}
+        />
+        <Toaster />
 
-      {/* Global Footer */}
-      <footer className="border-t border-[#39465A] bg-[#111827] py-4 px-6 text-center text-xs text-[#AEB9CC] print:hidden">
-        <div className="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2 font-heading tracking-wide">
-            <span className="font-bold text-[#F5F3EE]">BIDBATTLE</span>
-            <span>•</span>
-            <span className="text-[#AEB9CC]">Auction & Battle Arena</span>
-            <span>•</span>
-            <span className="text-[#AEB9CC]">Party Game Showdown</span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => {
-                if (platformMode !== 'rules') setPreviousMode(platformMode);
-                setPlatformMode('rules');
-              }}
-              className="flex items-center gap-1.5 text-[11px] text-[#D4B879] hover:text-[#F5F3EE] font-semibold font-heading tracking-wider transition-colors"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              OFFICIAL RULEBOOKS
-            </button>
-            <span>•</span>
-            <span className="flex items-center gap-1.5 text-[11px] text-[#AEB9CC] font-semibold font-heading tracking-wider">
-              <WifiOff className="w-3.5 h-3.5 text-[#AEB9CC]" />
-              100% PASS-AND-PLAY OFFLINE
-            </span>
-            <span>•</span>
-            <span className="text-[#AEB9CC]">1 Laptop • 2–4 Friends • Zero Login</span>
-          </div>
-        </div>
-      </footer>
-    </div>
+        {/* Adaptive Global Footer */}
+        <AdaptiveFooter onOpenRules={() => handleModeChange('rules')} />
+      </div>
+    </ThemeProvider>
   );
 }
+
+const AdaptiveFooter = ({ onOpenRules }) => {
+  const { theme, isDark } = useTheme();
+
+  return (
+    <footer 
+      className="border-t py-4 px-6 text-center text-xs print:hidden transition-colors duration-200"
+      style={{
+        backgroundColor: theme.colors.card,
+        borderColor: theme.colors.border,
+        color: theme.colors.textSecondary,
+      }}
+    >
+      <div className="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-2 font-heading tracking-wide">
+          <span className="font-bold" style={{ color: theme.colors.text }}>PLAYZONE</span>
+          <span>•</span>
+          <span>Auction, Battle & Party Tournament Hub</span>
+          <span>•</span>
+          <span className="font-mono text-[11px] opacity-75">{theme.name}</span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onOpenRules}
+            className="flex items-center gap-1.5 text-[11px] font-semibold font-heading tracking-wider transition-colors hover:underline"
+            style={{ color: theme.colors.accentPrimary }}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            OFFICIAL RULEBOOKS
+          </button>
+          <span>•</span>
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold font-heading tracking-wider">
+            <WifiOff className="w-3.5 h-3.5" />
+            100% PASS-AND-PLAY OFFLINE
+          </span>
+          <span>•</span>
+          <span>1 Laptop • 2–10+ Franchises • Zero Login</span>
+        </div>
+      </div>
+    </footer>
+  );
+};
 
 export function App() {
   return (

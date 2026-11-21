@@ -4,27 +4,84 @@
 
 @layer base {
   :root {
-    --color-bg: #111827;
-    --color-surface: #222F43;
-    --color-card: #222F43;
-    --color-elevated: #2C394C;
-    --color-light: #F0EDE5;
-    --color-border: #39465A;
-    --color-text: #F5F3EE;
-    --color-secondary: #AEB9CC;
-    --color-muted: #7E8B9F;
-    --color-accent: #D97858;
-    --color-sage: #91A98B;
-    --color-champagne: #D4B879;
+    /* Default: Alpine Editorial (Main Website) */
+    --theme-bg: #F4F1E8;
+    --theme-card: #FFFFFF;
+    --theme-surface-secondary: #EAE6DC;
+    --theme-text: #26343B;
+    --theme-text-secondary: #697477;
+    --theme-accent-primary: #176B68;
+    --theme-accent-action: #C46A45;
+    --theme-accent-secondary: #A8B8A3;
+    --theme-border: #D9D5CA;
+
+    /* Legacy mapping for backwards compatibility */
+    --color-bg: var(--theme-bg);
+    --color-surface: var(--theme-card);
+    --color-card: var(--theme-card);
+    --color-elevated: var(--theme-surface-secondary);
+    --color-border: var(--theme-border);
+    --color-text: var(--theme-text);
+    --color-secondary: var(--theme-text-secondary);
+    --color-accent: var(--theme-accent-action);
+
     --franchise-nishanth: #8875A8;
     --franchise-ajmal: #71999B;
     --franchise-praneeth: #B68B68;
     --franchise-nagulan: #84977B;
   }
 
+  [data-theme="website"] {
+    --theme-bg: #F4F1E8;
+    --theme-card: #FFFFFF;
+    --theme-surface-secondary: #EAE6DC;
+    --theme-text: #26343B;
+    --theme-text-secondary: #697477;
+    --theme-accent-primary: #176B68;
+    --theme-accent-action: #C46A45;
+    --theme-accent-secondary: #A8B8A3;
+    --theme-border: #D9D5CA;
+  }
+
+  [data-theme="auction"] {
+    --theme-bg: #102C27;
+    --theme-card: #193B33;
+    --theme-surface-secondary: #244A40;
+    --theme-text: #F5F0E5;
+    --theme-text-secondary: #B6C5B5;
+    --theme-accent-primary: #C5A46D;
+    --theme-accent-action: #D77A54;
+    --theme-accent-secondary: #B6C5B5;
+    --theme-border: #35574B;
+  }
+
+  [data-theme="battle"] {
+    --theme-bg: #101B32;
+    --theme-card: #1C2D4B;
+    --theme-surface-secondary: #293D5C;
+    --theme-text: #F0F3F8;
+    --theme-text-secondary: #B7C3D4;
+    --theme-accent-primary: #6198E8;
+    --theme-accent-action: #C5A46D;
+    --theme-accent-secondary: #C6D0DD;
+    --theme-border: #394C69;
+  }
+
+  [data-theme="party"] {
+    --theme-bg: #F8F1EB;
+    --theme-card: #FFFFFF;
+    --theme-surface-secondary: #F0E5EC;
+    --theme-text: #342B3B;
+    --theme-text-secondary: #776B7D;
+    --theme-accent-primary: #D97567;
+    --theme-accent-action: #D7AC64;
+    --theme-accent-secondary: #9581B5;
+    --theme-border: #E4D6DC;
+  }
+
   body {
-    background-color: #111827;
-    color: #F5F3EE;
+    background-color: var(--theme-bg, #F4F1E8);
+    color: var(--theme-text, #26343B);
     font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
   }
@@ -35,14 +92,14 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #111827;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #39465A;
+    background: var(--theme-border, #D9D5CA);
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #D97858;
+    background: var(--theme-accent-primary, #176B68);
   }
 }
 
@@ -51,27 +108,175 @@
   .bg-grid-pattern {
     background-size: 32px 32px;
     background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
   }
 
-  /* Structural Deep Slate Panels */
+  [data-theme="auction"] .bg-grid-pattern,
+  [data-theme="battle"] .bg-grid-pattern {
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  }
+
+  /* Structural Panels adapted dynamically to active theme */
   .battle-panel {
-    background: #222F43;
-    border: 1px solid #39465A;
-    box-shadow: 0 4px 16px -2px rgba(10, 15, 26, 0.5);
+    background: var(--theme-card, #FFFFFF);
+    border: 1px solid var(--theme-border, #D9D5CA);
+    color: var(--theme-text, #26343B);
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08);
   }
 
   .battle-panel-interactive {
-    background: #222F43;
-    border: 1px solid #39465A;
+    background: var(--theme-card, #FFFFFF);
+    border: 1px solid var(--theme-border, #D9D5CA);
+    color: var(--theme-text, #26343B);
     transition: all 0.15s ease-in-out;
   }
 
   .battle-panel-interactive:hover {
-    background: #2C394C;
-    border-color: #4B5A70;
+    background: var(--theme-surface-secondary, #EAE6DC);
+    border-color: var(--theme-accent-primary, #176B68);
     transform: translateY(-1px);
+  }
+
+  /* Theme helper classes */
+  .theme-bg {
+    background-color: var(--theme-bg);
+  }
+  .theme-card {
+    background-color: var(--theme-card);
+  }
+  .theme-surface {
+    background-color: var(--theme-surface-secondary);
+  }
+  .theme-border {
+    border-color: var(--theme-border);
+  }
+  .theme-text {
+    color: var(--theme-text);
+  }
+  .theme-text-muted {
+    color: var(--theme-text-secondary);
+  }
+  .theme-accent-primary {
+    color: var(--theme-accent-primary);
+  }
+  .theme-accent-action {
+    color: var(--theme-accent-action);
+  }
+
+  /* ========================================================================= */
+  /* SYSTEMIC THEME ADAPTATION OVERRIDES                                       */
+  /* Ensures existing hardcoded Tailwind utility classes inherit section tokens */
+  /* ========================================================================= */
+
+  /* 1. ALPINE EDITORIAL (Main Website) */
+  [data-theme="website"] .bg-\[\#111827\],
+  [data-theme="website"] .bg-battle-bg {
+    background-color: #F4F1E8 !important;
+  }
+  [data-theme="website"] .bg-\[\#222F43\],
+  [data-theme="website"] .bg-battle-surface {
+    background-color: #FFFFFF !important;
+  }
+  [data-theme="website"] .bg-\[\#2C394C\],
+  [data-theme="website"] .bg-battle-elevated {
+    background-color: #EAE6DC !important;
+  }
+  [data-theme="website"] .border-\[\#39465A\],
+  [data-theme="website"] .border-battle-border {
+    border-color: #D9D5CA !important;
+  }
+  [data-theme="website"] .text-\[\#F5F3EE\],
+  [data-theme="website"] .text-white {
+    color: #26343B !important;
+  }
+  [data-theme="website"] .text-\[\#AEB9CC\],
+  [data-theme="website"] .text-\[\#7E8B9F\],
+  [data-theme="website"] .text-battle-muted {
+    color: #697477 !important;
+  }
+
+  /* 2. EMERALD & IVORY (Auction Arena) */
+  [data-theme="auction"] .bg-\[\#111827\],
+  [data-theme="auction"] .bg-battle-bg {
+    background-color: #102C27 !important;
+  }
+  [data-theme="auction"] .bg-\[\#222F43\],
+  [data-theme="auction"] .bg-battle-surface {
+    background-color: #193B33 !important;
+  }
+  [data-theme="auction"] .bg-\[\#2C394C\],
+  [data-theme="auction"] .bg-battle-elevated {
+    background-color: #244A40 !important;
+  }
+  [data-theme="auction"] .border-\[\#39465A\],
+  [data-theme="auction"] .border-battle-border {
+    border-color: #35574B !important;
+  }
+  [data-theme="auction"] .text-\[\#F5F3EE\],
+  [data-theme="auction"] .text-white {
+    color: #F5F0E5 !important;
+  }
+  [data-theme="auction"] .text-\[\#AEB9CC\],
+  [data-theme="auction"] .text-\[\#7E8B9F\],
+  [data-theme="auction"] .text-battle-muted {
+    color: #B6C5B5 !important;
+  }
+
+  /* 3. COBALT & SILVER (Battle Arena) */
+  [data-theme="battle"] .bg-\[\#111827\],
+  [data-theme="battle"] .bg-battle-bg {
+    background-color: #101B32 !important;
+  }
+  [data-theme="battle"] .bg-\[\#222F43\],
+  [data-theme="battle"] .bg-battle-surface {
+    background-color: #1C2D4B !important;
+  }
+  [data-theme="battle"] .bg-\[\#2C394C\],
+  [data-theme="battle"] .bg-battle-elevated {
+    background-color: #293D5C !important;
+  }
+  [data-theme="battle"] .border-\[\#39465A\],
+  [data-theme="battle"] .border-battle-border {
+    border-color: #394C69 !important;
+  }
+  [data-theme="battle"] .text-\[\#F5F3EE\],
+  [data-theme="battle"] .text-white {
+    color: #F0F3F8 !important;
+  }
+  [data-theme="battle"] .text-\[\#AEB9CC\],
+  [data-theme="battle"] .text-\[\#7E8B9F\],
+  [data-theme="battle"] .text-battle-muted {
+    color: #B7C3D4 !important;
+  }
+
+  /* 4. CORAL & LAVENDER (Party Arena) */
+  [data-theme="party"] .bg-\[\#111827\],
+  [data-theme="party"] .bg-battle-bg {
+    background-color: #F8F1EB !important;
+  }
+  [data-theme="party"] .bg-\[\#222F43\],
+  [data-theme="party"] .bg-battle-surface {
+    background-color: #FFFFFF !important;
+  }
+  [data-theme="party"] .bg-\[\#2C394C\],
+  [data-theme="party"] .bg-battle-elevated {
+    background-color: #F0E5EC !important;
+  }
+  [data-theme="party"] .border-\[\#39465A\],
+  [data-theme="party"] .border-battle-border {
+    border-color: #E4D6DC !important;
+  }
+  [data-theme="party"] .text-\[\#F5F3EE\],
+  [data-theme="party"] .text-white {
+    color: #342B3B !important;
+  }
+  [data-theme="party"] .text-\[\#AEB9CC\],
+  [data-theme="party"] .text-\[\#7E8B9F\],
+  [data-theme="party"] .text-battle-muted {
+    color: #776B7D !important;
   }
 
   /* Typography utilities */

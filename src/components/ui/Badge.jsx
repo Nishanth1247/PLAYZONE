@@ -16,6 +16,9 @@ const VARIANTS = {
   ivory: 'bg-[#F0EDE5] text-[#111827] border-[#F0EDE5]',
   slate: 'bg-[#2C394C] text-[#AEB9CC] border-[#39465A]',
   forest: 'bg-[#222F43] text-[#91A98B] border-[#39465A]',
+  theme: 'bg-[var(--theme-surface-secondary)] text-[var(--theme-text)] border-[var(--theme-border)]',
+  'theme-accent': 'bg-[var(--theme-accent-primary)]/15 text-[var(--theme-accent-primary)] border-[var(--theme-accent-primary)]/30',
+  'theme-action': 'bg-[var(--theme-accent-action)]/15 text-[var(--theme-accent-action)] border-[var(--theme-accent-action)]/30',
   // Muted franchise color identities
   purple: 'bg-[#8875A8]/15 text-[#8875A8] border-[#8875A8]/30',
   cyan: 'bg-[#71999B]/15 text-[#71999B] border-[#71999B]/30',

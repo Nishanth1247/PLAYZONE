@@ -7,13 +7,16 @@ const VARIANTS = {
   ivory: 'bg-[#F0EDE5] hover:bg-[#E4E0D6] text-[#111827] font-bold border border-[#F0EDE5] shadow-sm',
   danger: 'bg-[#222F43] hover:bg-rose-950/50 text-rose-300 border border-rose-900/40',
   accent: 'bg-[#D97858] hover:bg-[#C86747] text-[#F5F3EE] font-bold border border-[#D97858] shadow-sm',
-  ghost: 'bg-transparent hover:bg-[#2C394C] text-[#AEB9CC] hover:text-[#F5F3EE]',
-  outline: 'bg-transparent hover:bg-[#222F43] border border-[#39465A] text-[#F5F3EE] hover:border-[#4B5A70]',
+  ghost: 'bg-transparent hover:bg-black/5 dark:hover:bg-white/10 text-inherit',
+  outline: 'bg-transparent border border-[var(--theme-border)] text-[var(--theme-text)] hover:bg-[var(--theme-surface-secondary)]',
   sage: 'bg-[#91A98B] hover:bg-[#80997A] text-[#111827] font-bold border border-[#91A98B]',
   champagne: 'bg-[#D4B879] hover:bg-[#C5A866] text-[#111827] font-bold border border-[#D4B879]',
   cyan: 'bg-[#2C394C] hover:bg-[#34445A] text-[#71999B] border border-[#71999B]/40',
   gold: 'bg-[#D4B879] hover:bg-[#C5A866] text-[#111827] font-bold border border-[#D4B879]',
   terracotta: 'bg-[#D97858] hover:bg-[#C86747] text-[#F5F3EE] font-bold border border-[#D97858]',
+  'theme-primary': 'bg-[var(--theme-accent-primary)] hover:opacity-90 text-white font-bold shadow-sm',
+  'theme-action': 'bg-[var(--theme-accent-action)] hover:opacity-90 text-white font-bold shadow-sm',
+  'theme-card': 'bg-[var(--theme-card)] hover:bg-[var(--theme-surface-secondary)] border border-[var(--theme-border)] text-[var(--theme-text)]',
 };
 
 const SIZES = {

@@ -8,6 +8,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        // FOUR DYNAMIC THEMES ARCHITECTURE (Alpine Editorial, Emerald & Ivory, Cobalt & Silver, Coral & Lavender)
+        theme: {
+          bg: 'var(--theme-bg)',
+          card: 'var(--theme-card)',
+          surface: 'var(--theme-surface-secondary)',
+          text: 'var(--theme-text)',
+          muted: 'var(--theme-text-secondary)',
+          border: 'var(--theme-border)',
+          accent: 'var(--theme-accent-primary)',
+          action: 'var(--theme-accent-action)',
+          secondary: 'var(--theme-accent-secondary)',
+        },
+
         // NEW BIDBATTLE DESIGN SYSTEM (MIDNIGHT NAVY & SLATE)
         navy: {
           bg: '#111827',       // Midnight Navy (Main background)

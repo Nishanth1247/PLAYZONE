@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Swords, 
@@ -13,7 +13,9 @@ import {
   CheckCircle2, 
   Layers,
   ArrowRight,
-  BookOpen
+  BookOpen,
+  Calendar,
+  Lock
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -23,13 +25,16 @@ import { franchiseService } from '../../services/franchiseService';
 import { useBattleArena } from '../../context/BattleArenaContext';
 import { storageService } from '../../services/storageService';
 import { BattleImportModal } from './BattleImportModal';
+import { TeamBudgetConfig } from '../setup/TeamBudgetConfig';
 import { openGameRules } from '../rules/GameRules';
 import { toast } from 'sonner';
+
+const BATTLE_SQUAD_PRESETS = [3, 5, 7, 10];
 
 export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   const { initializeBattleTournament } = useBattleArena();
 
-  // Restore team count & selected team IDs independently using franchiseService
+  // 1. Independent team count & franchise selection (saved under 'battle')
   const [selectedTeamIds, setSelectedTeamIds] = useState(() => {
     const saved = franchiseService.getSelectedFranchiseIds('battle');
     if (saved && saved.length >= 2) return saved;
@@ -42,15 +47,23 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
     return saved && saved.length >= 2 ? saved.length : 4;
   });
 
-  // Save battle selection to independent franchiseService storage
-  React.useEffect(() => {
+  // Save battle selection to independent storage
+  useEffect(() => {
     if (selectedTeamIds && selectedTeamIds.length > 0) {
       franchiseService.saveSelectedFranchiseIds('battle', selectedTeamIds);
     }
   }, [selectedTeamIds]);
 
+  // 2. Squad Size Configuration
   const [squadSize, setSquadSize] = useState(3);
+  const [customSquadSize, setCustomSquadSize] = useState('');
+
+  // 3. Independent Starting Purse Configuration
+  const [purseMode, setPurseMode] = useState('equal'); // 'equal' | 'custom'
   const [startingPurse, setStartingPurse] = useState(100);
+  const [configuredTeams, setConfiguredTeams] = useState([]);
+
+  // 4. Tournament Pool & Presets
   const [selectedPresetId, setSelectedPresetId] = useState(AUCTION_PRESETS[0].id);
   const [importedTournament, setImportedTournament] = useState(null);
   const [customFileItems, setCustomFileItems] = useState(null);
@@ -58,7 +71,7 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Selected teams dynamically resolved from franchiseService
-  const activeTeams = React.useMemo(() => {
+  const activeTeams = useMemo(() => {
     return selectedTeamIds
       .map((id) => franchiseService.getFranchiseById(id))
       .filter(Boolean);
@@ -70,8 +83,17 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
   const selectedPreset = AUCTION_PRESETS.find((p) => p.id === selectedPresetId) || AUCTION_PRESETS[0];
   const activePool = importedTournament?.items || customFileItems || selectedPreset.items;
 
+  // Pool capacity validation
   const requiredPoolLots = teamCount * squadSize;
   const isPoolSufficient = activePool.length >= requiredPoolLots;
+
+  // Estimated matches calculation for round-robin
+  const estimatedMatches = useMemo(() => {
+    if (teamCount === 2) return squadSize;
+    if (teamCount === 3) return Math.max(1, Math.floor(squadSize / 2)) * 3;
+    if (teamCount === 4) return (squadSize >= 6 ? Math.floor(squadSize / 3) : 1) * 6;
+    return Math.floor((teamCount * (teamCount - 1)) / 2);
+  }, [teamCount, squadSize]);
 
   const handleStartTournament = () => {
     if (!isSelectionValid) {
@@ -83,10 +105,16 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
       return;
     }
 
+    const finalTeamsToLaunch = configuredTeams.length === teamCount ? configuredTeams : activeTeams.map(t => ({
+      ...t,
+      initialPurse: startingPurse,
+      purse: startingPurse,
+    }));
+
     const success = initializeBattleTournament({
       preset: selectedPreset,
       teamCount,
-      selectedTeams: activeTeams,
+      selectedTeams: finalTeamsToLaunch,
       squadSize,
       startingPurse: Number(startingPurse) || 100,
       customItems: importedTournament?.items || customFileItems,
@@ -94,29 +122,29 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
     });
 
     if (success) {
-      toast.success('Entering Round 1: Team Auction!');
+      toast.success('Entering Round 1: Team Auction (Cobalt & Silver)!');
     }
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#111827] pb-16">
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-[#101B32] text-[#F0F3F8] pb-16">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 space-y-10">
         
         {/* HERO TITLE SECTION */}
         <div className="text-center max-w-3xl mx-auto pt-4 space-y-4">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#222F43] border border-[#39465A] text-xs font-heading font-bold text-[#AEB9CC] shadow-sm">
-            <Swords className="w-4 h-4 text-[#D4B879]" />
-            <span className="text-[#F5F3EE]">Competitive Battle System</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#39465A]" />
-            <span className="text-[#AEB9CC] font-mono tracking-wider">ROUND 1: AUCTION → ROUND 2: BATTLES</span>
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#1C2D4B] border border-[#394C69] text-xs font-heading font-bold text-[#B7C3D4] shadow-sm">
+            <Swords className="w-4 h-4 text-[#6198E8]" />
+            <span className="text-[#F0F3F8]">Competitive Battle Arena</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#394C69]" />
+            <span className="text-[#B7C3D4] font-mono tracking-wider">ROUND 1: AUCTION → ROUND 2: TACTICAL CLASH</span>
           </div>
 
-          <h1 className="font-title text-5xl sm:text-7xl font-black tracking-wider uppercase text-[#F5F3EE] leading-none">
+          <h1 className="font-title text-5xl sm:text-7xl font-black tracking-wider uppercase text-[#F0F3F8] leading-none">
             BATTLE ARENA
           </h1>
 
-          <p className="text-sm sm:text-base text-[#AEB9CC] max-w-2xl mx-auto leading-relaxed">
-            Acquire your superstar roster through a strategic high-stakes auction, then clash head-to-head in tactical arena battles to crown the undisputed champion!
+          <p className="text-sm sm:text-base text-[#B7C3D4] max-w-2xl mx-auto leading-relaxed">
+            Acquire your superstar roster through a strategic blind auction, draft fighters secretly behind the pass-and-play curtain, then clash head-to-head in tactical arena bouts!
           </p>
 
           <div className="flex items-center justify-center gap-3 pt-1">
@@ -132,7 +160,7 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
           </div>
         </div>
 
-        {/* DYNAMIC FRANCHISE SELECTION (STEP 1 & 2) */}
+        {/* 1. DYNAMIC FRANCHISE SELECTION */}
         <div className="max-w-5xl mx-auto">
           <FranchiseSelector
             teamCount={teamCount}
@@ -141,93 +169,118 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
             onSelectedTeamsChange={setSelectedTeamIds}
             arenaType="battle"
             showCountSelector={true}
+            title="1. Select Contending Franchises"
+            description="Choose how many franchises will compete (2, 3, 4, 5, 6, 8, 10+) in this battle tournament."
           />
         </div>
 
-        {/* SETUP CONFIGURATION GRID */}
+        {/* 2. SETUP CONFIGURATION GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-5xl mx-auto">
           
-          {/* LEFT: SQUAD & PURSE SETTINGS (6 COLS) */}
-          <div className="lg:col-span-6 bg-[#222F43] rounded-3xl p-6 sm:p-8 border border-[#39465A] shadow-xl space-y-6">
+          {/* LEFT: SQUAD & INDEPENDENT PURSE CONFIGURATION (6 COLS) */}
+          <div className="lg:col-span-6 bg-[#1C2D4B] rounded-3xl p-6 sm:p-8 border border-[#394C69] shadow-xl space-y-6">
             
             {/* Squad Size Selector */}
             <div>
-              <label className="text-xs font-bold font-heading uppercase text-[#AEB9CC] tracking-wider mb-3 flex items-center justify-between">
-                <span>Required Squad Size Per Team</span>
-                <span className="text-[#F5F3EE] font-mono font-black">{squadSize} Players</span>
+              <label className="text-xs font-bold font-heading uppercase text-[#B7C3D4] tracking-wider mb-3 flex items-center justify-between">
+                <span>2. Required Squad Size Per Team</span>
+                <span className="text-[#F0F3F8] font-mono font-black">{squadSize} Fighters</span>
               </label>
 
               <div className="grid grid-cols-4 gap-2.5">
-                {[3, 5, 8].map((size) => (
+                {BATTLE_SQUAD_PRESETS.map((size) => (
                   <button
                     key={size}
                     type="button"
-                    onClick={() => setSquadSize(size)}
+                    onClick={() => {
+                      setSquadSize(size);
+                      setCustomSquadSize('');
+                    }}
                     className={`py-2.5 rounded-2xl border font-mono text-xs transition-all text-center ${
                       squadSize === size
-                        ? 'bg-[#D97858] text-[#F5F3EE] font-black border-[#D97858]'
-                        : 'bg-[#2C394C] text-[#AEB9CC] hover:text-[#F5F3EE] border-[#39465A]'
+                        ? 'bg-[#6198E8] text-[#101B32] font-black border-[#6198E8]'
+                        : 'bg-[#293D5C] text-[#B7C3D4] hover:text-[#F0F3F8] border-[#394C69]'
                     }`}
                   >
                     <span className="block text-sm font-black">{size} Lots</span>
-                    <span className="text-[10px] font-heading block opacity-80">Equal Squad</span>
+                    <span className="text-[10px] font-heading block opacity-80">Preset</span>
                   </button>
                 ))}
-
-                {/* Custom size input */}
-                <div className="relative">
-                  <input
-                    type="number"
-                    min={2}
-                    max={12}
-                    value={squadSize}
-                    onChange={(e) => setSquadSize(Math.max(2, Math.min(12, Number(e.target.value) || 2)))}
-                    className="w-full h-full py-2 px-2 text-center rounded-2xl bg-[#2C394C] border border-[#39465A] text-[#F5F3EE] text-xs font-mono font-bold focus:border-[#D97858] focus:outline-none"
-                    placeholder="Custom"
-                  />
-                  <span className="text-[9px] text-[#AEB9CC] font-mono block text-center mt-1">
-                    Custom Cap
-                  </span>
-                </div>
               </div>
 
-              <p className="text-[11px] text-[#AEB9CC] mt-2 italic">
-                Every team must acquire exactly {squadSize} players during Round 1 before battles can begin.
-              </p>
+              {/* Custom size input */}
+              <div className="flex items-center gap-2 mt-3">
+                <span className="text-[11px] text-[#B7C3D4] font-heading">Custom squad size:</span>
+                <input
+                  type="number"
+                  min={2}
+                  max={15}
+                  value={customSquadSize}
+                  onChange={(e) => {
+                    setCustomSquadSize(e.target.value);
+                    const val = Number(e.target.value);
+                    if (val >= 2 && val <= 15) setSquadSize(val);
+                  }}
+                  className="w-20 rounded-xl px-2.5 py-1 text-xs font-mono bg-[#293D5C] border border-[#394C69] text-[#F0F3F8] focus:outline-none focus:border-[#6198E8]"
+                  placeholder="e.g. 6"
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-[#293D5C] border border-[#394C69] text-xs mt-3 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[#B7C3D4]">Total Fighters Needed:</span>
+                  <span className="font-mono font-bold text-[#F0F3F8]">{requiredPoolLots} ({teamCount} × {squadSize})</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[#B7C3D4]">Fighter Pool Lots:</span>
+                  <span className={`font-mono font-bold ${isPoolSufficient ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {activePool.length} Lots
+                  </span>
+                </div>
+                {!isPoolSufficient && (
+                  <p className="text-[11px] text-rose-300 font-bold pt-1">
+                    ⚠️ Pool requires at least {requiredPoolLots} fighters!
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Starting Purse Configuration */}
-            <div className="pt-2">
-              <label className="text-xs font-bold font-heading uppercase text-[#A3A3A3] tracking-wider block mb-2 flex items-center justify-between">
-                <span>Equal Starting Purse</span>
-                <span className="text-[#F2F2F0] font-mono font-bold">₹{startingPurse} Cr / Team</span>
+            {/* Starting Purse Configuration (Independent from Auction) */}
+            <div className="pt-2 border-t border-[#394C69]">
+              <label className="text-xs font-bold font-heading uppercase text-[#B7C3D4] tracking-wider mb-2 flex items-center justify-between">
+                <span>3. Franchise Purse Budget</span>
+                <span className="text-[#6198E8] font-mono font-bold">₹{startingPurse} Cr / Team</span>
               </label>
 
-              <div className="grid grid-cols-3 gap-2">
-                {[50, 100, 150].map((amount) => (
+              <div className="grid grid-cols-4 gap-2">
+                {[50, 75, 100, 150].map((amount) => (
                   <button
                     key={amount}
                     type="button"
                     onClick={() => setStartingPurse(amount)}
                     className={`py-2 rounded-xl border font-mono text-xs transition-all ${
                       startingPurse === amount
-                        ? 'bg-[#F2F2F0] text-[#090909] font-black border-[#F2F2F0]'
-                        : 'bg-[#111111] text-[#A3A3A3] hover:text-[#F2F2F0] border-[#303030]'
+                        ? 'bg-[#6198E8] text-[#101B32] font-black border-[#6198E8]'
+                        : 'bg-[#293D5C] text-[#B7C3D4] hover:text-[#F0F3F8] border-[#394C69]'
                     }`}
                   >
                     ₹{amount} Cr
                   </button>
                 ))}
               </div>
+
+              <p className="text-[11px] text-[#B7C3D4] mt-2 italic">
+                Independent Battle budget used exclusively for Round 1 auction bidding.
+              </p>
             </div>
 
           </div>
 
           {/* RIGHT: TOURNAMENT ROSTER SELECTION (6 COLS) */}
-          <div className="lg:col-span-6 battle-panel rounded-3xl p-6 sm:p-8 border border-brand-purple/40 shadow-xl space-y-6 flex flex-col justify-between">
+          <div className="lg:col-span-6 bg-[#1C2D4B] rounded-3xl p-6 sm:p-8 border border-[#394C69] shadow-xl space-y-6 flex flex-col justify-between">
             <div className="space-y-4">
-              <label className="text-xs font-bold font-broadcast uppercase text-battle-muted tracking-wider block">
-                4. Select Tournament Roster
+              <label className="text-xs font-bold font-heading uppercase text-[#B7C3D4] tracking-wider block">
+                4. Select Fighter Pool
               </label>
 
               {/* Preset Cards Selector */}
@@ -246,131 +299,66 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
                       }}
                       className={`w-full p-3 rounded-2xl border text-left transition-all flex items-center justify-between ${
                         isSelected
-                          ? 'bg-battle-surface border-brand-purple shadow-glow-purple'
-                          : 'bg-battle-surface/40 border-battle-border hover:border-battle-borderLight text-battle-muted hover:text-white'
+                          ? 'bg-[#293D5C] border-[#6198E8] shadow-sm'
+                          : 'bg-[#101B32] border-[#394C69] hover:border-[#6198E8]/50 text-[#B7C3D4] hover:text-[#F0F3F8]'
                       }`}
                     >
-                      <div className="min-w-0 pr-2">
-                        <h4 className="font-broadcast font-bold text-xs text-white truncate">
+                      <div>
+                        <span className="font-heading font-bold text-xs text-[#F0F3F8] block">
                           {preset.name}
-                        </h4>
-                        <span className="text-[10px] font-mono text-battle-muted block">
-                          {preset.category} • {preset.items.length} Entries
+                        </span>
+                        <span className="text-[10px] text-[#B7C3D4] block">
+                          {preset.category} • {preset.items.length} Fighters Available
                         </span>
                       </div>
-                      {isSelected && (
-                        <CheckCircle2 className="w-4 h-4 text-brand-purple flex-shrink-0" />
-                      )}
+                      <Badge variant={isSelected ? 'theme-accent' : 'outline'} className="text-[9px]">
+                        {isSelected ? 'ACTIVE' : 'SELECT'}
+                      </Badge>
                     </button>
                   );
                 })}
               </div>
 
-              {/* Dedicated Import Tournament Button */}
-              <div className="pt-2 border-t border-battle-border/60 space-y-2">
-                <button
-                  type="button"
-                  onClick={() => setIsImportModalOpen(true)}
-                  className="w-full py-3 px-4 rounded-2xl border border-dashed border-brand-orange/60 hover:border-brand-orange bg-battle-bg/80 hover:bg-brand-orange/10 transition-all flex items-center justify-between text-left group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-battle-surface border border-brand-orange/40 flex items-center justify-center text-brand-orange shadow-sm group-hover:scale-105 transition-transform">
-                      <Upload className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-broadcast font-bold text-white block">
-                        Import Tournament JSON
-                      </span>
-                      <span className="text-[10px] text-battle-muted font-mono block">
-                        Upload custom player roster (.json)
-                      </span>
-                    </div>
-                  </div>
-                  <Badge variant="orange" className="text-[10px]">
-                    IMPORT
-                  </Badge>
-                </button>
-
-                {/* Active Imported Tournament Card */}
-                {importedTournament && (
-                  <div className="p-3.5 rounded-2xl border-2 border-brand-orange bg-brand-orange/10 relative shadow-glow-orange space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Badge variant="orange" className="text-[9px]">
-                        ACTIVE IMPORTED TOURNAMENT
-                      </Badge>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setImportedTournament(null);
-                          setCustomFileItems(null);
-                          setCustomTournamentName('');
-                        }}
-                        className="text-[10px] text-battle-muted hover:text-rose-400 font-mono transition-colors"
-                      >
-                        Revert to Preset
-                      </button>
-                    </div>
-                    <div>
-                      <h4 className="font-broadcast font-bold text-sm text-white truncate">
-                        {importedTournament.name}
-                      </h4>
-                      <p className="text-[11px] text-battle-muted font-mono truncate">
-                        {importedTournament.category} • {importedTournament.items.length} Entries
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between pt-1 border-t border-brand-orange/20">
-                      <span className="text-[10px] text-brand-orange font-mono font-medium">
-                        ✓ Loaded for Round 1 Auction
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setIsImportModalOpen(true)}
-                        className="text-[10px] text-brand-cyan hover:underline font-mono font-bold"
-                      >
-                        Re-import / Replace
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Pool Validation Status Card */}
-              <div className={`p-4 rounded-2xl border text-xs font-mono ${
-                isPoolSufficient
-                  ? 'bg-emerald-950/30 border-emerald-800 text-emerald-300'
-                  : 'bg-rose-950/40 border-rose-800 text-rose-300'
-              }`}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold">Lot Pool Status:</span>
-                  <span>{activePool.length} Lots Available</span>
-                </div>
-                <p className="text-[11px] opacity-90">
-                  {isPoolSufficient
-                    ? `✓ Pool verified. Requires ${requiredPoolLots} sold lots for ${teamCount} teams.`
-                    : `⚠️ Deficit! Requires at least ${requiredPoolLots} lots (Need +${requiredPoolLots - activePool.length} more).`}
-                </p>
-              </div>
-            </div>
-
-            {/* Launch Round 1 Auction Button */}
-            <div className="pt-4 space-y-2">
-              {!isSelectionValid && (
-                <div className="p-3 rounded-xl bg-[#2C394C] border border-[#39465A] text-[#AEB9CC] text-xs font-heading font-bold flex items-center gap-1.5">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-[#D97858]" />
-                  <span>Select exactly {teamCount} franchises to start ({selectedTeamIds.length}/{teamCount} selected).</span>
-                </div>
-              )}
-              <Button
-                variant="primary"
-                size="xl"
-                disabled={!isPoolSufficient || !isSelectionValid}
-                onClick={handleStartTournament}
-                className="w-full font-heading text-base font-black flex items-center justify-center gap-2 shadow-lg"
+              {/* Custom JSON Import Action */}
+              <button
+                type="button"
+                onClick={() => setIsImportModalOpen(true)}
+                className="w-full py-2.5 rounded-xl border border-dashed border-[#6198E8]/40 hover:border-[#6198E8] text-[#6198E8] text-xs font-heading font-bold flex items-center justify-center gap-1.5 transition-colors"
               >
-                <Play className="w-5 h-5 fill-current" />
-                <span>START ROUND 1: TEAM AUCTION</span>
-              </Button>
+                <Upload className="w-3.5 h-3.5" />
+                <span>Upload Custom JSON / TXT Roster</span>
+              </button>
             </div>
+
+            {/* PRE-LAUNCH REVIEW SUMMARY (PART 6.1.E) */}
+            <div className="p-4 rounded-2xl bg-[#101B32] border border-[#394C69] space-y-2">
+              <span className="text-[11px] font-heading font-bold text-[#F0F3F8] uppercase tracking-wider block">
+                Tournament Pre-Launch Preview:
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-xs text-[#B7C3D4] font-mono">
+                <div>• Contenders: <strong className="text-[#F0F3F8]">{teamCount} Teams</strong></div>
+                <div>• Squad Target: <strong className="text-[#F0F3F8]">{squadSize} Lots</strong></div>
+                <div>• Est. Matches: <strong className="text-[#6198E8]">~{estimatedMatches} Bouts</strong></div>
+                <div>• Team Purse: <strong className="text-[#C5A46D]">₹{startingPurse} Cr</strong></div>
+              </div>
+
+              <div className="pt-2 border-t border-[#394C69]/60 flex items-center justify-between text-[11px]">
+                <span className="text-[#B7C3D4]">Rating Concealment:</span>
+                <span className="text-emerald-400 font-bold">Encrypted until bout reveal</span>
+              </div>
+            </div>
+
+            {/* LAUNCH BUTTON */}
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handleStartTournament}
+              disabled={!isSelectionValid || !isPoolSufficient}
+              className="w-full py-3.5 bg-[#6198E8] hover:bg-[#4d86db] text-[#101B32] font-black uppercase tracking-wider text-sm shadow-xl shadow-[#6198E8]/20"
+            >
+              <Swords className="w-5 h-5 mr-1" />
+              <span>Launch Battle Tournament</span>
+            </Button>
 
           </div>
 
@@ -378,28 +366,16 @@ export const BattleArenaHome = ({ onSwitchToAuction, onSwitchToParty }) => {
 
       </div>
 
-      {/* Battle Tournament Import Modal */}
+      {/* Battle Import Modal */}
       <BattleImportModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}
-        teamCount={teamCount}
-        squadSize={squadSize}
-        onImportSuccess={({ tournament, items, runtimeConfig }) => {
-          setImportedTournament(tournament);
-          setCustomFileItems(items);
-          setCustomTournamentName(tournament.name);
-          if (runtimeConfig) {
-            if (runtimeConfig.teams && runtimeConfig.teams.length >= 2 && runtimeConfig.teams.length <= 4) {
-              setTeamCount(runtimeConfig.teams.length);
-              setSelectedTeamIds(runtimeConfig.teams.map((t) => t.id));
-            }
-            if (runtimeConfig.squadSize) {
-              setSquadSize(runtimeConfig.squadSize);
-            }
-            if (runtimeConfig.teamBudgets?.defaultPurse) {
-              setStartingPurse(runtimeConfig.teamBudgets.defaultPurse);
-            }
-          }
+        onImportSuccess={(customItems, name, parsedTournament) => {
+          setCustomFileItems(customItems);
+          setCustomTournamentName(name || 'Custom Roster');
+          setImportedTournament(parsedTournament || null);
+          setIsImportModalOpen(false);
+          toast.success(`Imported ${customItems.length} custom fighters!`);
         }}
       />
     </div>
